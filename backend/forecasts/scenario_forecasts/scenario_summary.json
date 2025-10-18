@@ -1,0 +1,62 @@
+{
+    "forecast_period": {
+        "start_date": "2026-01",
+        "end_date": "2030-12",
+        "total_months": 60
+    },
+    "scenario_summary": {
+        "baseline": {
+            "total_2026_2030": 17078035,
+            "mean_monthly": 284633.9181818717,
+            "median_monthly": 289427.63649806153,
+            "min_monthly": 262747,
+            "max_monthly": 290949,
+            "std_monthly": 7615.698934533613
+        },
+        "optimistic": {
+            "total_2026_2030": 17342608,
+            "mean_monthly": 289043.46922642546,
+            "median_monthly": 290729.62446279894,
+            "min_monthly": 262716,
+            "max_monthly": 299901,
+            "std_monthly": 8326.241679059718
+        },
+        "pessimistic": {
+            "total_2026_2030": 16659245,
+            "mean_monthly": 277654.0917612886,
+            "median_monthly": 278816.05802217906,
+            "min_monthly": 252249,
+            "max_monthly": 290601,
+            "std_monthly": 8358.788281803501
+        }
+    },
+    "scenario_comparison": {
+        "upside_potential_percent": 1.5492008375952613,
+        "downside_risk_percent": -2.4522117621004083,
+        "range_total_arrivals": 683362,
+        "range_percent_of_baseline": 4.001412599695669
+    },
+    "annual_breakdowns": {
+        "baseline": {
+            "2026": 3412336,
+            "2027": 3413264,
+            "2028": 3423565,
+            "2029": 3414161,
+            "2030": 3414707
+        },
+        "optimistic": {
+            "2026": 3420398,
+            "2027": 3443802,
+            "2028": 3476671,
+            "2029": 3489469,
+            "2030": 3512266
+        },
+        "pessimistic": {
+            "2026": 3398185,
+            "2027": 3364468,
+            "2028": 3339746,
+            "2029": 3295661,
+            "2030": 3261182
+        }
+    }
+}

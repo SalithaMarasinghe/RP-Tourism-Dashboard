@@ -1,0 +1,1442 @@
+[
+    {
+        "date": "2026-01",
+        "scenario": "Baseline",
+        "total_forecast": 290498,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215589,
+                "percentage": 74.21362730914932,
+                "raw_prediction": 375228
+            },
+            "tsformer": {
+                "absolute": 74909,
+                "percentage": 25.786373615310833,
+                "raw_prediction": 176072
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 0.14972830385262537,
+            "exchange_rates": 0.01642710472280484,
+            "events": 0.25806451612903225,
+            "weather": -7.9459676160885895,
+            "google_trends": 1.2199228692577169
+        }
+    },
+    {
+        "date": "2026-02",
+        "scenario": "Baseline",
+        "total_forecast": 262792,
+        "model_contributions": {
+            "svr": {
+                "absolute": 194876,
+                "percentage": 74.15596520507877,
+                "raw_prediction": 339177
+            },
+            "tsformer": {
+                "absolute": 67916,
+                "percentage": 25.844035723945126,
+                "raw_prediction": 159635
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 0.424131802693295,
+            "exchange_rates": 0.048733744010975855,
+            "events": 0.0,
+            "weather": -9.042686333525452,
+            "google_trends": 1.6973857858122665
+        }
+    },
+    {
+        "date": "2026-03",
+        "scenario": "Baseline",
+        "total_forecast": 290727,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215715,
+                "percentage": 74.19850629979078,
+                "raw_prediction": 375448
+            },
+            "tsformer": {
+                "absolute": 75012,
+                "percentage": 25.801493112379674,
+                "raw_prediction": 176314
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 0.6993117467956056,
+            "exchange_rates": 0.08104038329912466,
+            "events": 0.0,
+            "weather": -4.048278099889457,
+            "google_trends": 2.177139291717234
+        }
+    },
+    {
+        "date": "2026-04",
+        "scenario": "Baseline",
+        "total_forecast": 280699,
+        "model_contributions": {
+            "svr": {
+                "absolute": 208664,
+                "percentage": 74.33729974696323,
+                "raw_prediction": 363175
+            },
+            "tsformer": {
+                "absolute": 72035,
+                "percentage": 25.662699296302417,
+                "raw_prediction": 169317
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 0.9846159166664759,
+            "exchange_rates": 0.11444216290215081,
+            "events": 0.0,
+            "weather": 2.2921535980935603,
+            "google_trends": 2.675508786222447
+        }
+    },
+    {
+        "date": "2026-05",
+        "scenario": "Baseline",
+        "total_forecast": 289707,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215761,
+                "percentage": 74.4754538400235,
+                "raw_prediction": 375527
+            },
+            "tsformer": {
+                "absolute": 73946,
+                "percentage": 25.524545317263115,
+                "raw_prediction": 173810
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 1.2707453417482695,
+            "exchange_rates": 0.14784394250517696,
+            "events": 0.5161290322580645,
+            "weather": 11.260238235510567,
+            "google_trends": 3.1763224285346725
+        }
+    },
+    {
+        "date": "2026-06",
+        "scenario": "Baseline",
+        "total_forecast": 279967,
+        "model_contributions": {
+            "svr": {
+                "absolute": 208626,
+                "percentage": 74.51823218090966,
+                "raw_prediction": 363109
+            },
+            "tsformer": {
+                "absolute": 71340,
+                "percentage": 25.481766859853728,
+                "raw_prediction": 167684
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 1.5576934001551468,
+            "exchange_rates": 0.1812457221081587,
+            "events": 0.26666666666666666,
+            "weather": 9.153185543162735,
+            "google_trends": 3.679565443655819
+        }
+    },
+    {
+        "date": "2026-07",
+        "scenario": "Baseline",
+        "total_forecast": 289403,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215627,
+                "percentage": 74.50741001463611,
+                "raw_prediction": 375294
+            },
+            "tsformer": {
+                "absolute": 73776,
+                "percentage": 25.492588973045333,
+                "raw_prediction": 173410
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 1.8454714687948126,
+            "exchange_rates": 0.21464750171118485,
+            "events": 0.0,
+            "weather": 5.2890863194377635,
+            "google_trends": 4.185276507735325
+        }
+    },
+    {
+        "date": "2026-08",
+        "scenario": "Baseline",
+        "total_forecast": 289658,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215804,
+                "percentage": 74.50307633953979,
+                "raw_prediction": 375602
+            },
+            "tsformer": {
+                "absolute": 73853,
+                "percentage": 25.496924671889648,
+                "raw_prediction": 173592
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 2.1388132744952992,
+            "exchange_rates": 0.24859685147162747,
+            "events": 0.0,
+            "weather": 5.664130864285877,
+            "google_trends": 4.701798761917808
+        }
+    },
+    {
+        "date": "2026-09",
+        "scenario": "Baseline",
+        "total_forecast": 280291,
+        "model_contributions": {
+            "svr": {
+                "absolute": 208798,
+                "percentage": 74.49322623768083,
+                "raw_prediction": 363408
+            },
+            "tsformer": {
+                "absolute": 71493,
+                "percentage": 25.506772455784127,
+                "raw_prediction": 168043
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 2.428258573063946,
+            "exchange_rates": 0.2819986310746314,
+            "events": 0.0,
+            "weather": 8.341831880569138,
+            "google_trends": 5.212482295284193
+        }
+    },
+    {
+        "date": "2026-10",
+        "scenario": "Baseline",
+        "total_forecast": 289757,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215799,
+                "percentage": 74.4758096267775,
+                "raw_prediction": 375593
+            },
+            "tsformer": {
+                "absolute": 73958,
+                "percentage": 25.524189867681567,
+                "raw_prediction": 173837
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 2.7185411052453867,
+            "exchange_rates": 0.31540041067763536,
+            "events": 0.25806451612903225,
+            "weather": 12.637961874222881,
+            "google_trends": 5.725670368057423
+        }
+    },
+    {
+        "date": "2026-11",
+        "scenario": "Baseline",
+        "total_forecast": 280666,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209005,
+                "percentage": 74.46745187167649,
+                "raw_prediction": 363768
+            },
+            "tsformer": {
+                "absolute": 71661,
+                "percentage": 25.53254743243477,
+                "raw_prediction": 168438
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 3.009654153038732,
+            "exchange_rates": 0.3488021902806615,
+            "events": 0.0,
+            "weather": 12.517197233997068,
+            "google_trends": 6.241347840169098
+        }
+    },
+    {
+        "date": "2026-12",
+        "scenario": "Baseline",
+        "total_forecast": 290559,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216074,
+                "percentage": 74.36499218553342,
+                "raw_prediction": 376072
+            },
+            "tsformer": {
+                "absolute": 74485,
+                "percentage": 25.63500848666058,
+                "raw_prediction": 175075
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 3.301609258484972,
+            "exchange_rates": 0.38220396988366545,
+            "events": 0.0,
+            "weather": 2.41586962814635,
+            "google_trends": 6.759554343404206
+        }
+    },
+    {
+        "date": "2027-01",
+        "scenario": "Baseline",
+        "total_forecast": 290646,
+        "model_contributions": {
+            "svr": {
+                "absolute": 215702,
+                "percentage": 74.21465305676335,
+                "raw_prediction": 375424
+            },
+            "tsformer": {
+                "absolute": 74944,
+                "percentage": 25.785346271243387,
+                "raw_prediction": 176154
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 3.5992088574395176,
+            "exchange_rates": 0.41615331964408586,
+            "events": 0.0,
+            "weather": -7.9459676160885895,
+            "google_trends": 7.288839166686123
+        }
+    },
+    {
+        "date": "2027-02",
+        "scenario": "Baseline",
+        "total_forecast": 263178,
+        "model_contributions": {
+            "svr": {
+                "absolute": 195331,
+                "percentage": 74.22002626224527,
+                "raw_prediction": 339969
+            },
+            "tsformer": {
+                "absolute": 67847,
+                "percentage": 25.779974479883077,
+                "raw_prediction": 159474
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 3.883209791434772,
+            "exchange_rates": 0.44845995893223467,
+            "events": 0.2857142857142857,
+            "weather": -9.042686333525452,
+            "google_trends": 7.794929673477369
+        }
+    },
+    {
+        "date": "2027-03",
+        "scenario": "Baseline",
+        "total_forecast": 291053,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216094,
+                "percentage": 74.24568741843764,
+                "raw_prediction": 376107
+            },
+            "tsformer": {
+                "absolute": 74958,
+                "percentage": 25.754311826626143,
+                "raw_prediction": 176189
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 4.1680143273536086,
+            "exchange_rates": 0.4807665982204057,
+            "events": 0.0,
+            "weather": -4.048278099889457,
+            "google_trends": 8.303448108145407
+        }
+    },
+    {
+        "date": "2027-04",
+        "scenario": "Baseline",
+        "total_forecast": 281129,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209149,
+                "percentage": 74.39633106218125,
+                "raw_prediction": 364020
+            },
+            "tsformer": {
+                "absolute": 71979,
+                "percentage": 25.603670240460634,
+                "raw_prediction": 169186
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 4.46329719021219,
+            "exchange_rates": 0.5141683778234096,
+            "events": 0.0,
+            "weather": 2.2921535980935603,
+            "google_trends": 8.8316987037383
+        }
+    },
+    {
+        "date": "2027-05",
+        "scenario": "Baseline",
+        "total_forecast": 290081,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216208,
+                "percentage": 74.53370792791864,
+                "raw_prediction": 376305
+            },
+            "tsformer": {
+                "absolute": 73873,
+                "percentage": 25.46629224040687,
+                "raw_prediction": 173637
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 4.759434172102273,
+            "exchange_rates": 0.547570157426458,
+            "events": 0.5161290322580645,
+            "weather": 11.260238235510567,
+            "google_trends": 9.362539992680219
+        }
+    },
+    {
+        "date": "2027-06",
+        "scenario": "Baseline",
+        "total_forecast": 280449,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209174,
+                "percentage": 74.58542472356025,
+                "raw_prediction": 364062
+            },
+            "tsformer": {
+                "absolute": 71274,
+                "percentage": 25.4145744059057,
+                "raw_prediction": 167530
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 5.056418419533459,
+            "exchange_rates": 0.5809719370294397,
+            "events": 0.26666666666666666,
+            "weather": 9.153185543162735,
+            "google_trends": 9.895956314097809
+        }
+    },
+    {
+        "date": "2027-07",
+        "scenario": "Baseline",
+        "total_forecast": 289904,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216176,
+                "percentage": 74.56829610161145,
+                "raw_prediction": 376250
+            },
+            "tsformer": {
+                "absolute": 73727,
+                "percentage": 25.431703308889354,
+                "raw_prediction": 173295
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 5.354261707327956,
+            "exchange_rates": 0.6143737166324437,
+            "events": 0.0,
+            "weather": 5.2890863194377635,
+            "google_trends": 10.43198866307442
+        }
+    },
+    {
+        "date": "2027-08",
+        "scenario": "Baseline",
+        "total_forecast": 290041,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216254,
+                "percentage": 74.55985855715144,
+                "raw_prediction": 376385
+            },
+            "tsformer": {
+                "absolute": 73786,
+                "percentage": 25.440141695371736,
+                "raw_prediction": 173434
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 5.657863327390289,
+            "exchange_rates": 0.6483230663929085,
+            "events": 0.0,
+            "weather": 5.664130864285877,
+            "google_trends": 10.979480416516862
+        }
+    },
+    {
+        "date": "2027-09",
+        "scenario": "Baseline",
+        "total_forecast": 280722,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209286,
+                "percentage": 74.5529298688431,
+                "raw_prediction": 364258
+            },
+            "tsformer": {
+                "absolute": 71435,
+                "percentage": 25.44706900056235,
+                "raw_prediction": 167907
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 5.957432157530307,
+            "exchange_rates": 0.6817248459959346,
+            "events": 0.0,
+            "weather": 8.341831880569138,
+            "google_trends": 11.520783372726328
+        }
+    },
+    {
+        "date": "2027-10",
+        "scenario": "Baseline",
+        "total_forecast": 290333,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216439,
+                "percentage": 74.54870554125903,
+                "raw_prediction": 376707
+            },
+            "tsformer": {
+                "absolute": 73893,
+                "percentage": 25.45129496328011,
+                "raw_prediction": 173685
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 6.257867504055992,
+            "exchange_rates": 0.7151266255989386,
+            "events": 0.25806451612903225,
+            "weather": 12.637961874222881,
+            "google_trends": 12.06474103482753
+        }
+    },
+    {
+        "date": "2027-11",
+        "scenario": "Baseline",
+        "total_forecast": 280943,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209358,
+                "percentage": 74.51966944113944,
+                "raw_prediction": 364383
+            },
+            "tsformer": {
+                "absolute": 71585,
+                "percentage": 25.480330558860558,
+                "raw_prediction": 168260
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 6.559162413999986,
+            "exchange_rates": 0.7485284052019203,
+            "events": 0.26666666666666666,
+            "weather": 12.517197233997068,
+            "google_trends": 12.611337354988073
+        }
+    },
+    {
+        "date": "2027-12",
+        "scenario": "Baseline",
+        "total_forecast": 291021,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216586,
+                "percentage": 74.42299045750185,
+                "raw_prediction": 376963
+            },
+            "tsformer": {
+                "absolute": 74434,
+                "percentage": 25.577009626389174,
+                "raw_prediction": 174956
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 6.861328833093472,
+            "exchange_rates": 0.7819301848049687,
+            "events": 0.0,
+            "weather": 2.41586962814635,
+            "google_trends": 13.160614341224663
+        }
+    },
+    {
+        "date": "2028-01",
+        "scenario": "Baseline",
+        "total_forecast": 291078,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216229,
+                "percentage": 74.28572762174387,
+                "raw_prediction": 376343
+            },
+            "tsformer": {
+                "absolute": 74848,
+                "percentage": 25.714273300875128,
+                "raw_prediction": 175930
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 7.169337165409906,
+            "exchange_rates": 0.8158795345654113,
+            "events": 0.0,
+            "weather": -7.9459676160885895,
+            "google_trends": 13.721633878374572
+        }
+    },
+    {
+        "date": "2028-02",
+        "scenario": "Baseline",
+        "total_forecast": 272888,
+        "model_contributions": {
+            "svr": {
+                "absolute": 202666,
+                "percentage": 74.26708107232996,
+                "raw_prediction": 352735
+            },
+            "tsformer": {
+                "absolute": 70222,
+                "percentage": 25.73291874873914,
+                "raw_prediction": 165055
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 7.468262535066517,
+            "exchange_rates": 0.8487337440109544,
+            "events": 0.0,
+            "weather": -9.042686333525452,
+            "google_trends": 14.267189575766515
+        }
+    },
+    {
+        "date": "2028-03",
+        "scenario": "Baseline",
+        "total_forecast": 291494,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216588,
+                "percentage": 74.30273190815076,
+                "raw_prediction": 376966
+            },
+            "tsformer": {
+                "absolute": 74906,
+                "percentage": 25.697267840584608,
+                "raw_prediction": 176065
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 7.768043148015313,
+            "exchange_rates": 0.8815879534565862,
+            "events": 0.25806451612903225,
+            "weather": -4.048278099889457,
+            "google_trends": 14.815391683117806
+        }
+    },
+    {
+        "date": "2028-04",
+        "scenario": "Baseline",
+        "total_forecast": 281668,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209756,
+                "percentage": 74.46909283772204,
+                "raw_prediction": 365075
+            },
+            "tsformer": {
+                "absolute": 71912,
+                "percentage": 25.530907855690316,
+                "raw_prediction": 169029
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 8.073682500516322,
+            "exchange_rates": 0.914989733059568,
+            "events": 0.0,
+            "weather": 2.2921535980935603,
+            "google_trends": 15.375404315211295
+        }
+    },
+    {
+        "date": "2028-05",
+        "scenario": "Baseline",
+        "total_forecast": 290275,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216466,
+                "percentage": 74.5729235022592,
+                "raw_prediction": 376755
+            },
+            "tsformer": {
+                "absolute": 73808,
+                "percentage": 25.427077254699622,
+                "raw_prediction": 173485
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 8.380205928663331,
+            "exchange_rates": 0.9483915126625719,
+            "events": 0.0,
+            "weather": 11.260238235510567,
+            "google_trends": 15.938163410845796
+        }
+    },
+    {
+        "date": "2028-06",
+        "scenario": "Baseline",
+        "total_forecast": 280832,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209595,
+                "percentage": 74.63344216586934,
+                "raw_prediction": 364795
+            },
+            "tsformer": {
+                "absolute": 71237,
+                "percentage": 25.366557747196094,
+                "raw_prediction": 167442
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 8.68760633859278,
+            "exchange_rates": 0.9817932922655759,
+            "events": 0.26666666666666666,
+            "weather": 9.153185543162735,
+            "google_trends": 16.503652367509215
+        }
+    },
+    {
+        "date": "2028-07",
+        "scenario": "Baseline",
+        "total_forecast": 290356,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216692,
+                "percentage": 74.62989029737074,
+                "raw_prediction": 377148
+            },
+            "tsformer": {
+                "absolute": 73663,
+                "percentage": 25.370108945881796,
+                "raw_prediction": 173145
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 8.995895918106477,
+            "exchange_rates": 1.015195071868602,
+            "events": 0.0,
+            "weather": 5.2890863194377635,
+            "google_trends": 17.07191464518958
+        }
+    },
+    {
+        "date": "2028-08",
+        "scenario": "Baseline",
+        "total_forecast": 290339,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216616,
+                "percentage": 74.60808079231238,
+                "raw_prediction": 377015
+            },
+            "tsformer": {
+                "absolute": 73722,
+                "percentage": 25.391919039511464,
+                "raw_prediction": 173283
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 9.310145792534662,
+            "exchange_rates": 1.0491444216290446,
+            "events": 0.0,
+            "weather": 5.664130864285877,
+            "google_trends": 17.652325345059474
+        }
+    },
+    {
+        "date": "2028-09",
+        "scenario": "Baseline",
+        "total_forecast": 281153,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209762,
+                "percentage": 74.60775701627907,
+                "raw_prediction": 365086
+            },
+            "tsformer": {
+                "absolute": 71391,
+                "percentage": 25.392242115366514,
+                "raw_prediction": 167803
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 9.620221434538067,
+            "exchange_rates": 1.0825462012320486,
+            "events": 0.26666666666666666,
+            "weather": 8.341831880569138,
+            "google_trends": 18.22617513490512
+        }
+    },
+    {
+        "date": "2028-10",
+        "scenario": "Baseline",
+        "total_forecast": 290573,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216766,
+                "percentage": 74.59939810731355,
+                "raw_prediction": 377276
+            },
+            "tsformer": {
+                "absolute": 73807,
+                "percentage": 25.400602564847624,
+                "raw_prediction": 173483
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 9.931193984355469,
+            "exchange_rates": 1.115947980835097,
+            "events": 0.0,
+            "weather": 12.637961874222881,
+            "google_trends": 18.80283924970618
+        }
+    },
+    {
+        "date": "2028-11",
+        "scenario": "Baseline",
+        "total_forecast": 281376,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209841,
+                "percentage": 74.57687063227732,
+                "raw_prediction": 365224
+            },
+            "tsformer": {
+                "absolute": 71534,
+                "percentage": 25.42313040892144,
+                "raw_prediction": 168140
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 10.243056245157334,
+            "exchange_rates": 1.1493497604380787,
+            "events": 0.0,
+            "weather": 12.517197233997068,
+            "google_trends": 19.382300676724817
+        }
+    },
+    {
+        "date": "2028-12",
+        "scenario": "Baseline",
+        "total_forecast": 291595,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217205,
+                "percentage": 74.48846581284523,
+                "raw_prediction": 378040
+            },
+            "tsformer": {
+                "absolute": 74390,
+                "percentage": 25.511533349897004,
+                "raw_prediction": 174853
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 10.555820581648856,
+            "exchange_rates": 1.1827515400410604,
+            "events": 0.0,
+            "weather": 2.41586962814635,
+            "google_trends": 19.964603949786806
+        }
+    },
+    {
+        "date": "2029-01",
+        "scenario": "Baseline",
+        "total_forecast": 291510,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216784,
+                "percentage": 74.36578281374636,
+                "raw_prediction": 377307
+            },
+            "tsformer": {
+                "absolute": 74726,
+                "percentage": 25.634217270003845,
+                "raw_prediction": 175643
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 10.874631725454353,
+            "exchange_rates": 1.2167008898015252,
+            "events": 0.25806451612903225,
+            "weather": -7.9459676160885895,
+            "google_trends": 20.559355816185644
+        }
+    },
+    {
+        "date": "2029-02",
+        "scenario": "Baseline",
+        "total_forecast": 263797,
+        "model_contributions": {
+            "svr": {
+                "absolute": 196047,
+                "percentage": 74.31726037436958,
+                "raw_prediction": 341215
+            },
+            "tsformer": {
+                "absolute": 67750,
+                "percentage": 25.682740180921122,
+                "raw_prediction": 159246
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 11.178874953358342,
+            "exchange_rates": 1.249007529089674,
+            "events": 0.0,
+            "weather": -9.042686333525452,
+            "google_trends": 21.128044469705777
+        }
+    },
+    {
+        "date": "2029-03",
+        "scenario": "Baseline",
+        "total_forecast": 291816,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216988,
+                "percentage": 74.35772317710743,
+                "raw_prediction": 377663
+            },
+            "tsformer": {
+                "absolute": 74828,
+                "percentage": 25.642275484295908,
+                "raw_prediction": 175882
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 11.483979060273297,
+            "exchange_rates": 1.2813141683778229,
+            "events": 0.0,
+            "weather": -4.048278099889457,
+            "google_trends": 21.69946136059957
+        }
+    },
+    {
+        "date": "2029-04",
+        "scenario": "Baseline",
+        "total_forecast": 281838,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209994,
+                "percentage": 74.50893297202134,
+                "raw_prediction": 365491
+            },
+            "tsformer": {
+                "absolute": 71843,
+                "percentage": 25.491065728614647,
+                "raw_prediction": 168867
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 11.800308341578813,
+            "exchange_rates": 1.314715947980849,
+            "events": 0.0,
+            "weather": 2.2921535980935603,
+            "google_trends": 22.293051076070824
+        }
+    },
+    {
+        "date": "2029-05",
+        "scenario": "Baseline",
+        "total_forecast": 290619,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216871,
+                "percentage": 74.62375035825252,
+                "raw_prediction": 377459
+            },
+            "tsformer": {
+                "absolute": 73748,
+                "percentage": 25.376250565823984,
+                "raw_prediction": 173344
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 12.117552619632765,
+            "exchange_rates": 1.3481177275838307,
+            "events": 0.25806451612903225,
+            "weather": 11.260238235510567,
+            "google_trends": 22.889551926788833
+        }
+    },
+    {
+        "date": "2029-06",
+        "scenario": "Baseline",
+        "total_forecast": 281169,
+        "model_contributions": {
+            "svr": {
+                "absolute": 209993,
+                "percentage": 74.68563335834317,
+                "raw_prediction": 365488
+            },
+            "tsformer": {
+                "absolute": 71176,
+                "percentage": 25.314367770451884,
+                "raw_prediction": 167298
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 12.435704552459171,
+            "exchange_rates": 1.381519507186879,
+            "events": 0.26666666666666666,
+            "weather": 9.153185543162735,
+            "google_trends": 23.488946314792504
+        }
+    },
+    {
+        "date": "2029-07",
+        "scenario": "Baseline",
+        "total_forecast": 290586,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216993,
+                "percentage": 74.67435112327044,
+                "raw_prediction": 377671
+            },
+            "tsformer": {
+                "absolute": 73592,
+                "percentage": 25.32564954886214,
+                "raw_prediction": 172978
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 12.754776754135966,
+            "exchange_rates": 1.4149212867899053,
+            "events": 0.0,
+            "weather": 5.2890863194377635,
+            "google_trends": 24.09128030583192
+        }
+    },
+    {
+        "date": "2029-08",
+        "scenario": "Baseline",
+        "total_forecast": 290648,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216978,
+                "percentage": 74.65317693930912,
+                "raw_prediction": 377646
+            },
+            "tsformer": {
+                "absolute": 73670,
+                "percentage": 25.346823480683383,
+                "raw_prediction": 173160
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 13.080017715794835,
+            "exchange_rates": 1.4488706365503257,
+            "events": 0.0,
+            "weather": 5.664130864285877,
+            "google_trends": 24.706491110817417
+        }
+    },
+    {
+        "date": "2029-09",
+        "scenario": "Baseline",
+        "total_forecast": 281564,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210234,
+                "percentage": 74.66659893500169,
+                "raw_prediction": 365907
+            },
+            "tsformer": {
+                "absolute": 71329,
+                "percentage": 25.33340141183325,
+                "raw_prediction": 167659
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 13.400938448621513,
+            "exchange_rates": 1.4822724161533074,
+            "events": 0.0,
+            "weather": 8.341831880569138,
+            "google_trends": 25.31474762853985
+        }
+    },
+    {
+        "date": "2029-10",
+        "scenario": "Baseline",
+        "total_forecast": 290735,
+        "model_contributions": {
+            "svr": {
+                "absolute": 216995,
+                "percentage": 74.6367147951455,
+                "raw_prediction": 377675
+            },
+            "tsformer": {
+                "absolute": 73740,
+                "percentage": 25.36328461704097,
+                "raw_prediction": 173324
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 13.72278745917772,
+            "exchange_rates": 1.5156741957563336,
+            "events": 0.25806451612903225,
+            "weather": 12.637961874222881,
+            "google_trends": 25.925987211739333
+        }
+    },
+    {
+        "date": "2029-11",
+        "scenario": "Baseline",
+        "total_forecast": 281667,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210182,
+                "percentage": 74.62076878674473,
+                "raw_prediction": 365817
+            },
+            "tsformer": {
+                "absolute": 71485,
+                "percentage": 25.379232253378305,
+                "raw_prediction": 168024
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 14.045557298920318,
+            "exchange_rates": 1.549075975359382,
+            "events": 0.5333333333333333,
+            "weather": 12.517197233997068,
+            "google_trends": 26.54019182763303
+        }
+    },
+    {
+        "date": "2029-12",
+        "scenario": "Baseline",
+        "total_forecast": 291966,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217675,
+                "percentage": 74.55484077074934,
+                "raw_prediction": 378859
+            },
+            "tsformer": {
+                "absolute": 74291,
+                "percentage": 25.445157974961553,
+                "raw_prediction": 174620
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 14.36926076501781,
+            "exchange_rates": 1.5824777549623636,
+            "events": 0.25806451612903225,
+            "weather": 2.41586962814635,
+            "google_trends": 27.157408680193562
+        }
+    },
+    {
+        "date": "2030-01",
+        "scenario": "Baseline",
+        "total_forecast": 291887,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217238,
+                "percentage": 74.42523350653873,
+                "raw_prediction": 378098
+            },
+            "tsformer": {
+                "absolute": 74649,
+                "percentage": 25.57476716259646,
+                "raw_prediction": 175462
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 14.699222529322542,
+            "exchange_rates": 1.616427104722784,
+            "events": 0.0,
+            "weather": -7.9459676160885895,
+            "google_trends": 27.787820515426564
+        }
+    },
+    {
+        "date": "2030-02",
+        "scenario": "Baseline",
+        "total_forecast": 264089,
+        "model_contributions": {
+            "svr": {
+                "absolute": 196411,
+                "percentage": 74.37326524213023,
+                "raw_prediction": 341850
+            },
+            "tsformer": {
+                "absolute": 67677,
+                "percentage": 25.626733648514755,
+                "raw_prediction": 159074
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 15.014106855694198,
+            "exchange_rates": 1.6487337440109773,
+            "events": 0.2857142857142857,
+            "weather": -9.042686333525452,
+            "google_trends": 28.39060644683109
+        }
+    },
+    {
+        "date": "2030-03",
+        "scenario": "Baseline",
+        "total_forecast": 292300,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217527,
+                "percentage": 74.41932769446711,
+                "raw_prediction": 378602
+            },
+            "tsformer": {
+                "absolute": 74772,
+                "percentage": 25.580672054961102,
+                "raw_prediction": 175751
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 15.329882170862286,
+            "exchange_rates": 1.6810403832991039,
+            "events": 0.0,
+            "weather": -4.048278099889457,
+            "google_trends": 28.99628419451541
+        }
+    },
+    {
+        "date": "2030-04",
+        "scenario": "Baseline",
+        "total_forecast": 282042,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210251,
+                "percentage": 74.54590838083634,
+                "raw_prediction": 365937
+            },
+            "tsformer": {
+                "absolute": 71791,
+                "percentage": 25.454091013232276,
+                "raw_prediction": 168744
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 15.657275267963389,
+            "exchange_rates": 1.71444216290213,
+            "events": 0.0,
+            "weather": 2.2921535980935603,
+            "google_trends": 29.625464198895134
+        }
+    },
+    {
+        "date": "2030-05",
+        "scenario": "Baseline",
+        "total_forecast": 290981,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217282,
+                "percentage": 74.6723854094104,
+                "raw_prediction": 378175
+            },
+            "tsformer": {
+                "absolute": 73698,
+                "percentage": 25.327615010101663,
+                "raw_prediction": 173227
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 15.98561536440033,
+            "exchange_rates": 1.7478439425051562,
+            "events": 0.0,
+            "weather": 11.260238235510567,
+            "google_trends": 30.257729883568054
+        }
+    },
+    {
+        "date": "2030-06",
+        "scenario": "Baseline",
+        "total_forecast": 281631,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210513,
+                "percentage": 74.7478148643596,
+                "raw_prediction": 366393
+            },
+            "tsformer": {
+                "absolute": 71118,
+                "percentage": 25.252184702200005,
+                "raw_prediction": 167161
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 16.31489486140689,
+            "exchange_rates": 1.7812457221081601,
+            "events": 0.0,
+            "weather": 9.153185543162735,
+            "google_trends": 30.893062595439467
+        }
+    },
+    {
+        "date": "2030-07",
+        "scenario": "Baseline",
+        "total_forecast": 290783,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217272,
+                "percentage": 74.71969390325677,
+                "raw_prediction": 378157
+            },
+            "tsformer": {
+                "absolute": 73510,
+                "percentage": 25.28030626466257,
+                "raw_prediction": 172785
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 16.645126814246346,
+            "exchange_rates": 1.8146475017111863,
+            "events": 0.0,
+            "weather": 5.2890863194377635,
+            "google_trends": 31.531511162257008
+        }
+    },
+    {
+        "date": "2030-08",
+        "scenario": "Baseline",
+        "total_forecast": 291043,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217427,
+                "percentage": 74.70621043100981,
+                "raw_prediction": 378427
+            },
+            "tsformer": {
+                "absolute": 73616,
+                "percentage": 25.2937907433733,
+                "raw_prediction": 173033
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 16.981743283332527,
+            "exchange_rates": 1.8485968514716067,
+            "events": 0.25806451612903225,
+            "weather": 5.664130864285877,
+            "google_trends": 32.183608607489724
+        }
+    },
+    {
+        "date": "2030-09",
+        "scenario": "Baseline",
+        "total_forecast": 281785,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210521,
+                "percentage": 74.70972604665167,
+                "raw_prediction": 366406
+            },
+            "tsformer": {
+                "absolute": 71264,
+                "percentage": 25.290273693426368,
+                "raw_prediction": 167505
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 17.31388842086281,
+            "exchange_rates": 1.8819986310746328,
+            "events": 0.26666666666666666,
+            "weather": 8.341831880569138,
+            "google_trends": 32.82833480221623
+        }
+    },
+    {
+        "date": "2030-10",
+        "scenario": "Baseline",
+        "total_forecast": 291129,
+        "model_contributions": {
+            "svr": {
+                "absolute": 217449,
+                "percentage": 74.69182516739507,
+                "raw_prediction": 378466
+            },
+            "tsformer": {
+                "absolute": 73679,
+                "percentage": 25.308174245586024,
+                "raw_prediction": 173182
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 17.646994303220744,
+            "exchange_rates": 1.9154004106776368,
+            "events": 0.5161290322580645,
+            "weather": 12.637961874222881,
+            "google_trends": 33.47622292023931
+        }
+    },
+    {
+        "date": "2030-11",
+        "scenario": "Baseline",
+        "total_forecast": 282046,
+        "model_contributions": {
+            "svr": {
+                "absolute": 210629,
+                "percentage": 74.67915661195835,
+                "raw_prediction": 366595
+            },
+            "tsformer": {
+                "absolute": 71416,
+                "percentage": 25.320842262754585,
+                "raw_prediction": 167863
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 17.9810532213456,
+            "exchange_rates": 1.9488021902806407,
+            "events": 0.0,
+            "weather": 12.517197233997068,
+            "google_trends": 34.12725384757138
+        }
+    },
+    {
+        "date": "2030-12",
+        "scenario": "Baseline",
+        "total_forecast": 292403,
+        "model_contributions": {
+            "svr": {
+                "absolute": 218198,
+                "percentage": 74.62214104573667,
+                "raw_prediction": 379768
+            },
+            "tsformer": {
+                "absolute": 74205,
+                "percentage": 25.377859037757638,
+                "raw_prediction": 174419
+            }
+        },
+        "external_factor_contributions_pct": {
+            "economic_indicators": 18.31607841999505,
+            "exchange_rates": 1.9822039698836225,
+            "events": 0.5161290322580645,
+            "weather": 2.41586962814635,
+            "google_trends": 34.781477618427935
+        }
+    }
+]
