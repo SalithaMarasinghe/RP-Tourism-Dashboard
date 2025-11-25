@@ -62,6 +62,32 @@ export default function TDMSComponent() {
     }
   }, [selectedSite, selectedYear]);
 
+  // Load dashboard data when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      const fetchDashboardData = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get(`http://localhost:8000/api/tdms/dashboard/${selectedDate}`);
+          setDashboardData(response.data);
+        } catch (error) {
+          console.error('Error fetching dashboard data:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDashboardData();
+    }
+  }, [selectedDate]);
+
+  // Helper function to get VLI color
+  const getVLIColor = (score) => {
+    if (score > 120) return 'bg-red-600';
+    if (score > 100) return 'bg-orange-600';
+    if (score > 80) return 'bg-yellow-600';
+    return 'bg-green-600';
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with Export Button */}
@@ -172,7 +198,51 @@ export default function TDMSComponent() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="vli"><div>VLI View Placeholder</div></TabsContent>
+        {/* View 2: VLI Intelligence */}
+        <TabsContent value="vli" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>National Grid Heatmap</CardTitle>
+              <CardDescription>15-tile grid representing all sites in network - {selectedDate}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {dashboardData?.vli_scores?.map((site) => (
+                  <div key={site.site} className={`${getVLIColor(site.vli_score)} p-4 rounded-lg text-white text-center`}>
+                    <h3 className="font-semibold text-sm mb-2">{site.site}</h3>
+                    <div className="text-2xl font-bold">{Math.round(site.vli_score)}%</div>
+                    <div className="text-xs opacity-90">{site.visitors} visitors</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>5-Year Trajectory</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                {trendData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={trendData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="visitors" stroke="#3B82F6" name="Visitors" />
+                      <Line type="monotone" dataKey="vli_score" stroke="#EF4444" name="VLI Score" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">Select a site to view 5-year trend</div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="redistribution"><div>Redistribution Placeholder</div></TabsContent>
       </Tabs>
     </div>
