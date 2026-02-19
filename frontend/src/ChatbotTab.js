@@ -1,30 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './components/ui/button';
 import { MessageCircle, Send, Plus, Trash2, Pencil, History } from 'lucide-react';
-import { auth, db } from './firebase';
+import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  getDocs,
-  updateDoc,
-  serverTimestamp,
-  doc,
-  limit,
-  setDoc,
-  onSnapshot,
-  deleteDoc
-} from 'firebase/firestore';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+
+const API_BASE = 'http://localhost:8000';
+
+// Helper: get an authenticated fetch call using Firebase ID token
+async function authFetch(path, options = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+  const token = await user.getIdToken();
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Request failed: ${res.status}`);
+  }
+  return res.json();
+}
 
 // Chat History Sidebar Component
-function ChatHistorySidebar({ 
-  chats, 
-  currentChatId, 
-  onSelectChat, 
-  onNewChat, 
-  onDeleteChat, 
+function ChatHistorySidebar({
+  chats,
+  currentChatId,
+  onSelectChat,
+  onNewChat,
+  onDeleteChat,
   onRenameChat,
   isOpen,
   onClose
@@ -35,7 +46,7 @@ function ChatHistorySidebar({
 
   const formatRelativeTime = (timestamp) => {
     if (!timestamp) return '';
-    
+
     try {
       const date = new Date(timestamp.seconds * 1000);
       const now = new Date();
@@ -49,7 +60,7 @@ function ChatHistorySidebar({
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays === 1) return 'Yesterday';
       if (diffDays < 7) return `${diffDays}d ago`;
-      
+
       return date.toLocaleDateString();
     } catch (e) {
       return '';
@@ -110,9 +121,8 @@ function ChatHistorySidebar({
 
       {/* Sidebar */}
       <div
-        className={`fixed md:static left-0 top-0 w-64 h-full bg-white border-r border-gray-200 flex flex-col z-40 transform transition-transform duration-250 md:transform-none overflow-hidden ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed md:static left-0 top-0 w-64 h-full bg-white border-r border-gray-200 flex flex-col z-40 transform transition-transform duration-250 md:transform-none overflow-hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
@@ -139,11 +149,10 @@ function ChatHistorySidebar({
               {chats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${
-                    currentChatId === chat.id
-                      ? 'bg-blue-50'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${currentChatId === chat.id
+                    ? 'bg-blue-50'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   {editingChatId === chat.id ? (
                     <input
@@ -163,9 +172,8 @@ function ChatHistorySidebar({
                         onClick={() => onSelectChat(chat.id)}
                       >
                         <span
-                          className={`text-sm font-medium truncate flex-1 ${
-                            currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
-                          }`}
+                          className={`text-sm font-medium truncate flex-1 ${currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
+                            }`}
                           title={chat.title}
                         >
                           {chat.title}
@@ -223,7 +231,7 @@ function ChatbotTab() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [firstMessageData, setFirstMessageData] = useState(null);
 
-  // Initialize user and set up real-time chat listener
+  // Initialize user and load chat list
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('Auth state changed. User:', user?.uid);
@@ -231,30 +239,8 @@ function ChatbotTab() {
 
       if (user) {
         setAuthWarning(false);
-        
-        // Set up real-time listener for chats
-        const chatsRef = collection(db, `users/${user.uid}/chats`);
-        const chatsQuery = query(chatsRef, orderBy('updatedAt', 'desc'));
-        
-        const unsubscribeChats = onSnapshot(chatsQuery, async (snapshot) => {
-          console.log('Chats update received:', snapshot.docs.length);
-          const chatsList = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          setChats(chatsList);
-
-          // Load the most recent chat if no chat is currently selected
-          if (!currentChatId && chatsList.length > 0) {
-            const mostRecentChat = chatsList[0];
-            await loadChat(user.uid, mostRecentChat.id);
-          }
-        }, (error) => {
-          console.error('Error setting up chats listener:', error);
-        });
-
+        await refreshChatList(user);
         setIsInitializing(false);
-        return () => unsubscribeChats();
       } else {
         console.log('User not authenticated');
         setAuthWarning(true);
@@ -268,24 +254,41 @@ function ChatbotTab() {
     return () => unsubscribe();
   }, []);
 
-  const loadChat = async (userId, chatId) => {
+  const refreshChatList = async (user) => {
+    try {
+      const token = await (user || auth.currentUser).getIdToken();
+      const res = await fetch(`${API_BASE}/api/chat/list`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const chatsList = data.chats || [];
+      setChats(chatsList);
+
+      // Auto-load most recent chat if none selected
+      if (!currentChatId && chatsList.length > 0) {
+        await loadChat(chatsList[0].id);
+      }
+    } catch (err) {
+      console.error('Error loading chat list:', err);
+    }
+  };
+
+  const loadChat = async (chatId) => {
     try {
       console.log('Loading chat:', chatId);
       setCurrentChatId(chatId);
 
-      const messagesRef = collection(db, `users/${userId}/chats/${chatId}/messages`);
-      const messagesQuery = query(messagesRef, orderBy('timestamp', 'asc'));
-      const messagesSnapshot = await getDocs(messagesQuery);
-
-      const loadedMessages = messagesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        text: doc.data().content,
-        sender: doc.data().role === 'assistant' ? 'bot' : 'user',
-        sources: doc.data().sources || []
+      const data = await authFetch(`/api/chat/${chatId}`);
+      const loadedMessages = (data.messages || []).map(msg => ({
+        id: msg.id,
+        text: msg.content,
+        sender: msg.role === 'assistant' ? 'bot' : 'user',
+        sources: msg.sources || []
       }));
 
       setMessages(loadedMessages);
-      
+
       // Scroll to bottom
       setTimeout(() => {
         const messagesElement = document.querySelector('[data-messages-container]');
@@ -298,8 +301,8 @@ function ChatbotTab() {
     }
   };
 
-  // Save user message to Firestore
-  const saveMessageToFirestore = async (role, content, sources = [], chatIdOverride = null) => {
+  // Save a message to the backend and return chatId
+  const saveMessageToBackend = async (role, content, sources = [], chatIdOverride = null) => {
     if (!currentUser) {
       console.warn('No user logged in');
       return null;
@@ -312,56 +315,43 @@ function ChatbotTab() {
       if (!chatId) {
         console.log('Creating new chat...');
         const title = content.length > 60 ? content.substring(0, 60) : content;
-        
-        // Ensure user document exists
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        await setDoc(userDocRef, { email: currentUser.email }, { merge: true });
-        
-        const newChatRef = await addDoc(collection(db, `users/${currentUser.uid}/chats`), {
-          title,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+        const newChat = await authFetch('/api/chat/create', {
+          method: 'POST',
+          body: JSON.stringify({ title })
         });
-        chatId = newChatRef.id;
+        chatId = newChat.chatId;
         console.log('New chat created with ID:', chatId);
         setCurrentChatId(chatId);
 
-        // Store first message data for later title generation
         if (role === 'user') {
           setFirstMessageData({ userMessage: content, chatId });
         }
+
+        // Refresh sidebar
+        await refreshChatList();
       }
 
       // Save the message
-      const messageData = {
-        role,
-        content,
-        timestamp: serverTimestamp(),
-        sources: sources || []
-      };
-      
-      console.log('Saving message to', `users/${currentUser.uid}/chats/${chatId}/messages`);
-      const messagesRef = collection(db, `users/${currentUser.uid}/chats/${chatId}/messages`);
-      await addDoc(messagesRef, messageData);
+      console.log('Saving message to chat:', chatId);
+      await authFetch(`/api/chat/${chatId}/message`, {
+        method: 'POST',
+        body: JSON.stringify({ role, content, sources: sources || [] })
+      });
       console.log('Message saved successfully');
 
-      // Update chat updatedAt
-      await updateDoc(doc(db, `users/${currentUser.uid}/chats/${chatId}`), {
-        updatedAt: serverTimestamp()
-      });
-      
+      // Refresh sidebar to update updatedAt ordering
+      await refreshChatList();
+
       return chatId;
     } catch (error) {
-      console.error('Error saving message to Firestore:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
+      console.error('Error saving message:', error);
       return null;
     }
   };
 
   const callGeminiAPI = async (message) => {
     const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('Gemini API key not configured');
     }
@@ -386,11 +376,11 @@ function ChatbotTab() {
           },
           body: JSON.stringify({ query: message })
         });
-        
+
         if (searchResponse.ok) {
           const searchData = await searchResponse.json();
           if (searchData.success && searchData.results.length > 0) {
-            contextData.webSearch = '\n\nRecent web search results:\n' + 
+            contextData.webSearch = '\n\nRecent web search results:\n' +
               searchData.results.map(r => `- ${r.title}: ${r.snippet}`).join('\n');
           }
         }
@@ -398,75 +388,227 @@ function ChatbotTab() {
         console.warn('Web search failed, proceeding without it:', searchError);
       }
 
-      // 2. Get TDMS data if user asks about specific sites or dates
-      if (message.toLowerCase().includes('site') || message.toLowerCase().includes('location') || 
-          message.toLowerCase().includes('place') || message.toLowerCase().includes('vli') ||
-          message.toLowerCase().includes('visitors') || message.toLowerCase().includes('capacity')) {
-        try {
-          // Get available sites
-          const sitesResponse = await fetch('http://localhost:8000/api/tdms/sites');
-          if (sitesResponse.ok) {
-            const sitesData = await sitesResponse.json();
-            if (sitesData.sites && sitesData.sites.length > 0) {
-              contextData.tdmsData = `\n\nAvailable tourism sites in dataset: ${sitesData.sites.slice(0, 10).join(', ')}...`;
-              
-              // If user mentions a specific site, get its data
-              const mentionedSite = sitesData.sites.find(site => 
-                message.toLowerCase().includes(site.toLowerCase())
-              );
-              if (mentionedSite) {
-                const siteResponse = await fetch(`http://localhost:8000/api/tdms/site/${encodeURIComponent(mentionedSite)}`);
-                if (siteResponse.ok) {
-                  const siteInfo = await siteResponse.json();
-                  if (siteInfo.data && siteInfo.data.length > 0) {
-                    const latestData = siteInfo.data[siteInfo.data.length - 1];
-                    contextData.tdmsData += `\n\nLatest data for ${mentionedSite}:\n- Predicted visitors: ${latestData.predicted_total_visitors}\n- VLI score: ${latestData.vli_score}\n- Statistical capacity: ${latestData.statistical_capacity}\n- Date: ${latestData.date}`;
-                  }
-                }
+      // 2. Get comprehensive dashboard data for better context
+      try {
+        // Always get forecast scenarios for context
+        const scenariosResponse = await fetch('http://localhost:8000/api/forecasts/scenarios');
+        if (scenariosResponse.ok) {
+          const scenariosData = await scenariosResponse.json();
+          if (scenariosData.baseline && scenariosData.baseline.length > 0) {
+            const latestData = scenariosData.baseline.slice(-3); // Last 3 months
+            contextData.forecasts = '\n\nRecent tourism forecasts (last 3 months):\n' +
+              latestData.map(d => `- ${d.date}: ${d.arrivals_forecast || d.total_forecast} arrivals (growth: ${d.growth_rate ? d.growth_rate.toFixed(1) : 'N/A'}%)`).join('\n');
+
+            // Add external factors if available
+            const latestWithFactors = scenariosData.baseline.slice(-1)[0];
+            if (latestWithFactors && latestWithFactors.external_factor_contributions_pct) {
+              const factors = Object.entries(latestWithFactors.external_factor_contributions_pct)
+                .filter(([_, value]) => value && parseFloat(value) !== 0)
+                .map(([key, value]) => `${key}: ${value}%`)
+                .join(', ');
+              if (factors) {
+                contextData.forecasts += `\nExternal factors affecting latest forecast: ${factors}`;
               }
             }
           }
-        } catch (tdmsError) {
-          console.warn('TDMS data fetch failed:', tdmsError);
         }
+      } catch (forecastError) {
+        console.warn('Forecast data fetch failed:', forecastError);
       }
 
-      // 3. Get forecast data if user asks about predictions
-      if (message.toLowerCase().includes('forecast') || message.toLowerCase().includes('prediction') ||
-          message.toLowerCase().includes('future') || message.toLowerCase().includes('trend')) {
-        try {
-          // Get daily predictions
-          const dailyResponse = await fetch('http://localhost:8000/api/forecasts/daily');
-          if (dailyResponse.ok) {
-            const dailyData = await dailyResponse.json();
-            if (dailyData.baseline && dailyData.baseline.length > 0) {
-              const nextMonth = dailyData.baseline.slice(0, 3);
-              contextData.dailyPredictions = '\n\nUpcoming tourism predictions (next 3 months):\n' +
-                nextMonth.map(d => `- ${d.date}: ${d.total_forecast} forecasted arrivals`).join('\n');
+      // 3. Get TDMS data for comprehensive site information
+      try {
+        // Get available sites and latest dashboard data
+        const [sitesResponse, dashboardResponse] = await Promise.all([
+          fetch('http://localhost:8000/api/tdms/sites'),
+          fetch('http://localhost:8000/api/tdms/dashboard/' + new Date().toISOString().split('T')[0])
+        ]);
+
+        if (sitesResponse.ok) {
+          const sitesData = await sitesResponse.json();
+          if (sitesData.sites && sitesData.sites.length > 0) {
+            contextData.tdmsData = `\n\nAvailable tourism sites (${sitesData.sites.length}): ${sitesData.sites.slice(0, 15).join(', ')}${sitesData.sites.length > 15 ? '...' : ''}`;
+
+            // If user mentions a specific site, get detailed data
+            const mentionedSite = sitesData.sites.find(site => {
+              const siteLower = site.toLowerCase();
+              const messageLower = message.toLowerCase();
+
+              // Check for exact match or partial match
+              if (messageLower.includes(siteLower)) return true;
+
+              // Check for common variations/shortcuts
+              const siteVariations = {
+                'sigiriya': 'sigiriya rock & museum',
+                'galle': 'galle fort',
+                'kandy': 'temple of the tooth (kandy)',
+                'polonnaruwa': 'polonnaruwa (gal viharaya & ruins)',
+                'sinharaja': 'sinharaja conservation forest',
+                'udawalawe': 'udawalawe national park',
+                'wilpattu': 'wilpattu national park',
+                'yala': 'yala national park',
+                'knuckles': 'knuckles conservation forest',
+                'horton plains': 'horton plains (world\'s end)',
+                'jaffna': 'jaffna fort',
+                'dambulla': 'dambulla cave temple',
+                'adams peak': 'adam\'s peak (sri pada)',
+                'mirissa': 'mirissa (whale watching)',
+                'kaudulla': 'kaudulla national park'
+              };
+
+              // Check if message contains any variation
+              for (const [variation, fullName] of Object.entries(siteVariations)) {
+                if (messageLower.includes(variation) && siteLower === fullName.toLowerCase()) {
+                  return true;
+                }
+              }
+
+              return false;
+            });
+
+            if (mentionedSite) {
+              try {
+                const [siteResponse, monthlyResponse, trendResponse] = await Promise.all([
+                  fetch(`http://localhost:8000/api/tdms/site/${encodeURIComponent(mentionedSite)}`),
+                  fetch(`http://localhost:8000/api/tdms/monthly/${mentionedSite}/${new Date().getFullYear()}`),
+                  fetch(`http://localhost:8000/api/tdms/weekly-trend/${encodeURIComponent(mentionedSite)}`)
+                ]);
+
+                if (siteResponse.ok) {
+                  const siteInfo = await siteResponse.json();
+                  if (siteInfo.data && siteInfo.data.length > 0) {
+                    // Check if user is asking for a specific month
+                    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june',
+                      'july', 'august', 'september', 'october', 'november', 'december'];
+                    const mentionedMonth = monthNames.find(month =>
+                      message.toLowerCase().includes(month)
+                    );
+
+                    let targetYear = new Date().getFullYear();
+                    const yearMatch = message.match(/\b(20\d{2})\b/);
+                    if (yearMatch) {
+                      targetYear = parseInt(yearMatch[1]);
+                    }
+
+                    // Check if we have data for the requested year, if not suggest available years
+                    const availableYears = [...new Set(siteInfo.data.map(item => new Date(item.date).getFullYear()))];
+                    if (!availableYears.includes(targetYear)) {
+                      contextData.tdmsData += `\n\nNote: Data for ${targetYear} is not available. Available years: ${availableYears.join(', ')}. Showing data for ${availableYears[0]} instead:`;
+                      targetYear = availableYears[0];
+                    }
+
+                    if (mentionedMonth) {
+                      // Find data for the specific month and year
+                      const monthIndex = monthNames.indexOf(mentionedMonth);
+                      const monthData = siteInfo.data.filter(item => {
+                        const itemDate = new Date(item.date);
+                        return itemDate.getMonth() === monthIndex && itemDate.getFullYear() === targetYear;
+                      });
+
+                      if (monthData.length > 0) {
+                        const avgVisitors = Math.round(monthData.reduce((sum, item) => sum + item.predicted_total_visitors, 0) / monthData.length);
+                        const avgVLI = (monthData.reduce((sum, item) => sum + item.vli_score, 0) / monthData.length).toFixed(1);
+                        contextData.tdmsData += `\n\n${mentionedSite} - ${mentionedMonth.charAt(0).toUpperCase() + mentionedMonth.slice(1)} ${targetYear}:\n- Average predicted visitors: ${avgVisitors} per day\n- Average VLI score: ${avgVLI}\n- Statistical capacity: ${monthData[0].statistical_capacity}\n- Data points: ${monthData.length} days`;
+                      } else {
+                        // Try to get the closest available month
+                        const sortedData = siteInfo.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        const closestDate = sortedData.find(item => {
+                          const itemDate = new Date(item.date);
+                          return itemDate.getMonth() === monthIndex;
+                        });
+
+                        if (closestDate) {
+                          contextData.tdmsData += `\n\n${mentionedSite} - ${mentionedMonth.charAt(0).toUpperCase() + mentionedMonth.slice(1)} (closest available data):\n- Predicted visitors: ${closestDate.predicted_total_visitors} (date: ${closestDate.date})\n- VLI score: ${closestDate.vli_score}\n- Statistical capacity: ${closestDate.statistical_capacity}`;
+                        }
+                      }
+                    } else {
+                      // Show latest data and recent trends
+                      const latestData = siteInfo.data[siteInfo.data.length - 1];
+                      const recentData = siteInfo.data.slice(-7); // Last 7 days
+                      const avgRecentVisitors = Math.round(recentData.reduce((sum, item) => sum + item.predicted_total_visitors, 0) / recentData.length);
+
+                      contextData.tdmsData += `\n\nDetailed data for ${mentionedSite}:\n- Latest predicted visitors: ${latestData.predicted_total_visitors} (${latestData.date})\n- 7-day average: ${avgRecentVisitors} visitors\n- Latest VLI score: ${latestData.vli_score}\n- Statistical capacity: ${latestData.statistical_capacity}`;
+                    }
+                  }
+                }
+
+                if (monthlyResponse.ok) {
+                  const monthlyInfo = await monthlyResponse.json();
+                  if (monthlyInfo.monthly_data && monthlyInfo.monthly_data.length > 0) {
+                    const latestMonthly = monthlyInfo.monthly_data[monthlyInfo.monthly_data.length - 1];
+                    contextData.tdmsData += `\n- Monthly trend: ${latestMonthly.predicted_total_visitors} visitors (capacity utilization: ${latestMonthly.capacity_utilization}%)`;
+                  }
+                }
+
+                // Add 5-Year Trajectory data
+                if (trendResponse.ok) {
+                  const trendInfo = await trendResponse.json();
+                  if (trendInfo.data && trendInfo.data.length > 0) {
+                    const trendStart = trendInfo.data[0];
+                    const trendEnd = trendInfo.data[trendInfo.data.length - 1];
+                    const growthRate = ((trendEnd.predicted_total_visitors - trendStart.predicted_total_visitors) / trendStart.predicted_total_visitors * 100).toFixed(1);
+
+                    contextData.tdmsData += `\n\n5-Year Trajectory for ${mentionedSite}:\n- Period: ${trendStart.date} to ${trendEnd.date}\n- Growth rate: ${growthRate}%\n- Starting visitors: ${trendStart.predicted_total_visitors}\n- Latest visitors: ${trendEnd.predicted_total_visitors}\n- Data points: ${trendInfo.data.length} weekly observations`;
+                  }
+                }
+              } catch (siteError) {
+                console.warn('Detailed site data fetch failed:', siteError);
+              }
             }
+          }
+        }
+
+        if (dashboardResponse.ok) {
+          const dashboardData = await dashboardResponse.json();
+          if (dashboardData.summary) {
+            contextData.tdmsData += `\n\nOverall tourism system summary:\n- Total sites monitored: ${dashboardData.summary.total_sites || 'N/A'}\n- Total predicted visitors: ${dashboardData.summary.total_predicted_visitors || 'N/A'}\n- Average VLI score: ${dashboardData.summary.avg_vli_score || 'N/A'}\n- High utilization sites: ${dashboardData.summary.high_utilization_sites || 'N/A'}`;
           }
 
-          // Get forecast scenarios
-          const scenariosResponse = await fetch('http://localhost:8000/api/forecasts/scenarios');
-          if (scenariosResponse.ok) {
-            const scenariosData = await scenariosResponse.json();
-            if (scenariosData.baseline && scenariosData.baseline.length > 0) {
-              contextData.forecasts = '\n\nForecast scenarios available: baseline, optimistic, pessimistic';
+          // Add National Grid Heatmap data
+          if (dashboardData.vli_scores && dashboardData.vli_scores.length > 0) {
+            contextData.tdmsData += `\n\nNational Grid Heatmap (${dashboardData.vli_scores.length} sites):\n`;
+            dashboardData.vli_scores.slice(0, 10).forEach(site => {
+              const utilization = site.vli_score > 120 ? 'Overcrowded' :
+                site.vli_score > 100 ? 'High utilization' :
+                  site.vli_score > 80 ? 'Moderate utilization' : 'Low utilization';
+              contextData.tdmsData += `- ${site.site}: ${Math.round(site.vli_score)}% (${site.visitors} visitors) - ${utilization}\n`;
+            });
+
+            if (dashboardData.vli_scores.length > 10) {
+              contextData.tdmsData += `... and ${dashboardData.vli_scores.length - 10} more sites`;
             }
           }
-        } catch (forecastError) {
-          console.warn('Forecast data fetch failed:', forecastError);
         }
+      } catch (tdmsError) {
+        console.warn('TDMS data fetch failed:', tdmsError);
+      }
+
+      // 4. Get daily predictions for short-term forecasts
+      try {
+        const dailyResponse = await fetch('http://localhost:8000/api/forecasts/daily');
+        if (dailyResponse.ok) {
+          const dailyData = await dailyResponse.json();
+          if (dailyData.baseline && dailyData.baseline.length > 0) {
+            const nextWeek = dailyData.baseline.slice(0, 7);
+            contextData.dailyPredictions = '\n\nDaily predictions (next 7 days):\n' +
+              nextWeek.map(d => `- ${d.date}: ${d.total_forecast} forecasted arrivals`).join('\n');
+          }
+        }
+      } catch (dailyError) {
+        console.warn('Daily predictions fetch failed:', dailyError);
       }
 
       // Build comprehensive prompt with all context
-      const prompt = `You are a helpful AI assistant specializing in tourism analytics and Sri Lanka tourism. You have access to real-time data from the tourism analytics dashboard.
+      const prompt = `You are a helpful AI assistant specializing in tourism analytics and Sri Lanka tourism. You have access to comprehensive real-time data from the tourism analytics dashboard.
 
 Available data sources:
-- Current web search results for latest information
-- TDMS (Tourism Destination Management System) data with site-specific visitor predictions and VLI scores
-- Tourism forecasts with multiple scenarios (baseline, optimistic, pessimistic)
-- Daily and monthly predictions for tourism arrivals
+- Current web search results for latest tourism information
+- TDMS (Tourism Destination Management System) data with site-specific visitor predictions, VLI scores, and capacity utilization
+- National Grid Heatmap showing all 15 sites with current utilization levels
+- 5-Year Trajectory data for long-term growth trends
+- Tourism forecasts with growth rates and external factor contributions
+- Daily predictions for short-term forecasting
+- Monthly trends and overall system summary
 
 ${contextData.webSearch}
 ${contextData.tdmsData}
@@ -475,7 +617,15 @@ ${contextData.dailyPredictions}
 
 User question: ${message}
 
-Provide a comprehensive and helpful response using the available data above. If specific data isn't available for the query, clearly state that and provide general guidance based on tourism best practices.`;
+Provide a comprehensive and helpful response using the available data above. You now have access to:
+1. Recent tourism forecasts with growth rates and external factors
+2. Detailed site-specific information including VLI scores and capacity utilization
+3. National Grid Heatmap data showing current utilization for all 15 sites
+4. 5-Year Trajectory analysis for long-term growth trends
+5. Overall tourism system summaries and trends
+6. Daily predictions for short-term planning
+
+Use this data to provide specific, data-driven insights. If specific data isn't available for the query, clearly state that and provide general guidance based on tourism best practices.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -502,30 +652,30 @@ Provide a comprehensive and helpful response using the available data above. If 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Gemini API error response:', errorText);
-        
+
         let errorData;
         try {
           errorData = JSON.parse(errorText);
         } catch (e) {
           errorData = { error: { message: errorText } };
         }
-        
+
         throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
       }
 
       const data = await response.json();
       console.log('Gemini API response data:', data);
-      
+
       if (data.candidates && data.candidates.length > 0) {
         const text = data.candidates[0].content.parts[0].text;
-        
+
         // Extract sources based on what data was used
         const sources = [];
         if (contextData.webSearch) sources.push('Web search integration');
         if (contextData.tdmsData) sources.push('TDMS dataset');
         if (contextData.forecasts) sources.push('Forecast scenarios');
         if (contextData.dailyPredictions) sources.push('Daily predictions');
-        
+
         return { text, sources };
       } else {
         throw new Error('No response generated from Gemini API');
@@ -536,25 +686,19 @@ Provide a comprehensive and helpful response using the available data above. If 
     }
   };
 
-  const generateChatTitle = async (chatId, userMessage, assistantResponse) => {
-    // Fire-and-forget, non-blocking title generation
+  const generateChatTitle = async (chatId, userMessage) => {
     if (!currentUser || !chatId) return;
-
     try {
-      // TODO: Replace with actual Gemini API call when integrated
-      // For now, use a simple heuristic-based title
       const words = userMessage.split(' ').slice(0, 6).join(' ');
       const generatedTitle = words.length > 0 ? words : userMessage.substring(0, 40);
-
-      // Update the chat document with the generated title
-      await updateDoc(doc(db, `users/${currentUser.uid}/chats/${chatId}`), {
-        title: generatedTitle
+      await authFetch(`/api/chat/${chatId}/rename`, {
+        method: 'PUT',
+        body: JSON.stringify({ title: generatedTitle })
       });
-      
+      await refreshChatList();
       console.log('Chat title updated:', generatedTitle);
     } catch (error) {
       console.error('Error generating chat title:', error);
-      // Silently fail - don't break the chat flow
     }
   };
 
@@ -572,12 +716,12 @@ Provide a comprehensive and helpful response using the available data above. If 
     // Add user message to local state
     setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
 
-    // Save user message to Firestore and get the chat ID
+    // Save user message to backend and get the chat ID
     let chatIdForThisMessage = currentChatId;
     if (!chatIdForThisMessage) {
-      chatIdForThisMessage = await saveMessageToFirestore('user', userMessage, [], currentChatId);
+      chatIdForThisMessage = await saveMessageToBackend('user', userMessage, [], currentChatId);
     } else {
-      await saveMessageToFirestore('user', userMessage, [], chatIdForThisMessage);
+      await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
     }
 
     setIsLoading(true);
@@ -585,16 +729,15 @@ Provide a comprehensive and helpful response using the available data above. If 
     try {
       // Call Gemini API
       const geminiResponse = await callGeminiAPI(userMessage);
-      
+
       setMessages(prev => [...prev, { text: geminiResponse.text, sender: 'bot', sources: geminiResponse.sources }]);
 
-      // Save assistant response to Firestore with the same chat ID
+      // Save assistant response to backend with the same chat ID
       if (chatIdForThisMessage) {
-        await saveMessageToFirestore('assistant', geminiResponse.text, geminiResponse.sources, chatIdForThisMessage);
-        
-        // Generate meaningful title after first exchange (fire-and-forget)
+        await saveMessageToBackend('assistant', geminiResponse.text, geminiResponse.sources, chatIdForThisMessage);
+
         if (firstMessageData?.chatId === chatIdForThisMessage) {
-          generateChatTitle(chatIdForThisMessage, userMessage, geminiResponse.text);
+          generateChatTitle(chatIdForThisMessage, userMessage);
           setFirstMessageData(null);
         }
       }
@@ -602,15 +745,15 @@ Provide a comprehensive and helpful response using the available data above. If 
       setIsLoading(false);
     } catch (error) {
       console.error('Error sending message:', error);
-      
+
       // Fallback response
       const fallbackResponse = "I apologize, but I'm having trouble connecting to the AI service. Please try again later.";
       setMessages(prev => [...prev, { text: fallbackResponse, sender: 'bot', sources: [] }]);
-      
+
       if (chatIdForThisMessage) {
-        await saveMessageToFirestore('assistant', fallbackResponse, [], chatIdForThisMessage);
+        await saveMessageToBackend('assistant', fallbackResponse, [], chatIdForThisMessage);
       }
-      
+
       setIsLoading(false);
     }
   };
@@ -625,23 +768,13 @@ Provide a comprehensive and helpful response using the available data above. If 
 
   const handleDeleteChat = async (chatId) => {
     if (!currentUser) return;
-
     try {
-      // Delete all messages in the chat
-      const messagesRef = collection(db, `users/${currentUser.uid}/chats/${chatId}/messages`);
-      const messagesSnapshot = await getDocs(messagesRef);
-      const deletePromises = messagesSnapshot.docs.map(doc => deleteDoc(doc.ref));
-      await Promise.all(deletePromises);
-
-      // Delete the chat document
-      await deleteDoc(doc(db, `users/${currentUser.uid}/chats/${chatId}`));
-
-      // If this was the active chat, clear the window
+      await authFetch(`/api/chat/${chatId}`, { method: 'DELETE' });
       if (currentChatId === chatId) {
         setMessages([]);
         setCurrentChatId(null);
       }
-
+      await refreshChatList();
       console.log('Chat deleted successfully');
     } catch (error) {
       console.error('Error deleting chat:', error);
@@ -650,11 +783,12 @@ Provide a comprehensive and helpful response using the available data above. If 
 
   const handleRenameChat = async (chatId, newTitle) => {
     if (!currentUser) return;
-
     try {
-      await updateDoc(doc(db, `users/${currentUser.uid}/chats/${chatId}`), {
-        title: newTitle
+      await authFetch(`/api/chat/${chatId}/rename`, {
+        method: 'PUT',
+        body: JSON.stringify({ title: newTitle })
       });
+      await refreshChatList();
       console.log('Chat renamed successfully');
     } catch (error) {
       console.error('Error renaming chat:', error);
@@ -711,7 +845,7 @@ Provide a comprehensive and helpful response using the available data above. If 
           chats={chats}
           currentChatId={currentChatId}
           onSelectChat={(chatId) => {
-            loadChat(currentUser.uid, chatId);
+            loadChat(chatId);
             setIsSidebarOpen(false);
           }}
           onNewChat={handleNewChat}
@@ -724,7 +858,7 @@ Provide a comprehensive and helpful response using the available data above. If 
         {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Messages Area */}
-          <div 
+          <div
             className="flex-1 overflow-y-auto py-6 px-6"
             data-messages-container
           >
@@ -737,20 +871,47 @@ Provide a comprehensive and helpful response using the available data above. If 
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 mt-3">
                 {messages.map((message, index) => (
                   <div
                     key={index}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`px-4 py-3 rounded-lg max-w-2xl break-words ${
-                        message.sender === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-800'
-                      }`}
+                      className={`px-4 py-3 rounded-lg break-words ${message.sender === 'user'
+                        ? 'bg-blue-600 text-white max-w-[75%] md:max-w-[75%] lg:max-w-[75%]'
+                        : 'bg-white text-gray-800 border border-gray-200 shadow-sm max-w-[90%] md:max-w-[75%] lg:max-w-[75%]'
+                        }`}
                     >
-                      {message.text}
+                      {message.sender === 'user' ? (
+                        <div className="text-sm leading-relaxed">{message.text}</div>
+                      ) : (
+                        <div className="prose prose-sm max-w-none">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                            components={{
+                              strong: ({ node, ...props }) => <strong className="font-bold text-gray-900" {...props} />,
+                              em: ({ node, ...props }) => <em className="italic text-gray-700" {...props} />,
+                              p: ({ node, ...props }) => <p className="mb-3 leading-relaxed text-sm" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3 space-y-1" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="list-decimal ml-6 mb-3 space-y-1" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-1 text-sm" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2 text-gray-900" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2 text-gray-900" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1 text-gray-900" {...props} />,
+                              code: ({ node, inline, ...props }) => (
+                                inline
+                                  ? <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                                  : <pre className="bg-gray-100 p-3 rounded text-xs font-mono overflow-x-auto mt-2" {...props} />
+                              ),
+                              blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-2" {...props} />,
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                       {message.sources && message.sources.length > 0 && (
                         <div className="mt-2 text-xs opacity-75 border-t pt-2">
                           <p className="font-semibold">Sources:</p>

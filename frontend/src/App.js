@@ -1125,21 +1125,7 @@ function OverviewTab() {
 
         <CardContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div className="text-center">
-
-              <div className="text-3xl font-bold text-purple-600">91.8%</div>
-
-              <div className="text-sm text-gray-600">Prediction Accuracy</div>
-
-              <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-
-                <div className="bg-purple-600 h-1.5 rounded-full" style={{ width: '91.8%' }}></div>
-
-              </div>
-
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <div className="text-center">
 

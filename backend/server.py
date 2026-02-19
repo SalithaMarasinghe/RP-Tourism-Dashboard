@@ -74,6 +74,7 @@ class StatusCheckCreate(BaseModel):
 
 # Add your routes to the router instead of directly to app
 from auth import get_current_user
+from routers import auth_router, chat_router
 
 @api_router.get("/")
 async def root():
@@ -403,6 +404,8 @@ async def log_requests(request: Request, call_next):
 
 # Include the router in the main app
 app.include_router(api_router)
+app.include_router(auth_router.router)
+app.include_router(chat_router.router)
 
 # Test endpoint to verify CORS is working
 @api_router.get("/test")
