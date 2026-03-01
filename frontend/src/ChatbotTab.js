@@ -779,19 +779,26 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
     setIsLoading(true);
 
     try {
-      // Call Gemini API
-      const geminiResponse = await callGeminiAPI(userMessage);
+      // Call backend Gemini API directly
+      const response = await authFetch('/api/chat/ask', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          message: userMessage,
+          chat_id: chatIdForThisMessage
+        })
+      });
 
-      setMessages(prev => [...prev, { text: geminiResponse.text, sender: 'bot', sources: geminiResponse.sources }]);
+      setMessages(prev => [...prev, { text: response.response, sender: 'bot', sources: response.sources || [] }]);
 
-      // Save assistant response to backend with the same chat ID
-      if (chatIdForThisMessage) {
-        await saveMessageToBackend('assistant', geminiResponse.text, geminiResponse.sources, chatIdForThisMessage);
+      // Update current chat ID if this was a new chat
+      if (!currentChatId && response.chat_id) {
+        setCurrentChatId(response.chat_id);
+        await refreshChatList(currentUser, true);
+      }
 
-        if (firstMessageData?.chatId === chatIdForThisMessage) {
-          generateChatTitle(chatIdForThisMessage, userMessage);
-          setFirstMessageData(null);
-        }
+      if (firstMessageData?.chatId === chatIdForThisMessage) {
+        generateChatTitle(chatIdForThisMessage, userMessage);
+        setFirstMessageData(null);
       }
 
       setIsLoading(false);
