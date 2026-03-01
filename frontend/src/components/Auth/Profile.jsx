@@ -183,7 +183,7 @@ export default function Profile() {
                                     {sidebarItems.find(item => item.id === activeSection)?.description}
                                 </p>
                             </div>
-                            <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                            <Link to="/dashboard" className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                 Back to Dashboard
                                 <ChevronRight className="h-4 w-4 ml-1" />
                             </Link>

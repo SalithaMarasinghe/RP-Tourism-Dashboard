@@ -11,6 +11,7 @@ import DailyPredictionsComponent from './components/DailyPredictionsComponent';
 import ChatbotTab from './ChatbotTab';
 import PowerBIDashboard from './components/PowerBIDashboard';
 import OverviewTab from './components/OverviewTab';
+import LandingPage from './components/Landing/LandingPage';
 
 const App = () => {
 
@@ -21,6 +22,10 @@ const App = () => {
       <AuthProvider>
 
         <Routes>
+
+          <Route path="/" element={<LandingPage />} />
+
+          <Route path="/home" element={<LandingPage />} />
 
           <Route path="/login" element={<Login />} />
 
@@ -35,22 +40,6 @@ const App = () => {
               <ProtectedRoute>
 
                 <Profile />
-
-              </ProtectedRoute>
-
-            }
-
-          />
-
-          <Route
-
-            path="/"
-
-            element={
-
-              <ProtectedRoute>
-
-                <PowerBIDashboard />
 
               </ProtectedRoute>
 

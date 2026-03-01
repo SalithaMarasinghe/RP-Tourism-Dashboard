@@ -362,7 +362,7 @@ function OverviewTab() {
       </div>
 
       {/* 5-Year Monthly Arrival Trend */}
-      <div className="bg-white rounded-xl border shadow-sm p-6 mt-6">
+      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
         <h3 className="text-base font-semibold text-gray-800 mb-1">5-Year Monthly Arrival Trend</h3>
         <p className="text-sm text-gray-500 mb-4">2026 – 2030 forecast trend</p>
         <div style={{ width: '100%', height: 220 }}>

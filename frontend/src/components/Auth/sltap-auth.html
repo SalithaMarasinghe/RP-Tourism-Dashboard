@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sri Lanka Tourism Analytics — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e2330;
+  --navy-2:#252b3b;
+  --navy-3:#2d3548;
+  --blue:#3b5bdb;
+  --blue-lt:#4c6ef5;
+  --blue-hover:#2f4ac0;
+  --blue-soft:rgba(59,91,219,.1);
+  --blue-glow:rgba(59,91,219,.25);
+  --green:#12b886;
+  --green-soft:rgba(18,184,134,.15);
+  --purple:#7950f2;
+  --amber:#f59f00;
+  --red:#fa5252;
+  --white:#ffffff;
+  --body-bg:#f0f2f7;
+  --border:#e5e7eb;
+  --text-dark:#1a1f2e;
+  --text-body:#374151;
+  --text-muted:#6b7280;
+  --text-dim:#9ca3af;
+  --font:'Manrope',system-ui,sans-serif;
+  --t:200ms ease;
+  --t-slow:400ms ease;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--navy);-webkit-font-smoothing:antialiased;display:flex}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+
+/* ── LAYOUT ── */
+.auth-layout{display:flex;width:100%;height:100vh;overflow:hidden}
+
+/* ── LEFT PANEL (Wallpaper) ── */
+.left-panel{
+  flex:0 0 55%;width:55%;
+  background:var(--navy);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:36px 44px;
+}
+
+/* Grid texture */
+.grid-texture{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+
+/* Glows */
+.glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+.g1{width:420px;height:420px;background:var(--blue);opacity:.18;top:-100px;right:-60px;animation:gPulse 8s ease-in-out infinite}
+.g2{width:320px;height:320px;background:var(--purple);opacity:.12;bottom:-80px;left:-40px;animation:gPulse 10s 2s ease-in-out infinite}
+.g3{width:200px;height:200px;background:var(--green);opacity:.1;top:40%;left:30%;animation:gPulse 12s 4s ease-in-out infinite}
+@keyframes gPulse{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.15);opacity:.25}}
+
+/* Top brand */
+.lp-brand{position:relative;z-index:2;display:flex;align-items:center;gap:10px}
+.brand-pill{font-size:13px;font-weight:700;color:var(--white);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:6px 14px;border-radius:5px;letter-spacing:-.01em}
+
+/* Center content */
+.lp-center{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 0}
+.lp-tagline-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(59,91,219,.8);background:rgba(59,91,219,.15);border:1px solid rgba(59,91,219,.25);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;width:fit-content}
+.lp-headline{font-size:clamp(26px,2.8vw,38px);font-weight:800;color:var(--white);line-height:1.15;letter-spacing:-.02em;margin-bottom:14px}
+.lp-headline .ac{color:var(--blue-lt)}
+.lp-sub{font-size:14px;color:rgba(255,255,255,.52);line-height:1.65;max-width:380px;margin-bottom:40px}
+
+/* Floating stat cards */
+.stat-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.stat-row{display:flex;gap:12px}
+.stat-card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:14px 18px;
+  backdrop-filter:blur(8px);
+  flex:1;
+  animation:cardFloat 6s ease-in-out infinite;
+  transition:border-color var(--t);
+}
+.stat-card:hover{border-color:rgba(255,255,255,.2)}
+.stat-card:nth-child(2){animation-delay:1.5s}
+.stat-card:nth-child(3){animation-delay:3s}
+@keyframes cardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.sc-label{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.sc-badge{font-size:8px;background:rgba(59,91,219,.25);color:var(--blue-lt);padding:1px 5px;border-radius:3px;font-weight:700}
+.sc-val{font-size:19px;font-weight:800;color:var(--white);line-height:1}
+.sc-delta{font-size:10px;font-weight:600;margin-top:4px}
+.up{color:var(--green)}.dn{color:#fa5252}.warn{color:var(--amber)}
+
+/* Mini inline chart */
+.mini-line-chart{position:relative;height:48px;margin-top:4px}
+.mini-line-chart svg{width:100%;height:100%}
+
+/* Slide bar chart preview */
+.bar-preview{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px}
+.bp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bp-title{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em}
+.bp-tabs{display:flex;gap:4px}
+.bp-tab{font-size:8px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(59,91,219,.2);color:var(--blue-lt);border:none;cursor:pointer;font-family:var(--font);transition:all var(--t)}
+.bp-tab.on{background:var(--blue);color:white}
+.bp-bars{display:flex;gap:5px;align-items:flex-end;height:44px}
+.bp-bar{flex:1;border-radius:3px 3px 0 0;background:var(--blue);opacity:.7;transition:opacity var(--t),height .4s ease}
+.bp-bar:hover{opacity:1}
+
+/* VLI row */
+.vli-row-wrap{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.vli-r{display:flex;align-items:center;gap:8px}
+.vli-n{font-size:9px;color:rgba(255,255,255,.45);width:46px}
+.vli-tw{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.vli-f{height:100%;border-radius:2px;transition:width .6s ease}
+.vli-num{font-size:9px;font-weight:700;width:22px;text-align:right}
+
+/* Bottom dots / particles */
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  animation:particleDrift linear infinite;
+}
+@keyframes particleDrift{
+  0%{transform:translateY(100vh) translateX(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:.5}
+  100%{transform:translateY(-20px) translateX(var(--drift));opacity:0}
+}
+
+/* Bottom info */
+.lp-footer{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between}
+.lp-footer-stat{text-align:center}
+.lf-val{font-size:16px;font-weight:800;color:var(--white)}
+.lf-label{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
+.lp-footer-divider{width:1px;height:32px;background:rgba(255,255,255,.1)}
+
+/* ── RIGHT PANEL (Form) ── */
+.right-panel{
+  flex:1;
+  background:var(--body-bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:32px 24px;
+  overflow-y:auto;
+  position:relative;
+}
+.right-panel::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(59,91,219,.3) 30%,rgba(59,91,219,.3) 70%,transparent);
+}
+
+.form-card{
+  width:100%;max-width:400px;
+  background:var(--white);
+  border-radius:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  border:1px solid var(--border);
+  overflow:hidden;
+  animation:cardIn .5s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Tabs */
+.form-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--body-bg)}
+.tab-btn{
+  flex:1;padding:14px;font-family:var(--font);font-size:14px;font-weight:600;
+  background:none;border:none;cursor:pointer;color:var(--text-muted);
+  position:relative;transition:color var(--t);
+}
+.tab-btn::after{
+  content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;
+  background:var(--blue);border-radius:2px;
+  transform:scaleX(0);transition:transform var(--t);
+}
+.tab-btn.active{color:var(--navy);background:var(--white)}
+.tab-btn.active::after{transform:scaleX(1)}
+
+/* Form body */
+.form-body{padding:28px 28px 24px;display:none}
+.form-body.active{display:block}
+
+.form-header{margin-bottom:22px}
+.form-title{font-size:20px;font-weight:800;color:var(--text-dark);margin-bottom:4px;letter-spacing:-.02em}
+.form-sub{font-size:13px;color:var(--text-muted);line-height:1.5}
+
+/* Form fields */
+.field{margin-bottom:16px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:6px;letter-spacing:.01em}
+.input-wrap{position:relative}
+.input-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none;display:flex}
+input[type="text"],input[type="email"],input[type="password"],select{
+  width:100%;padding:10px 12px 10px 36px;
+  font-family:var(--font);font-size:14px;font-weight:500;color:var(--text-dark);
+  background:var(--body-bg);
+  border:1.5px solid var(--border);border-radius:8px;
+  outline:none;transition:border-color var(--t),box-shadow var(--t),background var(--t);
+  appearance:none;
+}
+input:focus,select:focus{border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px var(--blue-soft)}
+input.error{border-color:var(--red)}
+input::placeholder{color:var(--text-dim)}
+.input-no-icon{padding-left:12px !important}
+.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-dim);padding:2px;display:flex;transition:color var(--t)}
+.eye-btn:hover{color:var(--text-muted)}
+.field-hint{font-size:11px;color:var(--text-muted);margin-top:5px}
+.field-error{font-size:11px;color:var(--red);margin-top:5px;display:none}
+.field-error.show{display:block}
+
+/* Role selector */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px}
+.role-option{position:relative}
+.role-option input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
+.role-label{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 8px;border-radius:8px;border:1.5px solid var(--border);
+  cursor:pointer;transition:all var(--t);background:var(--body-bg);text-align:center;
+}
+.role-label:hover{border-color:var(--blue-lt);background:var(--blue-soft)}
+.role-option input:checked + .role-label{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.role-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:rgba(59,91,219,.12)}
+.role-name{font-size:10px;font-weight:700;color:var(--text-body)}
+.role-option input:checked + .role-label .role-name{color:var(--blue)}
+
+/* Password strength */
+.pw-strength{margin-top:7px}
+.pw-bars{display:flex;gap:3px;margin-bottom:4px}
+.pw-bar{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s ease}
+.pw-bar.s1{background:#fa5252}.pw-bar.s2{background:var(--amber)}.pw-bar.s3{background:var(--blue)}.pw-bar.s4{background:var(--green)}
+.pw-text{font-size:11px;color:var(--text-dim)}
+
+/* Checkbox */
+.check-field{display:flex;align-items:flex-start;gap:9px;margin-bottom:18px}
+.check-field input[type="checkbox"]{width:16px;height:16px;margin-top:1px;accent-color:var(--blue);flex-shrink:0;cursor:pointer}
+.check-field label{font-size:12px;color:var(--text-muted);font-weight:400;margin-bottom:0;cursor:pointer}
+.check-field label a{color:var(--blue);text-decoration:none}
+.check-field label a:hover{text-decoration:underline}
+
+/* Submit btn */
+.submit-btn{
+  width:100%;padding:12px;border-radius:9px;background:var(--blue);color:white;
+  font-family:var(--font);font-size:15px;font-weight:700;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all var(--t);margin-bottom:18px;
+  position:relative;overflow:hidden;
+}
+.submit-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);opacity:0;transition:opacity var(--t)}
+.submit-btn:hover{background:var(--blue-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(59,91,219,.35)}
+.submit-btn:hover::before{opacity:1}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn.loading .btn-text{opacity:0}
+.submit-btn .spinner{position:absolute;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.submit-btn.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider-text{font-size:12px;color:var(--text-dim);white-space:nowrap}
+
+/* SSO btn */
+.sso-btn{
+  width:100%;padding:10px;border-radius:8px;background:var(--body-bg);color:var(--text-body);
+  font-family:var(--font);font-size:13px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all var(--t);margin-bottom:8px;
+}
+.sso-btn:hover{border-color:var(--border-dk,#d1d5db);background:white;transform:translateY(-1px)}
+
+/* Footer links */
+.form-footer{text-align:center;font-size:12px;color:var(--text-muted)}
+.form-footer a{color:var(--blue);text-decoration:none;font-weight:600}
+.form-footer a:hover{text-decoration:underline}
+
+/* Success state */
+.success-state{display:none;padding:32px 28px;text-align:center}
+.success-icon{width:56px;height:56px;border-radius:50%;background:var(--green-soft);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-size:18px;font-weight:800;color:var(--text-dark);margin-bottom:8px}
+.success-sub{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:24px}
+
+/* Notification toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--navy);color:white;padding:12px 20px;border-radius:10px;
+  font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:1000;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);border:1px solid rgba(255,255,255,.12);
+  white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  html,body{overflow:auto}
+  .auth-layout{flex-direction:column;height:auto;min-height:100vh}
+  .left-panel{flex:none;width:100%;padding:28px 24px 32px;min-height:320px}
+  .stat-cards{display:none}
+  .bar-preview{display:none}
+  .right-panel{padding:28px 16px}
+  .right-panel::before{display:none}
+}
+@media(max-width:480px){
+  .field-row{grid-template-columns:1fr}
+  .lp-headline{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="auth-layout">
+
+  <!-- ══════════════ LEFT WALLPAPER PANEL ══════════════ -->
+  <div class="left-panel">
+    <div class="grid-texture" aria-hidden="true"></div>
+    <div class="glow g1" aria-hidden="true"></div>
+    <div class="glow g2" aria-hidden="true"></div>
+    <div class="glow g3" aria-hidden="true"></div>
+    <div class="particles" id="particles" aria-hidden="true"></div>
+
+    <!-- Brand -->
+    <div class="lp-brand">
+      <span class="brand-pill">Sri Lanka Tourism Analytics</span>
+    </div>
+
+    <!-- Center -->
+    <div class="lp-center">
+      <div class="lp-tagline-label" aria-hidden="true">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.8 5.5L15 8l-5.2 1.5L8 15l-1.8-5.5L1 8l5.2-1.5z" fill="#4c6ef5"/></svg>
+        Official SLTDA Analytics Partner
+      </div>
+      <h1 class="lp-headline">Data-driven decisions<br/>for <span class="ac">Sri Lanka's</span><br/>tourism future</h1>
+      <p class="lp-sub">AI-powered forecasting, real-time visitor load intelligence, and strategic insights — all in one portal.</p>
+
+      <!-- KPI Cards -->
+      <div class="stat-cards" aria-hidden="true">
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="sc-label">Total Arrivals <span class="sc-badge">2024</span></div>
+            <div class="sc-val">2.05M</div>
+            <div class="sc-delta up">▲ 38.1% vs 2023</div>
+            <div class="mini-line-chart">
+              <svg viewBox="0 0 200 48" preserveAspectRatio="none">
+                <defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b5bdb" stop-opacity=".3"/><stop offset="1" stop-color="#3b5bdb" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0 38 C30 34,50 30,70 28 C90 26,110 20,130 16 C150 12,170 10,200 8 L200 48 L0 48Z" fill="url(#gA)"/>
+                <path d="M0 38 C30 34,50 30,70 28 C90 26,110 20,130 16 C150 12,170 10,200 8" fill="none" stroke="#3b5bdb" stroke-width="1.5"/>
+                <circle cx="200" cy="8" r="3" fill="#3b5bdb"/>
+              </svg>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Revenue (USD) <span class="sc-badge">2024</span></div>
+            <div class="sc-val">$3.17B</div>
+            <div class="sc-delta up">▲ 53.1% vs 2023</div>
+            <div class="mini-line-chart">
+              <svg viewBox="0 0 200 48" preserveAspectRatio="none">
+                <defs><linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12b886" stop-opacity=".3"/><stop offset="1" stop-color="#12b886" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0 42 C40 36,70 26,100 22 C130 18,160 14,200 10 L200 48 L0 48Z" fill="url(#gB)"/>
+                <path d="M0 42 C40 36,70 26,100 22 C130 18,160 14,200 10" fill="none" stroke="#12b886" stroke-width="1.5"/>
+                <circle cx="200" cy="10" r="3" fill="#12b886"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <!-- Bar chart preview -->
+          <div class="bar-preview" style="flex:1">
+            <div class="bp-head">
+              <div class="bp-title">Monthly Predictions 2026</div>
+              <div class="bp-tabs">
+                <button class="bp-tab on" onclick="setBpTab(this,'base')">Baseline</button>
+                <button class="bp-tab" onclick="setBpTab(this,'opt')">Optimistic</button>
+                <button class="bp-tab" onclick="setBpTab(this,'pes')">Pessimistic</button>
+              </div>
+            </div>
+            <div class="bp-bars" id="bpBars">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+          <!-- VLI -->
+          <div class="stat-card" style="min-width:140px">
+            <div class="sc-label">Visitor Load Index <span class="sc-badge" style="background:rgba(250,82,82,.2);color:#fa5252">3 Alerts</span></div>
+            <div class="vli-row-wrap" id="vliRows"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer stats -->
+    <div class="lp-footer" aria-hidden="true">
+      <div class="lp-footer-stat"><div class="lf-val">50+</div><div class="lf-label">Sites Monitored</div></div>
+      <div class="lp-footer-divider"></div>
+      <div class="lp-footer-stat"><div class="lf-val">94%</div><div class="lf-label">Model Confidence</div></div>
+      <div class="lp-footer-divider"></div>
+      <div class="lp-footer-stat"><div class="lf-val">7-day</div><div class="lf-label">Rolling Forecast</div></div>
+      <div class="lp-footer-divider"></div>
+      <div class="lp-footer-stat"><div class="lf-val">17.1M</div><div class="lf-label">2030 Baseline</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ RIGHT FORM PANEL ══════════════ -->
+  <div class="right-panel" role="main">
+    <div class="form-card" id="formCard">
+
+      <!-- Tabs -->
+      <div class="form-tabs" role="tablist" aria-label="Authentication">
+        <button class="tab-btn active" id="tab-login" role="tab" aria-selected="true" aria-controls="panel-login" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tab-register" role="tab" aria-selected="false" aria-controls="panel-register" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div class="form-body active" id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+        <div class="form-header">
+          <div class="form-title">Welcome back</div>
+          <div class="form-sub">Sign in to your analytics portal</div>
+        </div>
+
+        <form id="loginForm" novalidate onsubmit="handleLogin(event)">
+          <div class="field">
+            <label for="login-email">Email Address</label>
+            <div class="input-wrap">
+              <span class="input-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M1.5 5.5l6.5 4 6.5-4"/></svg></span>
+              <input type="email" id="login-email" placeholder="you@organisation.lk" autocomplete="email" required/>
+            </div>
+            <div class="field-error" id="login-email-err">Please enter a valid email address.</div>
+          </div>
+
+          <div class="field">
+            <label for="login-password" style="display:flex;justify-content:space-between;align-items:center">
+              Password
+              <a href="#" style="font-size:11px;color:var(--blue);text-decoration:none;font-weight:600">Forgot password?</a>
+            </label>
+            <div class="input-wrap">
+              <span class="input-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="10" height="8" rx="2"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg></span>
+              <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required/>
+              <button type="button" class="eye-btn" onclick="togglePw('login-password',this)" aria-label="Toggle password visibility">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+              </button>
+            </div>
+            <div class="field-error" id="login-pw-err">Password is required.</div>
+          </div>
+
+          <div class="check-field">
+            <input type="checkbox" id="remember" name="remember"/>
+            <label for="remember">Keep me signed in for 30 days</label>
+          </div>
+
+          <button type="submit" class="submit-btn" id="loginBtn">
+            <span class="btn-text">Sign In to Portal</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="divider"><span class="divider-text">or continue with</span></div>
+        <button class="sso-btn" onclick="showToast('Google SSO coming soon')">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <button class="sso-btn" onclick="showToast('Microsoft SSO coming soon')">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.4 24H0V12.6h11.4V24z" fill="#F1511B"/><path d="M24 24H12.6V12.6H24V24z" fill="#80CC28"/><path d="M11.4 11.4H0V0h11.4v11.4z" fill="#00ADEF"/><path d="M24 11.4H12.6V0H24v11.4z" fill="#FBBC09"/></svg>
+          Continue with Microsoft
+        </button>
+
+        <div class="form-footer" style="margin-top:16px">
+          Don't have an account? <a href="#" onclick="switchTab('register');return false">Create one free</a>
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div class="form-body" id="panel-register" role="tabpanel" aria-labelledby="tab-register">
+        <div class="form-header">
+          <div class="form-title">Create your account</div>
+          <div class="form-sub">Join Sri Lanka's tourism intelligence network</div>
+        </div>
+
+        <form id="registerForm" novalidate onsubmit="handleRegister(event)">
+          <div class="field">
+            <div class="field-row">
+              <div>
+                <label for="reg-fname">First Name</label>
+                <div class="input-wrap">
+                  <span class="input-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></span>
+                  <input type="text" id="reg-fname" placeholder="First name" autocomplete="given-name" required/>
+                </div>
+              </div>
+              <div>
+                <label for="reg-lname">Last Name</label>
+                <div class="input-wrap">
+                  <span class="input-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></span>
+                  <input type="text" id="reg-lname" placeholder="Last name" autocomplete="family-name" required/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="reg-email">Organisation Email</label>
+            <div class="input-wrap">
+              <span class="input-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M1.5 5.5l6.5 4 6.5-4"/></svg></span>
+              <input type="email" id="reg-email" placeholder="you@organisation.lk" autocomplete="email" required/>
+            </div>
+            <div class="field-hint">Use your official government or business email.</div>
+            <div class="field-error" id="reg-email-err">Please enter a valid email.</div>
+          </div>
+
+          <div class="field">
+            <label for="reg-org">Organisation Name</label>
+            <div class="input-wrap">
+              <span class="input-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M5 6V4a3 3 0 0 1 6 0v2"/></svg></span>
+              <input type="text" id="reg-org" placeholder="e.g. SLTDA, Cinnamon Hotels" required/>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Your Role</label>
+            <div class="role-grid" role="radiogroup" aria-label="Select your role">
+              <div class="role-option">
+                <input type="radio" name="role" id="role-sltda" value="sltda" checked/>
+                <label class="role-label" for="role-sltda">
+                  <div class="role-icon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" stroke-width="1.8"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg></div>
+                  <span class="role-name">SLTDA / Govt</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-hotel" value="hotel"/>
+                <label class="role-label" for="role-hotel">
+                  <div class="role-icon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" stroke-width="1.8"><path d="M2 14V5l6-3 6 3v9"/><rect x="6" y="9" width="4" height="5"/></svg></div>
+                  <span class="role-name">Hotel / Resort</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-operator" value="operator"/>
+                <label class="role-label" for="role-operator">
+                  <div class="role-icon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" stroke-width="1.8"><circle cx="8" cy="8" r="2"/><circle cx="8" cy="8" r="6"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/></svg></div>
+                  <span class="role-name">Tour / Transport</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="reg-password">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="10" height="8" rx="2"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg></span>
+              <input type="password" id="reg-password" placeholder="Create a strong password" autocomplete="new-password" required oninput="checkStrength(this.value)"/>
+              <button type="button" class="eye-btn" onclick="togglePw('reg-password',this)" aria-label="Toggle password">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+              </button>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-bars"><div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div><div class="pw-bar" id="pb3"></div><div class="pw-bar" id="pb4"></div></div>
+              <div class="pw-text" id="pwText">Use 8+ characters with numbers and symbols.</div>
+            </div>
+          </div>
+
+          <div class="check-field">
+            <input type="checkbox" id="terms" required/>
+            <label for="terms">I agree to the <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>. Official email required for verification.</label>
+          </div>
+
+          <button type="submit" class="submit-btn" id="registerBtn">
+            <span class="btn-text">Create Account</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          Already have an account? <a href="#" onclick="switchTab('login');return false">Sign in here</a>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div class="success-state" id="successState" aria-live="polite">
+        <div class="success-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#12b886" stroke-width="2.5"><polyline points="4,12 9,17 20,7"/></svg>
+        </div>
+        <div class="success-title">Account Created!</div>
+        <div class="success-sub">Your request has been submitted. Our team will verify your organisation and send login credentials within 24–48 hours.</div>
+        <button class="submit-btn" onclick="switchTab('login')">Back to Sign In</button>
+      </div>
+
+    </div>
+
+    <!-- WCAG note -->
+    <div style="position:absolute;bottom:16px;right:20px;font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:5px">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="2" aria-hidden="true"><polyline points="2,8 6,12 14,4"/></svg>
+      WCAG 2.1 AA
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#4c6ef5" stroke-width="2" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5l2 1.5"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ── Tab switching ── */
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  document.getElementById('tab-login').setAttribute('aria-selected', isLogin);
+  document.getElementById('tab-register').setAttribute('aria-selected', !isLogin);
+  document.getElementById('panel-login').classList.toggle('active', isLogin);
+  document.getElementById('panel-register').classList.toggle('active', !isLogin);
+  document.getElementById('successState').style.display = 'none';
+  // Reset panels display
+  if (isLogin) {
+    document.getElementById('panel-login').style.display = 'block';
+    document.getElementById('panel-register').style.display = 'none';
+  } else {
+    document.getElementById('panel-login').style.display = 'none';
+    document.getElementById('panel-register').style.display = 'block';
+  }
+}
+
+/* ── Password toggle ── */
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  const isText = inp.type === 'text';
+  inp.type = isText ? 'password' : 'text';
+  btn.innerHTML = isText
+    ? `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>`
+    : `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13.4 3.6L2.6 14.4M6.4 6.5A2 2 0 0 0 9.5 9.6"/><path d="M4.6 4.7C2.6 6 1 8 1 8s3 5 7 5c1.4 0 2.7-.4 3.8-1.1"/><path d="M10.7 10.9C12.6 9.7 15 8 15 8s-3-5-7-5c-.7 0-1.3.1-1.9.3"/></svg>`;
+}
+
+/* ── Password strength ── */
+function checkStrength(val) {
+  const bars = [document.getElementById('pb1'),document.getElementById('pb2'),document.getElementById('pb3'),document.getElementById('pb4')];
+  const txt = document.getElementById('pwText');
+  bars.forEach(b => { b.className = 'pw-bar'; });
+  if (!val) { txt.textContent = 'Use 8+ characters with numbers and symbols.'; return; }
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const labels = ['','Too short','Fair','Good','Strong'];
+  const cls = ['','s1','s2','s3','s4'];
+  for (let i = 0; i < score; i++) bars[i].classList.add(cls[score]);
+  txt.textContent = labels[score] || '';
+  txt.style.color = ['','#fa5252','#f59f00','#3b5bdb','#12b886'][score];
+}
+
+/* ── Form validation helpers ── */
+function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function setError(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+}
+function setInputError(id, show) {
+  const inp = document.getElementById(id);
+  if (inp) inp.classList.toggle('error', show);
+}
+
+/* ── Login handler ── */
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const pw = document.getElementById('login-password').value;
+  let valid = true;
+  if (!validateEmail(email)) { setError('login-email-err',true); setInputError('login-email',true); valid=false; } else { setError('login-email-err',false); setInputError('login-email',false); }
+  if (!pw) { setError('login-pw-err',true); setInputError('login-password',true); valid=false; } else { setError('login-pw-err',false); setInputError('login-password',false); }
+  if (!valid) return;
+  const btn = document.getElementById('loginBtn');
+  btn.classList.add('loading');
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    showToast('Signed in successfully — redirecting…');
+  }, 1800);
+}
+
+/* ── Register handler ── */
+function handleRegister(e) {
+  e.preventDefault();
+  const email = document.getElementById('reg-email').value;
+  const terms = document.getElementById('terms').checked;
+  let valid = true;
+  if (!validateEmail(email)) { setError('reg-email-err',true); setInputError('reg-email',true); valid=false; } else { setError('reg-email-err',false); setInputError('reg-email',false); }
+  if (!terms) { showToast('Please accept the Terms of Use to continue.'); valid=false; }
+  if (!valid) return;
+  const btn = document.getElementById('registerBtn');
+  btn.classList.add('loading');
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    document.getElementById('panel-register').style.display = 'none';
+    document.getElementById('successState').style.display = 'block';
+  }, 2000);
+}
+
+/* ── Toast ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ── Bar chart data ── */
+const barData = {
+  base:[290,263,291,281,290,280,289,290,280,290,281,291],
+  opt: [310,280,315,302,312,301,308,313,302,312,303,315],
+  pes: [268,244,270,260,268,259,268,270,259,269,260,270]
+};
+function setBpTab(btn, key) {
+  document.querySelectorAll('.bp-tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderBars(key);
+}
+function renderBars(key) {
+  const data = barData[key];
+  const mx = Math.max(...data);
+  const container = document.getElementById('bpBars');
+  if (!container) return;
+  container.innerHTML = data.map((v,i) => {
+    const h = Math.round((v/mx)*100);
+    const colors = {base:'#3b5bdb',opt:'#12b886',pes:'#fa5252'};
+    return `<div class="bp-bar" style="height:${h}%;background:${colors[key]};opacity:0.7" title="${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]}: ${v}K"></div>`;
+  }).join('');
+}
+renderBars('base');
+
+/* ── VLI rows ── */
+const vliData=[{n:'Sigiriya',v:128,c:'#fa5252'},{n:'Kandy',v:88,c:'#12b886'},{n:'Galle',v:114,c:'#f59f00'},{n:'Mirissa',v:72,c:'#12b886'},{n:'Ella',v:96,c:'#3b5bdb'}];
+const vliContainer = document.getElementById('vliRows');
+if (vliContainer) {
+  vliContainer.innerHTML = vliData.map(d=>`
+    <div class="vli-r">
+      <span class="vli-n">${d.n}</span>
+      <div class="vli-tw"><div class="vli-f" style="width:${Math.min(d.v/130*100,100)}%;background:${d.c}"></div></div>
+      <span class="vli-num" style="color:${d.c}">${d.v}</span>
+    </div>`).join('');
+}
+
+/* ── Particles ── */
+const pc = document.getElementById('particles');
+if (pc) {
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const x = Math.random() * 100;
+    const dur = 12 + Math.random() * 18;
+    const delay = -Math.random() * 20;
+    const drift = (Math.random() - 0.5) * 120;
+    p.style.cssText = `left:${x}%;--drift:${drift}px;animation-duration:${dur}s;animation-delay:${delay}s;opacity:${0.1+Math.random()*0.2};width:${2+Math.random()*3}px;height:${2+Math.random()*3}px`;
+    pc.appendChild(p);
+  }
+}
+
+/* ── Init ── */
+switchTab('login');
+</script>
+</body>
+</html>

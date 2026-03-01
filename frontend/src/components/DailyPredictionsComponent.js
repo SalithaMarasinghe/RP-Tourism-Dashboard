@@ -157,7 +157,7 @@ function DailyPredictionsComponent() {
       }
 
       return (
-        <div className="bg-white p-4 border border-gray-200 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
+        <div className="bg-white p-4 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
           <div className="font-semibold text-gray-900 mb-2">{label}</div>
           <div className="font-medium text-purple-600 mb-3">
             Predicted Arrivals: {data.arrivals.toLocaleString()}

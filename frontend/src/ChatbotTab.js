@@ -111,28 +111,40 @@ function ChatHistorySidebar({
 
   return (
     <>
-      {/* Sidebar Backdrop (mobile) */}
+      {/* Sidebar Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-30 md:hidden"
+          className="fixed inset-0 bg-black/30 z-40"
           onClick={onClose}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Floating Sidebar */}
       <div
-        className={`fixed md:static left-0 top-0 w-64 h-full bg-white border-r border-gray-200 flex flex-col z-40 transform transition-transform duration-250 md:transform-none overflow-hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`fixed left-4 top-20 w-80 h-[calc(100vh-6rem)] bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col z-50 transform transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
+        }`}
       >
         {/* Header */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex-shrink-0">
           {/* AI Assistant Branding */}
-          <div className="flex items-center gap-3 mb-4">
-            <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">AI Assistant</h2>
-              <p className="text-xs text-gray-500">Tourism analytics & insights</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">AI Assistant</h2>
+                <p className="text-xs text-gray-500">Tourism analytics & insights</p>
+              </div>
             </div>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+              title="Close sidebar"
+            >
+              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
           <p className="text-xs font-semibold text-gray-600 uppercase mb-3">Chat History</p>
           <Button
@@ -157,10 +169,11 @@ function ChatHistorySidebar({
               {chats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${currentChatId === chat.id
-                    ? 'bg-blue-50'
-                    : 'hover:bg-gray-100'
-                    }`}
+                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${
+                    currentChatId === chat.id
+                      ? 'bg-blue-50'
+                      : 'hover:bg-gray-100'
+                  }`}
                 >
                   {editingChatId === chat.id ? (
                     <input
@@ -180,8 +193,9 @@ function ChatHistorySidebar({
                         onClick={() => onSelectChat(chat.id)}
                       >
                         <span
-                          className={`text-sm font-medium truncate flex-1 ${currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
-                            }`}
+                          className={`text-sm font-medium truncate flex-1 ${
+                            currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
+                          }`}
                           title={chat.title}
                         >
                           {chat.title}
@@ -197,20 +211,20 @@ function ChatHistorySidebar({
                               e.stopPropagation();
                               handleEditStart(chat);
                             }}
-                            className="p-1 hover:bg-gray-200 rounded"
-                            title="Rename chat"
+                            className="p-1 rounded hover:bg-gray-200 transition-colors"
+                            title="Edit chat title"
                           >
-                            <Pencil className="h-3 w-3 text-gray-600" />
+                            <Pencil className="h-3 w-3 text-gray-500" />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(chat.id);
+                              setDeletingChatId(chat.id);
                             }}
-                            className="p-1 hover:bg-red-100 rounded"
+                            className="p-1 rounded hover:bg-red-100 transition-colors"
                             title="Delete chat"
                           >
-                            <Trash2 className="h-3 w-3 text-red-600" />
+                            <Trash2 className="h-3 w-3 text-red-500" />
                           </button>
                         </div>
                       </div>
@@ -222,6 +236,36 @@ function ChatHistorySidebar({
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deletingChatId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Chat?</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this chat? This cannot be undone.
+            </p>
+            <div className="flex space-x-3">
+              <Button
+                onClick={() => setDeletingChatId(null)}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDelete(deletingChatId);
+                  setDeletingChatId(null);
+                }}
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -262,7 +306,7 @@ function ChatbotTab() {
     return () => unsubscribe();
   }, []);
 
-  const refreshChatList = async (user) => {
+  const refreshChatList = async (user, skipAutoLoad = false) => {
     try {
       const token = await (user || auth.currentUser).getIdToken();
       const res = await fetch(`${API_BASE}/api/chat/list`, {
@@ -273,8 +317,8 @@ function ChatbotTab() {
       const chatsList = data.chats || [];
       setChats(chatsList);
 
-      // Auto-load most recent chat if none selected
-      if (!currentChatId && chatsList.length > 0) {
+      // Auto-load most recent chat if none selected (but skip if user is actively chatting)
+      if (!skipAutoLoad && !currentChatId && chatsList.length > 0) {
         await loadChat(chatsList[0].id);
       }
     } catch (err) {
@@ -336,7 +380,7 @@ function ChatbotTab() {
         }
 
         // Refresh sidebar
-        await refreshChatList();
+        await refreshChatList(currentUser, true);
       }
 
       // Save the message
@@ -348,7 +392,7 @@ function ChatbotTab() {
       console.log('Message saved successfully');
 
       // Refresh sidebar to update updatedAt ordering
-      await refreshChatList();
+      await refreshChatList(currentUser, true);
 
       return chatId;
     } catch (error) {
@@ -825,28 +869,22 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         </div>
       )}
 
-      {/* Main Content - Two Column Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Chat History Sidebar */}
-        <ChatHistorySidebar
-          chats={chats}
-          currentChatId={currentChatId}
-          onSelectChat={(chatId) => {
-            loadChat(chatId);
-            setIsSidebarOpen(false);
-          }}
-          onNewChat={handleNewChat}
-          onDeleteChat={handleDeleteChat}
-          onRenameChat={handleRenameChat}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+      {/* Main Content - Full Width Chat */}
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Floating Chat History Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="fixed left-4 top-20 z-40 bg-blue-600 text-white p-3 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
+          title="Toggle chat history"
+        >
+          <History className="h-5 w-5" />
+        </button>
 
         {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Messages Area */}
           <div
-            className="flex-1 overflow-y-auto py-6 px-6"
+            className="flex-1 overflow-y-auto py-2 px-4"
             data-messages-container
           >
             {messages.length === 0 ? (
@@ -858,14 +896,14 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                 </div>
               </div>
             ) : (
-              <div className="space-y-3 mt-3">
+              <div className="space-y-2">
                 {messages.map((message, index) => (
                   <div
                     key={index}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`px-4 py-3 rounded-lg break-words ${message.sender === 'user'
+                      className={`px-3 py-2 rounded-lg break-words ${message.sender === 'user'
                         ? 'bg-blue-600 text-white max-w-[75%] md:max-w-[75%] lg:max-w-[75%]'
                         : 'bg-white text-gray-800 border border-gray-200 shadow-sm max-w-[90%] md:max-w-[75%] lg:max-w-[75%]'
                         }`}
@@ -926,26 +964,41 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           </div>
 
           {/* Input Bar */}
-          <div className="flex space-x-2 pt-6 border-t border-gray-200 p-6 bg-white">
+          <div className="flex space-x-2 pt-2 pb-2 border-t border-gray-200 px-4 bg-white">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               disabled={isLoading || !currentUser}
             />
             <Button
               onClick={handleSendMessage}
               disabled={isLoading || !inputMessage.trim() || !currentUser}
-              className="px-4 py-2"
+              className="px-3 py-2 bg-blue-600 hover:bg-blue-700"
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Chat History Sidebar - Floating */}
+      <ChatHistorySidebar
+        chats={chats}
+        currentChatId={currentChatId}
+        onSelectChat={(chatId) => {
+          loadChat(chatId);
+          setIsSidebarOpen(false);
+        }}
+        onNewChat={handleNewChat}
+        onDeleteChat={handleDeleteChat}
+        onRenameChat={handleRenameChat}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
     </div>
   );
 }
