@@ -498,6 +498,7 @@ export default function TDMSComponent() {
           )}
 
           {/* Emergency Response Planning */}
+          {dashboardData && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
