@@ -98,6 +98,38 @@ export function AuthProvider({ children }) {
         return sendPasswordResetEmail(auth, email);
     }
 
+    async function changePassword(currentPassword, newPassword) {
+        // First, reauthenticate user with current password
+        const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } = await import("firebase/auth");
+        const user = auth.currentUser;
+        
+        if (!user) {
+            throw new Error("No authenticated user found");
+        }
+        
+        // Create credential for reauthentication
+        const credential = EmailAuthProvider.credential(user.email, currentPassword);
+        
+        try {
+            // Reauthenticate user
+            await reauthenticateWithCredential(user, credential);
+            
+            // Update password
+            await updatePassword(user, newPassword);
+            
+            return { success: true };
+        } catch (error) {
+            console.error("Password change error:", error);
+            if (error.code === 'auth/wrong-password') {
+                throw new Error("Current password is incorrect");
+            } else if (error.code === 'auth/weak-password') {
+                throw new Error("New password is too weak");
+            } else {
+                throw new Error("Failed to update password: " + error.message);
+            }
+        }
+    }
+
     async function updateProfile(data) {
         const updated = await apiFetch("/api/auth/profile", {
             method: "PUT",
@@ -151,11 +183,13 @@ export function AuthProvider({ children }) {
     const value = {
         currentUser,
         userData,
+        loading,
         signup,
         login,
         googleSignIn,
         logout,
         resetPassword,
+        changePassword,
         updateProfile,
         deleteAccount
     };

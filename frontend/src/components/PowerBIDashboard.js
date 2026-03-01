@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import OverviewTab from './OverviewTab';
 import MonthlyPredictionsComponent from './MonthlyPredictionsComponent';
@@ -15,16 +15,22 @@ import {
   X,
   User,
   MapPin,
-  MessageCircle
+  MessageCircle,
+  ChevronDown,
+  LogOut,
+  Settings
 } from 'lucide-react';
 
 function PowerBIDashboard() {
 
-  const { userData, currentUser } = React.useContext(AuthContext);
+  const { userData, currentUser, logout } = React.useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
 
 
@@ -38,17 +44,65 @@ function PowerBIDashboard() {
 
         setIsSidebarOpen(false);
 
+        setIsProfileDropdownOpen(false);
+
       }
 
     };
 
+    document.addEventListener('keydown', handleEscape);
 
-
-    window.addEventListener('keydown', handleEscape);
-
-    return () => window.removeEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
 
   }, []);
+
+  // Close dropdown when clicking outside
+
+  React.useEffect(() => {
+
+    const handleClickOutside = (event) => {
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+
+        setIsProfileDropdownOpen(false);
+
+      }
+
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+  }, []);
+
+  const handleLogout = async () => {
+
+    try {
+
+      await logout();
+
+      navigate('/login');
+
+    } catch (error) {
+
+      console.error('Logout failed:', error);
+
+    }
+
+  };
+
+  const getUserInitials = () => {
+
+    if (!userData) return "U";
+
+    const first = userData.firstName?.[0] || "";
+
+    const last = userData.lastName?.[0] || "";
+
+    return (first + last).toUpperCase() || "U";
+
+  };
 
 
 
@@ -80,7 +134,7 @@ function PowerBIDashboard() {
 
       <header className="bg-gray-800 text-white border-b border-gray-700">
 
-        <div className="flex items-center justify-between px-4 py-2">
+        <div className="flex items-center justify-between px-4 py-1">
 
           <div className="flex items-center space-x-4">
 
@@ -112,27 +166,69 @@ function PowerBIDashboard() {
 
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 relative" ref={dropdownRef}>
 
-            <div className="text-sm">
-
+            <button
+              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              className="flex items-center space-x-2 text-sm hover:bg-gray-700 rounded-md px-3 py-2 transition-colors"
+            >
               <span className="text-gray-300">Logged in as:</span>
+              <span className="ml-2 font-semibold text-white">{displayName}</span>
+              <User className="h-4 w-4 text-gray-300" />
+              <ChevronDown className={`h-4 w-4 text-gray-300 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-              <span className="ml-2 font-semibold">{displayName}</span>
+            {/* Profile Dropdown */}
+            {isProfileDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 overflow-hidden">
+                {/* User Summary */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                      {getUserInitials()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900 truncate">
+                        {userData?.firstName || ""} {userData?.lastName || ""}
+                      </div>
+                      <div className="text-sm text-gray-500 truncate">
+                        {currentUser?.email}
+                      </div>
+                      {userData?.role && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            {userData.role.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-            </div>
+                {/* Navigation Actions */}
+                <div className="py-1">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsProfileDropdownOpen(false)}
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Settings className="h-4 w-4 mr-3 text-gray-400 flex-shrink-0" />
+                    Account settings
+                  </Link>
+                </div>
 
-            <Link to="/profile">
-
-              <Button size="sm" variant="ghost" className="text-white hover:bg-gray-700">
-
-                <User className="h-4 w-4" />
-
-              </Button>
-
-            </Link>
-
-
+                {/* Logout Action */}
+                <div className="border-t border-gray-100 pt-1">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
+                    Log out
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
 

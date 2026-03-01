@@ -126,6 +126,14 @@ function ChatHistorySidebar({
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
+          {/* AI Assistant Branding */}
+          <div className="flex items-center gap-3 mb-4">
+            <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">AI Assistant</h2>
+              <p className="text-xs text-gray-500">Tourism analytics & insights</p>
+            </div>
+          </div>
           <p className="text-xs font-semibold text-gray-600 uppercase mb-3">Chat History</p>
           <Button
             onClick={onNewChat}
@@ -808,27 +816,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
   return (
     <div className="flex flex-col w-full h-full">
-      {/* Header */}
-      <div className="pb-4 border-b border-gray-200">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="md:hidden p-2 hover:bg-gray-100 rounded transition-colors"
-              title="Toggle chat history"
-            >
-              <History className="h-5 w-5 text-gray-600" />
-            </button>
-            <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
-            <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
-            <span className="text-gray-400">|</span>
-            <p className="text-gray-600 truncate">
-              Chat with our AI assistant for tourism analytics and insights
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Auth Warning */}
       {authWarning && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-4">

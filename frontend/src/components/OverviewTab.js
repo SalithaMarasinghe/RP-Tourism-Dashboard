@@ -7,6 +7,16 @@ import {
   Globe,
   Brain
 } from 'lucide-react';
+import {
+  LineChart as ReLineChart,
+  Line,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 function OverviewTab() {
   const [monthlyData, setMonthlyData] = useState([]);
@@ -14,6 +24,17 @@ function OverviewTab() {
   const [currentScenario, setCurrentScenario] = useState('baseline');
   const [nextMonthPrediction, setNextMonthPrediction] = useState(null);
   const [predictedGrowth, setPredictedGrowth] = useState(null);
+
+  const fiveYearTrendData = React.useMemo(() => {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const years = [2026, 2027, 2028, 2029, 2030];
+    return years.flatMap(year =>
+      months.map((month, i) => ({
+        label: i === 0 ? `${year}` : '',
+        value: 250000 + (year - 2026) * 15000 + Math.sin((i / 12) * Math.PI * 2) * 25000
+      }))
+    );
+  }, []);
 
   // Get next month name and year
   const getNextMonth = () => {
@@ -64,7 +85,7 @@ function OverviewTab() {
           return;
         }
 
-        const last12Months = scenarioData.slice(-12).map(item => {
+        const last12Months = scenarioData.slice(0, 12).map(item => {
           console.log('Processing item:', item);
           return {
             date: item.date,
@@ -240,7 +261,7 @@ function OverviewTab() {
             <CardTitle className="text-lg font-semibold flex items-center justify-between">
               <div className="flex items-center">
                 <LineChart className="h-5 w-5 mr-2 text-blue-600" />
-                Monthly Tourist Arrivals
+                Monthly Tourist Predictions
               </div>
               <div className="flex space-x-2">
                 {['baseline', 'optimistic', 'pessimistic'].map((scenario) => (
@@ -286,7 +307,7 @@ function OverviewTab() {
                   })}
                 </div>
                 <div className="mt-4 text-xs text-gray-500 text-center">
-                  Showing {currentScenario} scenario forecast for last 12 months
+                  Showing {currentScenario} scenario predictions for 2026
                 </div>
               </div>
             ) : (
@@ -338,6 +359,47 @@ function OverviewTab() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* 5-Year Monthly Arrival Trend */}
+      <div className="bg-white rounded-xl border shadow-sm p-6 mt-6">
+        <h3 className="text-base font-semibold text-gray-800 mb-1">5-Year Monthly Arrival Trend</h3>
+        <p className="text-sm text-gray-500 mb-4">2026 – 2030 forecast trend</p>
+        <div style={{ width: '100%', height: 220 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ReLineChart data={fiveYearTrendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <defs>
+                <linearGradient id="fiveYearGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 12, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis hide={true} />
+              <Tooltip content={() => null} />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="none"
+                fill="url(#fiveYearGradient)"
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#8b5cf6"
+                strokeWidth={3}
+                dot={false}
+                activeDot={false}
+              />
+            </ReLineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* ML Model Performance Summary */}
