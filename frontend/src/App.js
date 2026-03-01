@@ -947,7 +947,7 @@ function OverviewTab() {
 
             {isLoading ? (
 
-              <div className="h-80 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 flex items-center justify-center">
+              <div className="h-96 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 flex items-center justify-center">
 
                 <div className="text-blue-600">Loading monthly data...</div>
 
@@ -955,7 +955,7 @@ function OverviewTab() {
 
             ) : monthlyData.length > 0 ? (
 
-              <div className="h-80 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 overflow-y-auto">
+              <div className="h-96 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
 
                 <div className="space-y-2">
 
@@ -1007,10 +1007,8 @@ function OverviewTab() {
 
             ) : (
 
-              <div className="h-80 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 flex items-center justify-center">
-
+              <div className="h-96 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 flex items-center justify-center">
                 <div className="text-blue-600">No data available</div>
-
               </div>
 
             )}

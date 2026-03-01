@@ -5,6 +5,7 @@ import { Calendar, Download } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from 'recharts';
 
 // Daily Predictions Tab Component
 function DailyPredictionsComponent() {
@@ -105,6 +106,74 @@ function DailyPredictionsComponent() {
     const data = generateForecastPeriod();
     setForecastData(data);
   }, [selectedYear, selectedMonth, selectedDay, forecastDays, currentScenario, scenariosData]);
+
+  // Prepare chart data from filtered daily predictions
+  const dailyChartData = React.useMemo(() => {
+    return forecastData.map(item => ({
+      date: item.day,
+      arrivals: typeof item.prediction === 'number' ? item.prediction : 0,
+      externalFactors: item.externalFactors || []
+    }));
+  }, [forecastData]);
+
+  // Helper functions for chart (matching monthly implementation)
+  const formatNumberWithCommas = (value) => {
+    return value.toLocaleString();
+  };
+
+  const formatTooltip = (value, name) => {
+    return [formatNumberWithCommas(value), 'Predicted Arrivals'];
+  };
+
+  const truncateDate = (dateString) => {
+    // "Friday, January 2, 2026" → "Fri, Jan 2"
+    if (typeof dateString !== 'string') return dateString;
+    const parts = dateString.split(', ');
+    if (parts.length >= 2) {
+      return parts[0].substring(0, 3) + ', ' + parts[1].replace(/ 20\d{2}$/, '');
+    }
+    return dateString;
+  };
+
+  const formatFactor = (percentage) => {
+    const value = parseFloat(percentage);
+    const color = value >= 0 ? 'text-green-600' : 'text-red-600';
+    return <span className={color}>{percentage}</span>;
+  };
+
+  // Custom Tooltip Component for Daily Chart (same as monthly)
+  const DailyCustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      
+      // Convert external factors array to object for easier access
+      const factorsMap = {};
+      if (data.externalFactors && Array.isArray(data.externalFactors)) {
+        data.externalFactors.forEach(factor => {
+          // Convert factor names to match expected keys
+          const key = factor.name.toLowerCase().replace(/\s+/g, '_');
+          factorsMap[key] = factor.value;
+        });
+      }
+
+      return (
+        <div className="bg-white p-4 border border-gray-200 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
+          <div className="font-semibold text-gray-900 mb-2">{label}</div>
+          <div className="font-medium text-purple-600 mb-3">
+            Predicted Arrivals: {data.arrivals.toLocaleString()}
+          </div>
+          <div className="space-y-1 text-sm">
+            <div className="font-medium text-gray-700 mb-1">External Factor Contributions:</div>
+            <div>• Economic Indicators: {formatFactor(factorsMap.economic_indicators || '0%')}</div>
+            <div>• Exchange Rates: {formatFactor(factorsMap.exchange_rates || '0%')}</div>
+            <div>• Weather: {formatFactor(factorsMap.weather || '0%')}</div>
+            <div>• Google Trends: {formatFactor(factorsMap.google_trends || '0%')}</div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   // Generate years array (current year to 3 years ahead)
   const currentYear = new Date().getFullYear();
@@ -367,7 +436,50 @@ function DailyPredictionsComponent() {
         </CardContent>
       </Card>
 
-      {/* Daily Predictions Table */}
+      {/* Daily Tourist Arrival Forecast Chart - MOVED UP */}
+      {forecastData.length > 0 && (
+        <Card className="power-bi-card mt-6 mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Daily Tourist Arrival Forecast Chart</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={dailyChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  angle={-45} 
+                  height={80}
+                  tickFormatter={truncateDate}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  tickFormatter={formatNumberWithCommas}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip content={<DailyCustomTooltip />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="arrivals" 
+                  stroke="#9333ea" 
+                  fill="#f3e8ff" 
+                  fillOpacity={0.6}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="arrivals" 
+                  stroke="#9333ea" 
+                  strokeWidth={3}
+                  dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Daily Predictions Table - MOVED DOWN */}
       <Card className="power-bi-card">
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center">

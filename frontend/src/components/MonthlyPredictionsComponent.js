@@ -6,6 +6,7 @@ import { Download } from 'lucide-react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from 'recharts';
 
 // Monthly Predictions Tab Component
 function MonthlyPredictionsComponent() {
@@ -128,6 +129,64 @@ function MonthlyPredictionsComponent() {
   };
 
   const forecastData = React.useMemo(() => generateForecastPeriod(), [selectedYear, selectedMonth, forecastMonths, currentScenario, scenariosData]);
+
+  // Prepare chart data from filtered predictions
+  const chartData = React.useMemo(() => {
+    return forecastData.map(item => ({
+      month: item.month,
+      arrivals: typeof item.prediction === 'number' ? item.prediction : 0,
+      externalFactors: item.externalFactors || []
+    }));
+  }, [forecastData]);
+
+  // Helper functions for chart
+  const formatNumberWithCommas = (value) => {
+    return value.toLocaleString();
+  };
+
+  const formatTooltip = (value, name) => {
+    return [formatNumberWithCommas(value), 'Predicted Arrivals'];
+  };
+
+  const formatFactor = (percentage) => {
+    const value = parseFloat(percentage);
+    const color = value >= 0 ? 'text-green-600' : 'text-red-600';
+    return <span className={color}>{percentage}</span>;
+  };
+
+  // Custom Tooltip Component with External Factors
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      
+      // Convert external factors array to object for easier access
+      const factorsMap = {};
+      if (data.externalFactors && Array.isArray(data.externalFactors)) {
+        data.externalFactors.forEach(factor => {
+          // Convert factor names to match expected keys
+          const key = factor.name.toLowerCase().replace(/\s+/g, '_');
+          factorsMap[key] = factor.value;
+        });
+      }
+
+      return (
+        <div className="bg-white p-4 border border-gray-200 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
+          <div className="font-semibold text-gray-900 mb-2">{label}</div>
+          <div className="font-medium text-purple-600 mb-3">
+            Predicted Arrivals: {data.arrivals.toLocaleString()}
+          </div>
+          <div className="space-y-1 text-sm">
+            <div className="font-medium text-gray-700 mb-1">External Factor Contributions:</div>
+            <div>• Economic Indicators: {formatFactor(factorsMap.economic_indicators || '0%')}</div>
+            <div>• Exchange Rates: {formatFactor(factorsMap.exchange_rates || '0%')}</div>
+            <div>• Weather: {formatFactor(factorsMap.weather || '0%')}</div>
+            <div>• Google Trends: {formatFactor(factorsMap.google_trends || '0%')}</div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   // PDF Export Handler
   const handleExportPredictions = () => {
@@ -340,7 +399,49 @@ function MonthlyPredictionsComponent() {
         </CardContent>
       </Card>
 
-      {/* Forecast Results */}
+      {/* Monthly Tourist Arrival Forecast Chart - MOVED UP */}
+      {forecastData.length > 0 && (
+        <Card className="power-bi-card mt-6 mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Monthly Tourist Arrival Forecast Chart</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="month" 
+                  angle={-45} 
+                  height={80}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  tickFormatter={formatNumberWithCommas}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="arrivals" 
+                  stroke="#9333ea" 
+                  fill="#f3e8ff" 
+                  fillOpacity={0.6}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="arrivals" 
+                  stroke="#9333ea" 
+                  strokeWidth={3}
+                  dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Forecast Results - MOVED DOWN */}
       <Card className="power-bi-card">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Forecast Results</CardTitle>
