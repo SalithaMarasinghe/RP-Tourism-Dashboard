@@ -24,6 +24,13 @@ export default function TDMSComponent() {
   const [loading, setLoading] = useState(false);
   const [activeView, setActiveView] = useState('insights');
 
+  // Advanced Capacity Management State
+  const [capacityAlerts, setCapacityAlerts] = useState([]);
+  const [seasonalAnalysis, setSeasonalAnalysis] = useState({});
+  const [infrastructureLoad, setInfrastructureLoad] = useState({});
+  const [emergencyScenarios, setEmergencyScenarios] = useState([]);
+  const [alertThreshold, setAlertThreshold] = useState(80);
+
   // Load initial data
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -55,6 +62,89 @@ export default function TDMSComponent() {
     };
     fetchInitialData();
   }, []);
+
+  // Advanced Capacity Management - Real-time Alerts
+  useEffect(() => {
+    if (dashboardData?.vli_scores) {
+      const alerts = dashboardData.vli_scores
+        .filter(site => site.vli_score > alertThreshold)
+        .map(site => ({
+          site: site.site,
+          vli_score: site.vli_score,
+          severity: site.vli_score > 120 ? 'critical' : site.vli_score > 100 ? 'high' : 'moderate',
+          visitors: site.visitors,
+          capacity_utilization: ((site.vli_score / 100) * 100).toFixed(1),
+          timestamp: new Date().toISOString()
+        }));
+      
+      setCapacityAlerts(alerts);
+      console.log('TDMSComponent: Capacity alerts generated:', alerts);
+    }
+  }, [dashboardData, alertThreshold]);
+
+  // Seasonal Capacity Planning Analysis
+  useEffect(() => {
+    if (selectedSite && monthlyData.length > 0) {
+      const monthlyAvg = monthlyData.reduce((sum, month) => sum + month.total_visitors, 0) / monthlyData.length;
+      const peakMonth = monthlyData.reduce((max, month) => 
+        month.total_visitors > max.total_visitors ? month : max, monthlyData[0]);
+      const offPeakMonth = monthlyData.reduce((min, month) => 
+        month.total_visitors < min.total_visitors ? month : min, monthlyData[0]);
+      
+      const seasonalVariation = ((peakMonth.total_visitors - offPeakMonth.total_visitors) / offPeakMonth.total_visitors) * 100;
+      
+      setSeasonalAnalysis({
+        site: selectedSite,
+        monthly_average: Math.round(monthlyAvg),
+        peak_month: peakMonth.month,
+        peak_visitors: peakMonth.total_visitors,
+        off_peak_month: offPeakMonth.month,
+        off_peak_visitors: offPeakMonth.total_visitors,
+        seasonal_variation_percent: seasonalVariation.toFixed(1),
+        strategy: seasonalVariation > 50 ? 'high_variation' : seasonalVariation > 25 ? 'moderate_variation' : 'stable'
+      });
+    }
+  }, [selectedSite, monthlyData]);
+
+  // Infrastructure Load Balancing Analysis
+  useEffect(() => {
+    if (dashboardData?.vli_scores) {
+      const loadAnalysis = dashboardData.vli_scores.map(site => {
+        const utilizationRate = (site.vli_score / 100) * 100;
+        const loadCategory = utilizationRate > 100 ? 'overloaded' : 
+                           utilizationRate > 80 ? 'high_load' : 
+                           utilizationRate > 60 ? 'moderate_load' : 'optimal';
+        
+        return {
+          ...site,
+          utilization_rate: utilizationRate.toFixed(1),
+          load_category: loadCategory,
+          recommended_action: getRecommendedAction(loadCategory),
+          infrastructure_stress: utilizationRate > 100 ? 'critical' : utilizationRate > 80 ? 'high' : 'normal'
+        };
+      });
+      
+      setInfrastructureLoad({
+        analysis_date: selectedDate,
+        total_sites: loadAnalysis.length,
+        overloaded_sites: loadAnalysis.filter(s => s.load_category === 'overloaded').length,
+        high_load_sites: loadAnalysis.filter(s => s.load_category === 'high_load').length,
+        optimal_sites: loadAnalysis.filter(s => s.load_category === 'optimal').length,
+        site_analysis: loadAnalysis
+      });
+    }
+  }, [dashboardData, selectedDate]);
+
+  // Helper function for infrastructure recommendations
+  const getRecommendedAction = (loadCategory) => {
+    const actions = {
+      'overloaded': 'Immediate visitor redistribution required',
+      'high_load': 'Consider visitor flow management',
+      'moderate_load': 'Monitor capacity utilization',
+      'optimal': 'Current load is acceptable'
+    };
+    return actions[loadCategory] || 'Monitor capacity levels';
+  };
 
   // Load dashboard data when date changes
   useEffect(() => {
@@ -213,80 +303,275 @@ export default function TDMSComponent() {
           <TabsTrigger value="redistribution">Redistribution Simulator</TabsTrigger>
         </TabsList>
 
-        {/* View 1: Prediction Insights */}
+        {/* View 1: Prediction Insights with Advanced Capacity Management */}
         <TabsContent value="insights" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Site & Year Selection</CardTitle>
-                <CardDescription>Select a site and year to view prediction insights</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Site</label>
-                    <select
-                      value={selectedSite}
-                      onChange={(e) => setSelectedSite(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Select a site...</option>
-                      {availableSites.map(site => (
-                        <option key={site} value={site}>{site}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Year</label>
-                    <select
-                      value={selectedYear}
-                      onChange={(e) => setSelectedYear(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="2026">2026</option>
-                      <option value="2027">2027</option>
-                      <option value="2028">2028</option>
-                      <option value="2029">2029</option>
-                      <option value="2030">2030</option>
-                    </select>
-                  </div>
+          {/* Real-time Capacity Alerts */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                  Real-time Capacity Alerts
+                </span>
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium">Alert Threshold:</label>
+                  <select 
+                    value={alertThreshold} 
+                    onChange={(e) => setAlertThreshold(Number(e.target.value))}
+                    className="px-2 py-1 border rounded text-sm"
+                  >
+                    <option value={70}>70%</option>
+                    <option value={80}>80%</option>
+                    <option value={90}>90%</option>
+                    <option value={100}>100%</option>
+                  </select>
                 </div>
-              </CardContent>
-            </Card>
+              </CardTitle>
+              <CardDescription>
+                Sites exceeding VLI threshold - {capacityAlerts.length} sites affected
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {capacityAlerts.length > 0 ? (
+                <div className="space-y-3">
+                  {capacityAlerts.map((alert, index) => (
+                    <div key={index} className={`p-4 rounded-lg border-l-4 ${
+                      alert.severity === 'critical' ? 'bg-red-50 border-red-600' :
+                      alert.severity === 'high' ? 'bg-orange-50 border-orange-600' :
+                      'bg-yellow-50 border-yellow-600'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-800">{alert.site}</h4>
+                          <p className="text-sm text-gray-600">
+                            VLI: {alert.vli_score.toFixed(1)}% | 
+                            Visitors: {alert.visitors.toLocaleString()} | 
+                            Utilization: {alert.capacity_utilization}%
+                          </p>
+                        </div>
+                        <Badge className={
+                          alert.severity === 'critical' ? 'bg-red-600' :
+                          alert.severity === 'high' ? 'bg-orange-600' :
+                          'bg-yellow-600'
+                        }>
+                          {alert.severity.toUpperCase()}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="text-green-600 text-lg mb-2">✓ All Sites Operating Normally</div>
+                  <p>No sites exceeding {alertThreshold}% VLI threshold</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
+          {/* Seasonal Capacity Planning */}
+          {seasonalAnalysis.site && (
             <Card>
               <CardHeader>
-                <CardTitle>KPI Metrics</CardTitle>
-                <CardDescription>Key performance indicators for selected site and year</CardDescription>
+                <CardTitle className="flex items-center">
+                  <Calendar className="h-5 w-5 mr-2 text-blue-600" />
+                  Seasonal Capacity Planning - {seasonalAnalysis.site}
+                </CardTitle>
+                <CardDescription>
+                  Peak/off-season analysis for strategic resource allocation
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Yearly Peak Demand</p>
-                        <p className="text-xl font-bold text-blue-600">
-                          {monthlyData.length > 0 ? Math.max(...monthlyData.map(m => m.total_visitors)).toLocaleString() : 'N/A'}
-                        </p>
-                      </div>
-                      <TrendingUp className="h-6 w-6 text-blue-500" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {seasonalAnalysis.monthly_average.toLocaleString()}
                     </div>
+                    <div className="text-sm text-gray-600">Monthly Average</div>
                   </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Average Monthly Volume</p>
-                        <p className="text-xl font-bold text-green-600">
-                          {monthlyData.length > 0 ? Math.round(monthlyData.reduce((sum, m) => sum + m.total_visitors, 0) / monthlyData.length).toLocaleString() : 'N/A'}
-                        </p>
-                      </div>
-                      <BarChart3 className="h-6 w-6 text-green-500" />
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-lg font-semibold text-green-800">{seasonalAnalysis.peak_month}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {seasonalAnalysis.peak_visitors.toLocaleString()}
                     </div>
+                    <div className="text-sm text-gray-600">Peak Month</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-lg font-semibold text-orange-800">{seasonalAnalysis.off_peak_month}</div>
+                    <div className="text-2xl font-bold text-orange-600">
+                      {seasonalAnalysis.off_peak_visitors.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Off-Peak Month</div>
+                  </div>
+                </div>
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-gray-700">Seasonal Variation:</span>
+                    <Badge className={
+                      seasonalAnalysis.strategy === 'high_variation' ? 'bg-red-100 text-red-800' :
+                      seasonalAnalysis.strategy === 'moderate_variation' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
+                    }>
+                      {seasonalAnalysis.seasonal_variation_percent}%
+                    </Badge>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <strong>Recommended Strategy:</strong> {
+                      seasonalAnalysis.strategy === 'high_variation' ? 'Implement aggressive visitor redistribution during peak months' :
+                      seasonalAnalysis.strategy === 'moderate_variation' ? 'Consider seasonal pricing adjustments' :
+                      'Maintain current capacity levels'
+                    }
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
+
+          {/* Infrastructure Load Balancing */}
+          {infrastructureLoad.total_sites && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-purple-600" />
+                  Infrastructure Load Balancing
+                </CardTitle>
+                <CardDescription>
+                  System-wide capacity utilization and recommended actions - {infrastructureLoad.analysis_date}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{infrastructureLoad.optimal_sites}</div>
+                    <div className="text-sm text-gray-600">Optimal Sites</div>
+                  </div>
+                  <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">{infrastructureLoad.high_load_sites}</div>
+                    <div className="text-sm text-gray-600">High Load Sites</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">{infrastructureLoad.overloaded_sites}</div>
+                    <div className="text-sm text-gray-600">Overloaded Sites</div>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{infrastructureLoad.total_sites}</div>
+                    <div className="text-sm text-gray-600">Total Sites</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {infrastructureLoad.site_analysis?.map((site, index) => (
+                    <div key={index} className={`p-4 rounded-lg border ${
+                      site.load_category === 'overloaded' ? 'bg-red-50 border-red-200' :
+                      site.load_category === 'high_load' ? 'bg-orange-50 border-orange-200' :
+                      site.load_category === 'moderate_load' ? 'bg-yellow-50 border-yellow-200' :
+                      'bg-green-50 border-green-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-800">{site.site}</h4>
+                          <div className="text-sm text-gray-600">
+                            VLI: {site.vli_score.toFixed(1)}% | 
+                            Utilization: {site.utilization_rate}% | 
+                            Visitors: {site.visitors.toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge className={`mb-2 ${
+                            site.load_category === 'overloaded' ? 'bg-red-600' :
+                            site.load_category === 'high_load' ? 'bg-orange-600' :
+                            site.load_category === 'moderate_load' ? 'bg-yellow-600' :
+                            'bg-green-600'
+                          }`}>
+                            {site.load_category.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                          <div className="text-xs text-gray-600 mt-1 max-w-xs">
+                            {site.recommended_action}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Emergency Response Planning */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                Emergency Response Planning
+              </CardTitle>
+              <CardDescription>
+                Overcrowding mitigation scenarios and response strategies
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">Critical Overcrowding</h4>
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <p><strong>Trigger:</strong> VLI &gt; 120% for 2+ hours</p>
+                      <p><strong>Immediate Actions:</strong></p>
+                      <ul className="list-disc list-inside ml-4 space-y-1">
+                        <li>Activate visitor flow control</li>
+                        <li>Deploy additional staff</li>
+                        <li>Initiate redistribution to nearby sites</li>
+                        <li>Activate emergency transport</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-orange-50 rounded-lg">
+                    <h4 className="font-semibold text-orange-800 mb-2">High Capacity Strain</h4>
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <p><strong>Trigger:</strong> VLI &gt; 100-120% for 4+ hours</p>
+                      <p><strong>Response Actions:</strong></p>
+                      <ul className="list-disc list-inside ml-4 space-y-1">
+                        <li>Implement timed entry system</li>
+                        <li>Increase security presence</li>
+                        <li>Prepare contingency transport</li>
+                        <li>Alert nearby facilities</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-2">Proactive Mitigation Strategies</h4>
+                  <div className="text-sm text-gray-700 space-y-2">
+                    <div className="flex items-center justify-between p-2 bg-white rounded">
+                      <span>Dynamic Pricing:</span>
+                      <Badge className="bg-green-600">Recommended</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-white rounded">
+                      <span>Visitor Caps:</span>
+                      <Badge className="bg-green-600">Implement</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-white rounded">
+                      <span>Real-time Monitoring:</span>
+                      <Badge className="bg-green-600">Active</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-white rounded">
+                      <span>Alternative Routes:</span>
+                      <Badge className="bg-yellow-600">Plan</Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-center mt-4">
+                  <Button className="bg-red-600 hover:bg-red-700">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Run Emergency Simulation
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          )}
 
           {/* Monthly Aggregation Chart */}
           <Card>
