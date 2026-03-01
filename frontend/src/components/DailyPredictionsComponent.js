@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Calendar } from 'lucide-react';
+import { Calendar, Download } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Daily Predictions Tab Component
 function DailyPredictionsComponent() {
-  // Set default date to January 1, 2026
-  const [selectedYear, setSelectedYear] = useState(2026);
-  const [selectedMonth, setSelectedMonth] = useState(1); // January
-  const [selectedDay, setSelectedDay] = useState(1); // 1st
+  // Set default date to TODAY (current date when user views dashboard)
+  const today = new Date();
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1); // JavaScript months are 0-11, we need 1-12
+  const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [forecastDays, setForecastDays] = useState(7);
   const [scenariosData, setScenariosData] = useState({});
   const [currentScenario, setCurrentScenario] = useState('baseline');
@@ -102,8 +106,9 @@ function DailyPredictionsComponent() {
     setForecastData(data);
   }, [selectedYear, selectedMonth, selectedDay, forecastDays, currentScenario, scenariosData]);
 
-  // Generate years array (2026 to 2030)
-  const years = Array.from({ length: 5 }, (_, i) => 2026 + i);
+  // Generate years array (current year to 3 years ahead)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) => currentYear + i);
 
   // Generate months array
   const months = [
@@ -134,6 +139,137 @@ function DailyPredictionsComponent() {
     setCurrentScenario(scenario);
   };
 
+  // PDF Export Handler for Daily Predictions
+  const handleExportDailyPredictions = () => {
+    // Check if predictions are available
+    if (!forecastData || forecastData.length === 0 || isLoading) {
+      alert('Please generate daily predictions first before exporting');
+      return;
+    }
+
+    // Initialize PDF
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    
+    // Set colors (matching monthly export)
+    const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
+    const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
+    
+    // Helper function to add page numbers
+    const addPageNumbers = () => {
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth - 30, pageHeight - 10);
+      }
+    };
+
+    // Title and Header
+    doc.setFontSize(18);
+    doc.setTextColor(...headerColor);
+    doc.text('Sri Lanka Tourism Daily Predictions Report', pageWidth / 2, 20, { align: 'center' });
+    
+    // Subtitle with scenario and date range
+    const startMonthName = months[selectedMonth - 1].name;
+    const startDate = `${selectedDay} ${startMonthName} ${selectedYear}`;
+    
+    doc.setFontSize(14);
+    doc.setTextColor(60);
+    doc.text(`${currentScenario.charAt(0).toUpperCase() + currentScenario.slice(1)} Scenario - ${startDate} for ${forecastDays} Days`, pageWidth / 2, 30, { align: 'center' });
+    
+    // Date generated
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Date Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 38, { align: 'center' });
+    
+    let yPosition = 50;
+    
+    // Process each day
+    forecastData.forEach((dayData, index) => {
+      // Check if we need a new page
+      if (yPosition > pageHeight - 60) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      // Date header
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...headerColor);
+      doc.text(`Date: ${dayData.day}`, 20, yPosition);
+      yPosition += 10;
+      
+      // Predicted arrivals
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60);
+      const arrivalsText = dayData.prediction !== undefined && dayData.prediction !== null
+        ? `Predicted Arrivals: ${dayData.prediction.toLocaleString()}`
+        : 'Predicted Arrivals: -';
+      doc.text(arrivalsText, 20, yPosition);
+      yPosition += 12;
+      
+      // External factors table if available (check if data has external factors)
+      if (dayData.externalFactors && dayData.externalFactors.length > 0) {
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text('External Factor Contributions:', 20, yPosition);
+        yPosition += 8;
+        
+        // Create table data
+        const tableData = dayData.externalFactors.map(factor => [
+          factor.name,
+          `${factor.value}%`
+        ]);
+        
+        // Add table using autoTable
+        autoTable(doc, {
+          head: [['Factor', 'Contribution']],
+          body: tableData,
+          startY: yPosition,
+          margin: { left: 20, right: 20 },
+          styles: {
+            fontSize: 10,
+            cellPadding: 3,
+            textColor: [60, 60, 60]
+          },
+          headStyles: {
+            fillColor: headerColor,
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245]
+          }
+        });
+        
+        yPosition = doc.lastAutoTable.finalY + 15;
+      } else {
+        yPosition += 8;
+      }
+      
+      // Add separator line
+      if (index < forecastData.length - 1) {
+        doc.setDrawColor(200);
+        doc.setLineWidth(0.5);
+        doc.line(20, yPosition, pageWidth - 20, yPosition);
+        yPosition += 15;
+      }
+    });
+    
+    // Add page numbers
+    addPageNumbers();
+    
+    // Generate filename
+    const filename = `SL_Tourism_Daily_Predictions_${selectedDay}_${startMonthName}_${selectedYear}_${forecastDays}Days.pdf`;
+    
+    // Save the PDF
+    doc.save(filename);
+  };
+
   if (isLoading) {
     return <div className="p-4 text-center">Loading daily predictions...</div>;
   }
@@ -142,7 +278,13 @@ function DailyPredictionsComponent() {
     <div className="space-y-6">
       <Card className="power-bi-card">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Daily Forecast Filters</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">Daily Forecast Filters</CardTitle>
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportDailyPredictions}>
+              <Download className="h-4 w-4 mr-1" />
+              Export Predictions
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -242,9 +384,6 @@ function DailyPredictionsComponent() {
                   <div className="text-2xl font-bold text-purple-600">
                     {item.prediction.toLocaleString()}
                   </div>
-                  <Badge variant="outline">
-                    Confidence: {item.confidence}%
-                  </Badge>
                 </div>
               </div>
             ))}
