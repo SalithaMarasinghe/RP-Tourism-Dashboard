@@ -86,3 +86,30 @@ def get_daily_forecasts() -> Dict[str, List[Any]]:
         result[key] = transformed
 
     return result
+
+def get_upcoming_forecast_context(months: int = 3) -> str:
+    """
+    Load the baseline explainability report and return a formatted string
+    of the upcoming `months` predictions for injection into the LLM prompt.
+    """
+    try:
+        scenarios = get_scenarios()
+        baseline = scenarios.get("baseline", [])
+        
+        if not baseline:
+            return "No baseline forecast data available."
+
+        # Grab the first N months (assuming the data starts from current or upcoming period)
+        # We cap at N months to save token context
+        upcoming = baseline[:months]
+        
+        lines = ["Baseline Tourist Arrival Forecasts (Before any new events):"]
+        for month_data in upcoming:
+            date_str = month_data.get("date", "Unknown Date")
+            total = month_data.get("total_forecast", 0)
+            lines.append(f"- {date_str}: {total:,} arrivals projected")
+            
+        return "\n".join(lines)
+    except Exception as exc:
+        logger.warning(f"Failed to generate upcoming forecast context: {exc}")
+        return "Forecast projection data currently unavailable."

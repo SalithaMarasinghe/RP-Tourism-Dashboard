@@ -7,6 +7,8 @@ import { Badge } from '../components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users, MapPin, AlertTriangle, Download, RefreshCw, Calendar, BarChart3 } from 'lucide-react';
 
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 // TDMS Component
 export default function TDMSComponent() {
   const [selectedDate, setSelectedDate] = useState('2026-01-01');
@@ -37,8 +39,8 @@ export default function TDMSComponent() {
       console.log('TDMSComponent: Starting to fetch initial data...');
       try {
         const [datesResponse, sitesResponse] = await Promise.all([
-          axios.get('http://localhost:8000/api/tdms/dates'),
-          axios.get('http://localhost:8000/api/tdms/sites')
+          axios.get(`${API_BASE}/api/tdms/dates`),
+          axios.get(`${API_BASE}/api/tdms/sites`)
         ]);
 
         console.log('TDMSComponent: Dates response:', datesResponse.data);
@@ -76,7 +78,7 @@ export default function TDMSComponent() {
           capacity_utilization: ((site.vli_score / 100) * 100).toFixed(1),
           timestamp: new Date().toISOString()
         }));
-      
+
       setCapacityAlerts(alerts);
       console.log('TDMSComponent: Capacity alerts generated:', alerts);
     }
@@ -86,13 +88,13 @@ export default function TDMSComponent() {
   useEffect(() => {
     if (selectedSite && monthlyData.length > 0) {
       const monthlyAvg = monthlyData.reduce((sum, month) => sum + month.total_visitors, 0) / monthlyData.length;
-      const peakMonth = monthlyData.reduce((max, month) => 
+      const peakMonth = monthlyData.reduce((max, month) =>
         month.total_visitors > max.total_visitors ? month : max, monthlyData[0]);
-      const offPeakMonth = monthlyData.reduce((min, month) => 
+      const offPeakMonth = monthlyData.reduce((min, month) =>
         month.total_visitors < min.total_visitors ? month : min, monthlyData[0]);
-      
+
       const seasonalVariation = ((peakMonth.total_visitors - offPeakMonth.total_visitors) / offPeakMonth.total_visitors) * 100;
-      
+
       setSeasonalAnalysis({
         site: selectedSite,
         monthly_average: Math.round(monthlyAvg),
@@ -111,10 +113,10 @@ export default function TDMSComponent() {
     if (dashboardData?.vli_scores) {
       const loadAnalysis = dashboardData.vli_scores.map(site => {
         const utilizationRate = (site.vli_score / 100) * 100;
-        const loadCategory = utilizationRate > 100 ? 'overloaded' : 
-                           utilizationRate > 80 ? 'high_load' : 
-                           utilizationRate > 60 ? 'moderate_load' : 'optimal';
-        
+        const loadCategory = utilizationRate > 100 ? 'overloaded' :
+          utilizationRate > 80 ? 'high_load' :
+            utilizationRate > 60 ? 'moderate_load' : 'optimal';
+
         return {
           ...site,
           utilization_rate: utilizationRate.toFixed(1),
@@ -123,7 +125,7 @@ export default function TDMSComponent() {
           infrastructure_stress: utilizationRate > 100 ? 'critical' : utilizationRate > 80 ? 'high' : 'normal'
         };
       });
-      
+
       setInfrastructureLoad({
         analysis_date: selectedDate,
         total_sites: loadAnalysis.length,
@@ -153,7 +155,7 @@ export default function TDMSComponent() {
         setLoading(true);
         console.log('TDMSComponent: Fetching dashboard data for date:', selectedDate);
         try {
-          const response = await axios.get(`http://localhost:8000/api/tdms/dashboard/${selectedDate}`);
+          const response = await axios.get(`${API_BASE}/api/tdms/dashboard/${selectedDate}`);
           console.log('TDMSComponent: Dashboard response:', response.data);
           setDashboardData(response.data);
           console.log('TDMSComponent: Dashboard data set');
@@ -173,7 +175,7 @@ export default function TDMSComponent() {
       const fetchMonthlyData = async () => {
         console.log('TDMSComponent: Fetching monthly data for site:', selectedSite, 'year:', selectedYear);
         try {
-          const response = await axios.get(`http://localhost:8000/api/tdms/monthly/${selectedSite}/${selectedYear}`);
+          const response = await axios.get(`${API_BASE}/api/tdms/monthly/${selectedSite}/${selectedYear}`);
           console.log('TDMSComponent: Monthly data response:', response.data);
           setMonthlyData(response.data.monthly_data || []);
         } catch (error) {
@@ -191,7 +193,7 @@ export default function TDMSComponent() {
       const fetchTrendData = async () => {
         console.log('TDMSComponent: Fetching trend data for site:', selectedSite);
         try {
-          const response = await axios.get(`http://localhost:8000/api/tdms/weekly-trend/${encodeURIComponent(selectedSite)}`);
+          const response = await axios.get(`${API_BASE}/api/tdms/weekly-trend/${encodeURIComponent(selectedSite)}`);
           console.log('TDMSComponent: Trend data response:', response.data);
           setTrendData(response.data.trend_data || []);
         } catch (error) {
@@ -218,7 +220,7 @@ export default function TDMSComponent() {
               const reductionAmount = Math.floor(originalVisitors * (distributionPercentage / 100));
               const newVisitors = originalVisitors - reductionAmount;
               const newVliScore = Math.max(0, site.vli_score * (newVisitors / originalVisitors));
-              
+
               return {
                 ...site,
                 original_vli: site.vli_score,
@@ -233,7 +235,7 @@ export default function TDMSComponent() {
               const additionAmount = Math.floor(sourceVisitors * (distributionPercentage / 100));
               const newVisitors = originalVisitors + additionAmount;
               const newVliScore = site.vli_score * (newVisitors / originalVisitors);
-              
+
               return {
                 ...site,
                 original_vli: site.vli_score,
@@ -249,7 +251,7 @@ export default function TDMSComponent() {
               };
             }
           });
-          
+
           console.log('TDMSComponent: Simulated data calculated:', simulatedData);
           setSimulatedData(simulatedData);
         } catch (error) {
@@ -302,11 +304,11 @@ export default function TDMSComponent() {
               ))}
             </select>
           </div>
-          <Button onClick={() => {}} className="flex items-center space-x-2">
+          <Button onClick={() => { }} className="flex items-center space-x-2">
             <Download className="h-4 w-4" />
             <span>Export System Report</span>
           </Button>
-          <Button onClick={() => {}} variant="outline" className="flex items-center space-x-2">
+          <Button onClick={() => { }} variant="outline" className="flex items-center space-x-2">
             <RefreshCw className="h-4 w-4" />
             <span>Reload Data</span>
           </Button>
@@ -333,8 +335,8 @@ export default function TDMSComponent() {
                 </span>
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium">Alert Threshold:</label>
-                  <select 
-                    value={alertThreshold} 
+                  <select
+                    value={alertThreshold}
                     onChange={(e) => setAlertThreshold(Number(e.target.value))}
                     className="px-2 py-1 border rounded text-sm"
                   >
@@ -353,24 +355,23 @@ export default function TDMSComponent() {
               {capacityAlerts.length > 0 ? (
                 <div className="space-y-3">
                   {capacityAlerts.map((alert, index) => (
-                    <div key={index} className={`p-4 rounded-lg border-l-4 ${
-                      alert.severity === 'critical' ? 'bg-red-50 border-red-600' :
-                      alert.severity === 'high' ? 'bg-orange-50 border-orange-600' :
-                      'bg-yellow-50 border-yellow-600'
-                    }`}>
+                    <div key={index} className={`p-4 rounded-lg border-l-4 ${alert.severity === 'critical' ? 'bg-red-50 border-red-600' :
+                        alert.severity === 'high' ? 'bg-orange-50 border-orange-600' :
+                          'bg-yellow-50 border-yellow-600'
+                      }`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-gray-800">{alert.site}</h4>
                           <p className="text-sm text-gray-600">
-                            VLI: {alert.vli_score.toFixed(1)}% | 
-                            Visitors: {alert.visitors.toLocaleString()} | 
+                            VLI: {alert.vli_score.toFixed(1)}% |
+                            Visitors: {alert.visitors.toLocaleString()} |
                             Utilization: {alert.capacity_utilization}%
                           </p>
                         </div>
                         <Badge className={
                           alert.severity === 'critical' ? 'bg-red-600' :
-                          alert.severity === 'high' ? 'bg-orange-600' :
-                          'bg-yellow-600'
+                            alert.severity === 'high' ? 'bg-orange-600' :
+                              'bg-yellow-600'
                         }>
                           {alert.severity.toUpperCase()}
                         </Badge>
@@ -427,8 +428,8 @@ export default function TDMSComponent() {
                     <span className="font-medium text-gray-700">Seasonal Variation:</span>
                     <Badge className={
                       seasonalAnalysis.strategy === 'high_variation' ? 'bg-red-100 text-red-800' :
-                      seasonalAnalysis.strategy === 'moderate_variation' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
+                        seasonalAnalysis.strategy === 'moderate_variation' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
                     }>
                       {seasonalAnalysis.seasonal_variation_percent}%
                     </Badge>
@@ -436,8 +437,8 @@ export default function TDMSComponent() {
                   <div className="text-sm text-gray-600">
                     <strong>Recommended Strategy:</strong> {
                       seasonalAnalysis.strategy === 'high_variation' ? 'Implement aggressive visitor redistribution during peak months' :
-                      seasonalAnalysis.strategy === 'moderate_variation' ? 'Consider seasonal pricing adjustments' :
-                      'Maintain current capacity levels'
+                        seasonalAnalysis.strategy === 'moderate_variation' ? 'Consider seasonal pricing adjustments' :
+                          'Maintain current capacity levels'
                     }
                   </div>
                 </div>
@@ -476,31 +477,29 @@ export default function TDMSComponent() {
                     <div className="text-sm text-gray-600">Total Sites</div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   {infrastructureLoad.site_analysis?.map((site, index) => (
-                    <div key={index} className={`p-4 rounded-lg border ${
-                      site.load_category === 'overloaded' ? 'bg-red-50 border-red-200' :
-                      site.load_category === 'high_load' ? 'bg-orange-50 border-orange-200' :
-                      site.load_category === 'moderate_load' ? 'bg-yellow-50 border-yellow-200' :
-                      'bg-green-50 border-green-200'
-                    }`}>
+                    <div key={index} className={`p-4 rounded-lg border ${site.load_category === 'overloaded' ? 'bg-red-50 border-red-200' :
+                        site.load_category === 'high_load' ? 'bg-orange-50 border-orange-200' :
+                          site.load_category === 'moderate_load' ? 'bg-yellow-50 border-yellow-200' :
+                            'bg-green-50 border-green-200'
+                      }`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-gray-800">{site.site}</h4>
                           <div className="text-sm text-gray-600">
-                            VLI: {site.vli_score.toFixed(1)}% | 
-                            Utilization: {site.utilization_rate}% | 
+                            VLI: {site.vli_score.toFixed(1)}% |
+                            Utilization: {site.utilization_rate}% |
                             Visitors: {site.visitors.toLocaleString()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge className={`mb-2 ${
-                            site.load_category === 'overloaded' ? 'bg-red-600' :
-                            site.load_category === 'high_load' ? 'bg-orange-600' :
-                            site.load_category === 'moderate_load' ? 'bg-yellow-600' :
-                            'bg-green-600'
-                          }`}>
+                          <Badge className={`mb-2 ${site.load_category === 'overloaded' ? 'bg-red-600' :
+                              site.load_category === 'high_load' ? 'bg-orange-600' :
+                                site.load_category === 'moderate_load' ? 'bg-yellow-600' :
+                                  'bg-green-600'
+                            }`}>
                             {site.load_category.replace('_', ' ').toUpperCase()}
                           </Badge>
                           <div className="text-xs text-gray-600 mt-1 max-w-xs">
@@ -517,79 +516,79 @@ export default function TDMSComponent() {
 
           {/* Emergency Response Planning */}
           {dashboardData && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
-                Emergency Response Planning
-              </CardTitle>
-              <CardDescription>
-                Overcrowding mitigation scenarios and response strategies
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-red-50 rounded-lg">
-                    <h4 className="font-semibold text-red-800 mb-2">Critical Overcrowding</h4>
-                    <div className="text-sm text-gray-700 space-y-1">
-                      <p><strong>Trigger:</strong> VLI &gt; 120% for 2+ hours</p>
-                      <p><strong>Immediate Actions:</strong></p>
-                      <ul className="list-disc list-inside ml-4 space-y-1">
-                        <li>Activate visitor flow control</li>
-                        <li>Deploy additional staff</li>
-                        <li>Initiate redistribution to nearby sites</li>
-                        <li>Activate emergency transport</li>
-                      </ul>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                  Emergency Response Planning
+                </CardTitle>
+                <CardDescription>
+                  Overcrowding mitigation scenarios and response strategies
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-red-50 rounded-lg">
+                      <h4 className="font-semibold text-red-800 mb-2">Critical Overcrowding</h4>
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p><strong>Trigger:</strong> VLI &gt; 120% for 2+ hours</p>
+                        <p><strong>Immediate Actions:</strong></p>
+                        <ul className="list-disc list-inside ml-4 space-y-1">
+                          <li>Activate visitor flow control</li>
+                          <li>Deploy additional staff</li>
+                          <li>Initiate redistribution to nearby sites</li>
+                          <li>Activate emergency transport</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-orange-50 rounded-lg">
+                      <h4 className="font-semibold text-orange-800 mb-2">High Capacity Strain</h4>
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p><strong>Trigger:</strong> VLI &gt; 100-120% for 4+ hours</p>
+                        <p><strong>Response Actions:</strong></p>
+                        <ul className="list-disc list-inside ml-4 space-y-1">
+                          <li>Implement timed entry system</li>
+                          <li>Increase security presence</li>
+                          <li>Prepare contingency transport</li>
+                          <li>Alert nearby facilities</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="p-4 bg-orange-50 rounded-lg">
-                    <h4 className="font-semibold text-orange-800 mb-2">High Capacity Strain</h4>
-                    <div className="text-sm text-gray-700 space-y-1">
-                      <p><strong>Trigger:</strong> VLI &gt; 100-120% for 4+ hours</p>
-                      <p><strong>Response Actions:</strong></p>
-                      <ul className="list-disc list-inside ml-4 space-y-1">
-                        <li>Implement timed entry system</li>
-                        <li>Increase security presence</li>
-                        <li>Prepare contingency transport</li>
-                        <li>Alert nearby facilities</li>
-                      </ul>
+
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Proactive Mitigation Strategies</h4>
+                    <div className="text-sm text-gray-700 space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-white rounded">
+                        <span>Dynamic Pricing:</span>
+                        <Badge className="bg-green-600">Recommended</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-white rounded">
+                        <span>Visitor Caps:</span>
+                        <Badge className="bg-green-600">Implement</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-white rounded">
+                        <span>Real-time Monitoring:</span>
+                        <Badge className="bg-green-600">Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-white rounded">
+                        <span>Alternative Routes:</span>
+                        <Badge className="bg-yellow-600">Plan</Badge>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 mb-2">Proactive Mitigation Strategies</h4>
-                  <div className="text-sm text-gray-700 space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-white rounded">
-                      <span>Dynamic Pricing:</span>
-                      <Badge className="bg-green-600">Recommended</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-white rounded">
-                      <span>Visitor Caps:</span>
-                      <Badge className="bg-green-600">Implement</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-white rounded">
-                      <span>Real-time Monitoring:</span>
-                      <Badge className="bg-green-600">Active</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-white rounded">
-                      <span>Alternative Routes:</span>
-                      <Badge className="bg-yellow-600">Plan</Badge>
-                    </div>
+
+                  <div className="text-center mt-4">
+                    <Button className="bg-red-600 hover:bg-red-700">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Run Emergency Simulation
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="text-center mt-4">
-                  <Button className="bg-red-600 hover:bg-red-700">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Run Emergency Simulation
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
           )}
 
           {/* Monthly Aggregation Chart */}

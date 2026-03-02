@@ -23,7 +23,7 @@ function DailyPredictionsComponent() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const backendUrl = 'http://localhost:8000';
+        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
         console.log('Fetching daily forecast data...');
 
         const response = await fetch(`${backendUrl}/api/forecasts/daily`, {
@@ -145,7 +145,7 @@ function DailyPredictionsComponent() {
   const DailyCustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      
+
       // Convert external factors array to object for easier access
       const factorsMap = {};
       if (data.externalFactors && Array.isArray(data.externalFactors)) {
@@ -220,11 +220,11 @@ function DailyPredictionsComponent() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    
+
     // Set colors (matching monthly export)
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
     const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
-    
+
     // Helper function to add page numbers
     const addPageNumbers = () => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -240,22 +240,22 @@ function DailyPredictionsComponent() {
     doc.setFontSize(18);
     doc.setTextColor(...headerColor);
     doc.text('Sri Lanka Tourism Daily Predictions Report', pageWidth / 2, 20, { align: 'center' });
-    
+
     // Subtitle with scenario and date range
     const startMonthName = months[selectedMonth - 1].name;
     const startDate = `${selectedDay} ${startMonthName} ${selectedYear}`;
-    
+
     doc.setFontSize(14);
     doc.setTextColor(60);
     doc.text(`${currentScenario.charAt(0).toUpperCase() + currentScenario.slice(1)} Scenario - ${startDate} for ${forecastDays} Days`, pageWidth / 2, 30, { align: 'center' });
-    
+
     // Date generated
     doc.setFontSize(11);
     doc.setTextColor(100);
     doc.text(`Date Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 38, { align: 'center' });
-    
+
     let yPosition = 50;
-    
+
     // Process each day
     forecastData.forEach((dayData, index) => {
       // Check if we need a new page
@@ -263,14 +263,14 @@ function DailyPredictionsComponent() {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       // Date header
       doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
       doc.setTextColor(...headerColor);
       doc.text(`Date: ${dayData.day}`, 20, yPosition);
       yPosition += 10;
-      
+
       // Predicted arrivals
       doc.setFontSize(12);
       doc.setFont(undefined, 'normal');
@@ -280,20 +280,20 @@ function DailyPredictionsComponent() {
         : 'Predicted Arrivals: -';
       doc.text(arrivalsText, 20, yPosition);
       yPosition += 12;
-      
+
       // External factors table if available (check if data has external factors)
       if (dayData.externalFactors && dayData.externalFactors.length > 0) {
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text('External Factor Contributions:', 20, yPosition);
         yPosition += 8;
-        
+
         // Create table data
         const tableData = dayData.externalFactors.map(factor => [
           factor.name,
           `${factor.value}%`
         ]);
-        
+
         // Add table using autoTable
         autoTable(doc, {
           head: [['Factor', 'Contribution']],
@@ -314,12 +314,12 @@ function DailyPredictionsComponent() {
             fillColor: [245, 245, 245]
           }
         });
-        
+
         yPosition = doc.lastAutoTable.finalY + 15;
       } else {
         yPosition += 8;
       }
-      
+
       // Add separator line
       if (index < forecastData.length - 1) {
         doc.setDrawColor(200);
@@ -328,13 +328,13 @@ function DailyPredictionsComponent() {
         yPosition += 15;
       }
     });
-    
+
     // Add page numbers
     addPageNumbers();
-    
+
     // Generate filename
     const filename = `SL_Tourism_Daily_Predictions_${selectedDay}_${startMonthName}_${selectedYear}_${forecastDays}Days.pdf`;
-    
+
     // Save the PDF
     doc.save(filename);
   };
@@ -446,29 +446,29 @@ function DailyPredictionsComponent() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={dailyChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
-                  angle={-45} 
+                <XAxis
+                  dataKey="date"
+                  angle={-45}
                   height={80}
                   tickFormatter={truncateDate}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis 
+                <YAxis
                   tickFormatter={formatNumberWithCommas}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<DailyCustomTooltip />} />
-                <Area 
-                  type="monotone" 
-                  dataKey="arrivals" 
-                  stroke="#9333ea" 
-                  fill="#f3e8ff" 
+                <Area
+                  type="monotone"
+                  dataKey="arrivals"
+                  stroke="#9333ea"
+                  fill="#f3e8ff"
                   fillOpacity={0.6}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="arrivals" 
-                  stroke="#9333ea" 
+                <Line
+                  type="monotone"
+                  dataKey="arrivals"
+                  stroke="#9333ea"
                   strokeWidth={3}
                   dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}

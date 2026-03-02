@@ -8,7 +8,7 @@ import {
     signInWithCustomToken
 } from "firebase/auth";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 export const AuthContext = createContext();
 
@@ -102,21 +102,21 @@ export function AuthProvider({ children }) {
         // First, reauthenticate user with current password
         const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } = await import("firebase/auth");
         const user = auth.currentUser;
-        
+
         if (!user) {
             throw new Error("No authenticated user found");
         }
-        
+
         // Create credential for reauthentication
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
-        
+
         try {
             // Reauthenticate user
             await reauthenticateWithCredential(user, credential);
-            
+
             // Update password
             await updatePassword(user, newPassword);
-            
+
             return { success: true };
         } catch (error) {
             console.error("Password change error:", error);

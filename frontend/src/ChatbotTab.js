@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // Helper: get an authenticated fetch call using Firebase ID token
 async function authFetch(path, options = {}) {
@@ -469,8 +469,8 @@ function ChatbotTab() {
       try {
         // Get available sites and latest dashboard data
         const [sitesResponse, dashboardResponse] = await Promise.all([
-          fetch('http://localhost:8000/api/tdms/sites'),
-          fetch('http://localhost:8000/api/tdms/dashboard/' + new Date().toISOString().split('T')[0])
+          fetch(`${API_BASE}/api/tdms/sites`),
+          fetch(`${API_BASE}/api/tdms/dashboard/` + new Date().toISOString().split('T')[0])
         ]);
 
         if (sitesResponse.ok) {
@@ -518,9 +518,9 @@ function ChatbotTab() {
             if (mentionedSite) {
               try {
                 const [siteResponse, monthlyResponse, trendResponse] = await Promise.all([
-                  fetch(`http://localhost:8000/api/tdms/site/${encodeURIComponent(mentionedSite)}`),
-                  fetch(`http://localhost:8000/api/tdms/monthly/${mentionedSite}/${new Date().getFullYear()}`),
-                  fetch(`http://localhost:8000/api/tdms/weekly-trend/${encodeURIComponent(mentionedSite)}`)
+                  fetch(`${API_BASE}/api/tdms/site/${encodeURIComponent(mentionedSite)}`),
+                  fetch(`${API_BASE}/api/tdms/monthly/${mentionedSite}/${new Date().getFullYear()}`),
+                  fetch(`${API_BASE}/api/tdms/weekly-trend/${encodeURIComponent(mentionedSite)}`)
                 ]);
 
                 if (siteResponse.ok) {
@@ -762,21 +762,17 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
     const userMessage = inputMessage;
     setInputMessage('');
 
-    // Add user message to local state
+    // Add user message to local state (for instant UI feedback)
     setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
-
-    // Save user message to backend and get the chat ID
-    let chatIdForThisMessage = currentChatId;
-    if (!chatIdForThisMessage) {
-      chatIdForThisMessage = await saveMessageToBackend('user', userMessage, [], currentChatId);
-    } else {
-      await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
-    }
 
     setIsLoading(true);
 
+    // The backend /api/chat/ask handles saving both user message and AI response,
+    // so we do NOT call saveMessageToBackend for the user message here.
+    let chatIdForThisMessage = currentChatId;
+
     try {
-      // Call backend Gemini API directly
+      // Call backend Gemini API — it saves the user message + AI response to Firestore
       const response = await authFetch('/api/chat/ask', {
         method: 'POST',
         body: JSON.stringify({
@@ -790,10 +786,11 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
       // Update current chat ID if this was a new chat
       if (!currentChatId && response.chat_id) {
         setCurrentChatId(response.chat_id);
+        chatIdForThisMessage = response.chat_id;
         await refreshChatList(currentUser, true);
-      }
-
-      if (firstMessageData?.chatId === chatIdForThisMessage) {
+        // Generate a readable title for the new chat
+        generateChatTitle(response.chat_id, userMessage);
+      } else if (firstMessageData?.chatId === chatIdForThisMessage) {
         generateChatTitle(chatIdForThisMessage, userMessage);
         setFirstMessageData(null);
       }

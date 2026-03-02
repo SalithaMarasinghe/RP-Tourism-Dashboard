@@ -26,7 +26,7 @@ function OverviewTab() {
   const [predictedGrowth, setPredictedGrowth] = useState(null);
 
   const fiveYearTrendData = React.useMemo(() => {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const years = [2026, 2027, 2028, 2029, 2030];
     return years.flatMap(year =>
       months.map((month, i) => ({
@@ -50,7 +50,7 @@ function OverviewTab() {
   React.useEffect(() => {
     const fetchMonthlyData = async () => {
       try {
-        const backendUrl = 'http://localhost:8000';
+        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
         console.log('Fetching monthly forecast data...');
 
         const response = await fetch(`${backendUrl}/api/forecasts/scenarios`, {

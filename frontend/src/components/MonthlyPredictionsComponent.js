@@ -20,7 +20,7 @@ function MonthlyPredictionsComponent() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const backendUrl = 'http://localhost:8000';
+        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
         console.log('Fetching data from:', `${backendUrl}/api/forecasts/scenarios`);
 
         // First test the CORS connection
@@ -67,7 +67,7 @@ function MonthlyPredictionsComponent() {
   const generateForecastPeriod = () => {
     const result = [];
     const scenarioData = scenariosData[currentScenario] || [];
-    
+
     console.log('Generating forecast for:', { currentScenario, currentYear: selectedYear, currentMonth: selectedMonth, forecastMonths });
     console.log('Scenario data:', scenarioData);
 
@@ -158,7 +158,7 @@ function MonthlyPredictionsComponent() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      
+
       // Convert external factors array to object for easier access
       const factorsMap = {};
       if (data.externalFactors && Array.isArray(data.externalFactors)) {
@@ -200,11 +200,11 @@ function MonthlyPredictionsComponent() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    
+
     // Set colors
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
     const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
-    
+
     // Helper function to add page numbers
     const addPageNumbers = () => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -220,24 +220,24 @@ function MonthlyPredictionsComponent() {
     doc.setFontSize(18);
     doc.setTextColor(...headerColor);
     doc.text('Sri Lanka Tourism Predictions Report', pageWidth / 2, 20, { align: 'center' });
-    
+
     // Subtitle with scenario and date range
     const startMonthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long' });
     const endMonth = new Date(selectedYear, selectedMonth - 1 + forecastMonths);
     const endMonthName = endMonth.toLocaleString('default', { month: 'long' });
     const endYear = endMonth.getFullYear();
-    
+
     doc.setFontSize(14);
     doc.setTextColor(60);
     doc.text(`${currentScenario.charAt(0).toUpperCase() + currentScenario.slice(1)} Scenario - ${startMonthName} ${selectedYear} to ${endMonthName} ${endYear}`, pageWidth / 2, 30, { align: 'center' });
-    
+
     // Date generated
     doc.setFontSize(11);
     doc.setTextColor(100);
     doc.text(`Date Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 38, { align: 'center' });
-    
+
     let yPosition = 50;
-    
+
     // Process each month
     forecastData.forEach((monthData, index) => {
       // Check if we need a new page
@@ -245,37 +245,37 @@ function MonthlyPredictionsComponent() {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       // Month header
       doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
       doc.setTextColor(...headerColor);
       doc.text(`Month: ${monthData.month}`, 20, yPosition);
       yPosition += 10;
-      
+
       // Predicted arrivals
       doc.setFontSize(12);
       doc.setFont(undefined, 'normal');
       doc.setTextColor(60);
-      const arrivalsText = monthData.prediction !== '-' 
+      const arrivalsText = monthData.prediction !== '-'
         ? `Predicted Arrivals: ${monthData.prediction.toLocaleString()}`
         : 'Predicted Arrivals: -';
       doc.text(arrivalsText, 20, yPosition);
       yPosition += 12;
-      
+
       // External factors table if available
       if (monthData.externalFactors && monthData.externalFactors.length > 0) {
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text('External Factor Contributions:', 20, yPosition);
         yPosition += 8;
-        
+
         // Create table data
         const tableData = monthData.externalFactors.map(factor => [
           factor.name,
           `${factor.value}%`
         ]);
-        
+
         // Add table using autoTable
         autoTable(doc, {
           head: [['Factor', 'Contribution']],
@@ -296,12 +296,12 @@ function MonthlyPredictionsComponent() {
             fillColor: [245, 245, 245]
           }
         });
-        
+
         yPosition = doc.lastAutoTable.finalY + 15;
       } else {
         yPosition += 8;
       }
-      
+
       // Add separator line
       if (index < forecastData.length - 1) {
         doc.setDrawColor(200);
@@ -310,14 +310,14 @@ function MonthlyPredictionsComponent() {
         yPosition += 15;
       }
     });
-    
+
     // Add page numbers
     addPageNumbers();
-    
+
     // Generate filename
     const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long' });
     const filename = `SL_Tourism_Predictions_${monthName}_${selectedYear}_${forecastMonths}months.pdf`;
-    
+
     // Save the PDF
     doc.save(filename);
   };
@@ -409,28 +409,28 @@ function MonthlyPredictionsComponent() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="month" 
-                  angle={-45} 
+                <XAxis
+                  dataKey="month"
+                  angle={-45}
                   height={80}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis 
+                <YAxis
                   tickFormatter={formatNumberWithCommas}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Area 
-                  type="monotone" 
-                  dataKey="arrivals" 
-                  stroke="#9333ea" 
-                  fill="#f3e8ff" 
+                <Area
+                  type="monotone"
+                  dataKey="arrivals"
+                  stroke="#9333ea"
+                  fill="#f3e8ff"
                   fillOpacity={0.6}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="arrivals" 
-                  stroke="#9333ea" 
+                <Line
+                  type="monotone"
+                  dataKey="arrivals"
+                  stroke="#9333ea"
                   strokeWidth={3}
                   dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}

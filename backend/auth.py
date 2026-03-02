@@ -1,4 +1,5 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, auth
 from fastapi import HTTPException, Security, Request
@@ -9,19 +10,31 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize Firebase Admin
-# Expects serviceAccountKey.json in the same directory or specified via env var
+# Supports three methods (in priority order):
+# 1. FIREBASE_SERVICE_ACCOUNT_JSON env var (JSON string, for Render/cloud)
+# 2. FIREBASE_CREDENTIALS_PATH env var (file path)
+# 3. Default serviceAccountKey.json file
+cred_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
 cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH", "serviceAccountKey.json")
 
-if not os.path.exists(cred_path):
-    print(f"Warning: {cred_path} not found. Firebase Admin not initialized.")
-else:
+if cred_json:
+    try:
+        cred_dict = json.loads(cred_json)
+        cred = credentials.Certificate(cred_dict)
+        firebase_admin.initialize_app(cred)
+        print("Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT_JSON.")
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}")
+elif os.path.exists(cred_path):
     try:
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
-        print("Firebase Admin initialized successfully.")
+        print("Firebase Admin initialized from file.")
     except ValueError:
         # App already initialized
         pass
+else:
+    print(f"Warning: Firebase credentials not found. Set FIREBASE_SERVICE_ACCOUNT_JSON or provide {cred_path}.")
 
 security = HTTPBearer()
 

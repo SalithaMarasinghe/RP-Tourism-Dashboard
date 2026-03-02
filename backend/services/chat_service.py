@@ -17,7 +17,7 @@ from fastapi import HTTPException
 from firebase_admin import auth as firebase_auth, firestore
 import google.generativeai as genai
 
-from services.forecast_service import get_daily_forecasts, get_scenarios
+from services.forecast_service import get_daily_forecasts, get_scenarios, get_upcoming_forecast_context
 from services.search_service import web_search
 
 logger = logging.getLogger(__name__)
@@ -166,13 +166,10 @@ async def gather_context(message: str) -> Dict[str, str]:
 
     # 2. Forecast scenarios (direct import — no HTTP)
     try:
-        scenarios = get_scenarios()
-        baseline = scenarios.get("baseline", [])
-        if baseline:
-            context["forecasts"] = (
-                f"\n\nForecast Scenarios Data:\n"
-                f"Baseline scenario available with {len(baseline)} data points"
-            )
+        # Get actual upcoming numeric forecast data (next 3 months)
+        forecast_text = get_upcoming_forecast_context(3)
+        if forecast_text != "No baseline forecast data available.":
+            context["forecasts"] = f"\n\n{forecast_text}"
     except Exception as exc:
         logger.warning("Forecast scenarios fetch failed: %s", exc)
 
@@ -181,7 +178,7 @@ async def gather_context(message: str) -> Dict[str, str]:
         daily = get_daily_forecasts()
         baseline_daily = daily.get("baseline", [])
         if baseline_daily:
-            context["daily_predictions"] = "\n\nDaily Predictions: Short-term forecasts available"
+            context["daily_predictions"] = "\n\nDaily Predictions: Short-term forecasts available in system."
     except Exception as exc:
         logger.warning("Daily predictions fetch failed: %s", exc)
 
@@ -204,6 +201,7 @@ async def call_gemini_api(message: str, context: Dict[str, str]) -> Dict[str, An
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.5-flash")
 
+    # Construct intelligent system prompt with context engineering
     prompt = f"""You are an AI assistant specialising in Sri Lanka tourism analytics and insights. \
 You have access to real-time data and comprehensive tourism information.
 
@@ -215,11 +213,18 @@ Context Data:
 
 User Question: {message}
 
-Please provide a helpful, accurate response based on the available context and your knowledge. \
-If specific data isn't available, clearly state that and provide general guidance based on tourism best practices.
+Please provide a helpful, accurate response based on the available context and your knowledge.
+
+CRITICAL INSTRUCTION FOR FORECAST ADJUSTMENTS:
+When the user asks to predict the impact of an event or news (like a regional conflict, economic crisis, or viral trend) on upcoming Sri Lanka tourism, you MUST:
+1. Start with the provided baseline numerical forecasts from the Context Data (e.g. March: 290k).
+2. Analyze the sentiment and severity of the provided web search context regarding the event.
+3. Explicitly state a quantitative reasoning multiplier (e.g., "Given the European flight cancellations, I estimate a 12% drop").
+4. Output the final *Adjusted Forecasts* by mathematically applying your multiplier to the baseline numbers.
+DO NOT provide vague qualitative answers without numbers if you have baseline data available.
 
 Focus on:
-- Data-driven insights when available
+- Data-driven mathematical insights
 - Current tourism trends and information
 - Practical advice for tourism stakeholders
 - Specific Sri Lanka tourism context
