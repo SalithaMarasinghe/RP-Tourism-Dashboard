@@ -39,3 +39,18 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
             detail=f"Invalid authentication credentials: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+async def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
+    """
+    Shared token verification helper for use across all routers.
+    Verifies the Firebase ID token and returns the decoded payload.
+    """
+    try:
+        return auth.verify_id_token(credentials.credentials)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid token: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

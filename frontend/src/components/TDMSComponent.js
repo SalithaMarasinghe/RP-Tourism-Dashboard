@@ -95,6 +95,24 @@ export default function TDMSComponent() {
     }
   }, [selectedSite, selectedYear]);
 
+  // Load trend data when selected site changes
+  useEffect(() => {
+    if (selectedSite) {
+      const fetchTrendData = async () => {
+        console.log('TDMSComponent: Fetching trend data for site:', selectedSite);
+        try {
+          const response = await axios.get(`http://localhost:8000/api/tdms/weekly-trend/${encodeURIComponent(selectedSite)}`);
+          console.log('TDMSComponent: Trend data response:', response.data);
+          setTrendData(response.data.trend_data || []);
+        } catch (error) {
+          console.error('TDMSComponent: Error fetching trend data:', error);
+          setTrendData([]);
+        }
+      };
+      fetchTrendData();
+    }
+  }, [selectedSite]);
+
   // Load simulated data when redistribution parameters change
   useEffect(() => {
     if (sourceSite && targetSite && distributionPercentage > 0 && dashboardData) {
@@ -363,7 +381,7 @@ export default function TDMSComponent() {
                 <div className="h-80">
                   {trendData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <ReLineChart data={trendData}>
+                      <LineChart data={trendData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" />
                         <YAxis />
@@ -371,7 +389,7 @@ export default function TDMSComponent() {
                         <Legend />
                         <Line type="monotone" dataKey="visitors" stroke="#3B82F6" name="Visitors" />
                         <Line type="monotone" dataKey="vli_score" stroke="#EF4444" name="VLI Score" />
-                      </ReLineChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500">

@@ -121,9 +121,8 @@ function ChatHistorySidebar({
 
       {/* Floating Sidebar */}
       <div
-        className={`fixed left-4 top-20 w-80 h-[calc(100vh-6rem)] bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col z-50 transform transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
-        }`}
+        className={`fixed left-4 top-20 w-80 h-[calc(100vh-6rem)] bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col z-50 transform transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
+          }`}
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-200 flex-shrink-0">
@@ -169,11 +168,10 @@ function ChatHistorySidebar({
               {chats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${
-                    currentChatId === chat.id
-                      ? 'bg-blue-50'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${currentChatId === chat.id
+                    ? 'bg-blue-50'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   {editingChatId === chat.id ? (
                     <input
@@ -193,9 +191,8 @@ function ChatHistorySidebar({
                         onClick={() => onSelectChat(chat.id)}
                       >
                         <span
-                          className={`text-sm font-medium truncate flex-1 ${
-                            currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
-                          }`}
+                          className={`text-sm font-medium truncate flex-1 ${currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
+                            }`}
                           title={chat.title}
                         >
                           {chat.title}
@@ -421,7 +418,7 @@ function ChatbotTab() {
 
       // 1. Web search for current information
       try {
-        const searchResponse = await fetch('http://localhost:8000/api/search/web', {
+        const searchResponse = await fetch(`${API_BASE}/api/search/web`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -443,7 +440,7 @@ function ChatbotTab() {
       // 2. Get comprehensive dashboard data for better context
       try {
         // Always get forecast scenarios for context
-        const scenariosResponse = await fetch('http://localhost:8000/api/forecasts/scenarios');
+        const scenariosResponse = await fetch(`${API_BASE}/api/forecasts/scenarios`);
         if (scenariosResponse.ok) {
           const scenariosData = await scenariosResponse.json();
           if (scenariosData.baseline && scenariosData.baseline.length > 0) {
@@ -637,7 +634,7 @@ function ChatbotTab() {
 
       // 4. Get daily predictions for short-term forecasts
       try {
-        const dailyResponse = await fetch('http://localhost:8000/api/forecasts/daily');
+        const dailyResponse = await fetch(`${API_BASE}/api/forecasts/daily`);
         if (dailyResponse.ok) {
           const dailyData = await dailyResponse.json();
           if (dailyData.baseline && dailyData.baseline.length > 0) {
@@ -782,7 +779,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
       // Call backend Gemini API directly
       const response = await authFetch('/api/chat/ask', {
         method: 'POST',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: userMessage,
           chat_id: chatIdForThisMessage
         })
