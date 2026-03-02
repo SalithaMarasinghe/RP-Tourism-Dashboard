@@ -1,6 +1,5 @@
-
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -15,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Make port 8080 available to the world outside this container
-# Cloud Run expects the container to listen on $PORT (default 8080)
+# Railway/Cloud Run expects the container to listen on $PORT
 ENV PORT=8080
 
 # Run app.py when the container launches

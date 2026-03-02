@@ -43,6 +43,11 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+@app.get("/healthz", tags=["Health"])
+async def health_check():
+    """Endpoint for Render health checks."""
+    return {"status": "ok"}
+
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(core_router.router)
 app.include_router(auth_router.router)
