@@ -1,25 +1,32 @@
-# Use Alpine Linux for smaller base image
-FROM python:3.10-alpine as builder
+# Use Debian slim for better compatibility with ML packages
+FROM python:3.10-slim as builder
 
 # Set the working directory
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache gcc musl-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and setuptools first
+RUN pip install --upgrade pip setuptools
 
 # Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Production stage with Alpine
-FROM python:3.10-alpine
+# Production stage
+FROM python:3.10-slim
 
 # Set the working directory
 WORKDIR /app
 
 # Install runtime dependencies only
-RUN apk add --no-cache \
-    && adduser --disabled-password --gecos '' appuser
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && adduser --disabled-password --gecos '' appuser \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder stage
 COPY --from=builder /root/.local /home/appuser/.local
