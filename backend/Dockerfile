@@ -4,6 +4,9 @@ FROM python:3.10-slim as builder
 # Set the working directory
 WORKDIR /app
 
+# Copy requirements FIRST
+COPY requirements.txt .
+
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
