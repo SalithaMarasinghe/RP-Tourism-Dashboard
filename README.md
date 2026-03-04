@@ -14,7 +14,7 @@ The chatbot feature requires a Google Gemini API key:
 
 1. Install Python dependencies:
    ```bash
-   python -m pip install -r requirements-simple.txt
+   python -m pip install -r requirements.txt
    ```
 
 2. Start the backend server:
