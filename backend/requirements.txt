@@ -11,3 +11,8 @@ numpy==1.24.3
 chromadb==0.4.22
 sentence-transformers==2.2.2
 rank-bm25==0.2.2
+
+# Fix dependency resolution conflicts
+grpcio-status==1.62.3
+opentelemetry-proto==1.27.0
+opentelemetry-instrumentation-fastapi==0.48b0
