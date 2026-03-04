@@ -5,14 +5,14 @@ Pydantic request models for the auth module.
 """
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class SignupRequest(BaseModel):
     email: EmailStr
     password: str
-    firstName: str
-    lastName: str
+    first_name: str = Field(alias="firstName")
+    last_name: str = Field(alias="lastName")
 
 
 class LoginRequest(BaseModel):
@@ -21,14 +21,14 @@ class LoginRequest(BaseModel):
 
 
 class GoogleAuthRequest(BaseModel):
-    idToken: str
+    id_token: str = Field(alias="idToken")
 
 
 class ProfileUpdateRequest(BaseModel):
-    firstName: Optional[str] = None
-    lastName: Optional[str] = None
+    first_name: Optional[str] = Field(None, alias="firstName")
+    last_name: Optional[str] = Field(None, alias="lastName")
 
 
 class PasswordChangeRequest(BaseModel):
-    currentPassword: str
-    newPassword: str
+    current_password: str = Field(alias="currentPassword")
+    new_password: str = Field(alias="newPassword")
