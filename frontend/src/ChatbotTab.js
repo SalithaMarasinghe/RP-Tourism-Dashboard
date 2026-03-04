@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './components/ui/button';
-import { MessageCircle, Send, Plus, Trash2, Pencil, History } from 'lucide-react';
+import { MessageCircle, Send, Plus, Trash2, Pencil, History, Database } from 'lucide-react';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import ReactMarkdown from 'react-markdown';
@@ -38,7 +38,8 @@ function ChatHistorySidebar({
   onDeleteChat,
   onRenameChat,
   isOpen,
-  onClose
+  onClose,
+  chatMode
 }) {
   const [editingChatId, setEditingChatId] = useState(null);
   const [editingTitle, setEditingTitle] = useState('');
@@ -129,10 +130,18 @@ function ChatHistorySidebar({
           {/* AI Assistant Branding */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
+              {chatMode === 'tourism' ? (
+                <Database className="h-6 w-6 text-green-600 flex-shrink-0" />
+              ) : (
+                <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
+              )}
               <div>
-                <h2 className="text-lg font-bold text-gray-900">AI Assistant</h2>
-                <p className="text-xs text-gray-500">Tourism analytics & insights</p>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {chatMode === 'tourism' ? 'Tourism Data Assistant' : 'AI Assistant'}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {chatMode === 'tourism' ? 'Statistical insights & reports' : 'Tourism analytics & insights'}
+                </p>
               </div>
             </div>
             <button
@@ -145,15 +154,17 @@ function ChatHistorySidebar({
               </svg>
             </button>
           </div>
-          <p className="text-xs font-semibold text-gray-600 uppercase mb-3">Chat History</p>
+          <p className="text-xs font-semibold text-gray-600 uppercase mb-3">
+            {chatMode === 'tourism' ? 'Tourism Data Chats' : 'General Chats'}
+          </p>
           <Button
             onClick={onNewChat}
             size="sm"
             className="w-full"
-            title="Start a new chat"
+            title={`Start a new ${chatMode === 'tourism' ? 'tourism data' : 'general'} chat`}
           >
             <Plus className="h-4 w-4 mr-2" />
-            New Chat
+            New {chatMode === 'tourism' ? 'Data' : ''} Chat
           </Button>
         </div>
 
@@ -279,6 +290,9 @@ function ChatbotTab() {
   const [chats, setChats] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [firstMessageData, setFirstMessageData] = useState(null);
+  const [chatMode, setChatMode] = useState('gemini'); // 'gemini' or 'tourism'
+  const [geminiChats, setGeminiChats] = useState([]);
+  const [tourismChats, setTourismChats] = useState([]);
 
   // Initialize user and load chat list
   useEffect(() => {
@@ -290,6 +304,13 @@ function ChatbotTab() {
         setAuthWarning(false);
         await refreshChatList(user);
         setIsInitializing(false);
+        
+        // Set up periodic refresh for chat list (every 30 seconds)
+        const refreshInterval = setInterval(() => {
+          refreshChatList(user, true); // Skip auto-load during periodic refresh
+        }, 30000);
+        
+        return () => clearInterval(refreshInterval);
       } else {
         console.log('User not authenticated');
         setAuthWarning(true);
@@ -303,7 +324,34 @@ function ChatbotTab() {
     return () => unsubscribe();
   }, []);
 
-  const refreshChatList = async (user, skipAutoLoad = false) => {
+  // Update chats when mode changes only (not when chat lists update)
+  useEffect(() => {
+    if (currentUser) {
+      const newChats = chatMode === 'tourism' ? tourismChats : geminiChats;
+      setChats(newChats);
+      
+      // Clear current chat if it doesn't belong to the current mode
+      // Only clear if we're not loading and not in the middle of operations
+      if (currentChatId && !isLoading && !isSidebarOpen) {
+        const chatBelongsToCurrentMode = newChats.some(chat => chat.id === currentChatId);
+        if (!chatBelongsToCurrentMode) {
+          setCurrentChatId(null);
+          setMessages([]);
+        }
+      }
+    }
+  }, [chatMode, currentUser]); // Only depend on mode and user, not chat lists
+
+  // Update chats display when chat lists change (without clearing messages)
+  useEffect(() => {
+    if (currentUser) {
+      const newChats = chatMode === 'tourism' ? tourismChats : geminiChats;
+      setChats(newChats);
+    }
+  }, [geminiChats, tourismChats, chatMode, currentUser]); // Update display when lists change
+
+  // Separate chat list management for each mode
+  const refreshGeminiChatList = async (user, skipAutoLoad = false) => {
     try {
       const token = await (user || auth.currentUser).getIdToken();
       const res = await fetch(`${API_BASE}/api/chat/list`, {
@@ -312,15 +360,50 @@ function ChatbotTab() {
       if (!res.ok) return;
       const data = await res.json();
       const chatsList = data.chats || [];
-      setChats(chatsList);
-
-      // Auto-load most recent chat if none selected (but skip if user is actively chatting)
-      if (!skipAutoLoad && !currentChatId && chatsList.length > 0) {
-        await loadChat(chatsList[0].id);
+      
+      // Only get Gemini chats (no [Tourism Data] prefix)
+      const gemini = chatsList.filter(chat => !chat.title?.includes('[Tourism Data]'));
+      console.log('Gemini refresh - all chats:', chatsList.map(c => ({ id: c.id, title: c.title })));
+      console.log('Gemini refresh - filtered chats:', gemini.map(c => ({ id: c.id, title: c.title })));
+      console.log('Gemini refresh - current chat ID:', currentChatId);
+      setGeminiChats(gemini);
+      
+      // Auto-load only if in Gemini mode and no current chat
+      if (chatMode === 'gemini' && !skipAutoLoad && !currentChatId && gemini.length > 0) {
+        await loadChat(gemini[0].id);
       }
     } catch (err) {
-      console.error('Error loading chat list:', err);
+      console.error('Error loading Gemini chat list:', err);
     }
+  };
+
+  const refreshTourismChatList = async (user, skipAutoLoad = false) => {
+    try {
+      const token = await (user || auth.currentUser).getIdToken();
+      const res = await fetch(`${API_BASE}/api/chat/list`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const chatsList = data.chats || [];
+      
+      // Only get Tourism chats (with [Tourism Data] prefix)
+      const tourism = chatsList.filter(chat => chat.title?.includes('[Tourism Data]'));
+      setTourismChats(tourism);
+      
+      // Auto-load only if in Tourism mode and no current chat
+      if (chatMode === 'tourism' && !skipAutoLoad && !currentChatId && tourism.length > 0) {
+        await loadChat(tourism[0].id);
+      }
+    } catch (err) {
+      console.error('Error loading Tourism chat list:', err);
+    }
+  };
+
+  const refreshChatList = async (user, skipAutoLoad = false) => {
+    // Refresh both chat lists
+    await refreshGeminiChatList(user, skipAutoLoad);
+    await refreshTourismChatList(user, skipAutoLoad);
   };
 
   const loadChat = async (chatId) => {
@@ -337,6 +420,7 @@ function ChatbotTab() {
       }));
 
       setMessages(loadedMessages);
+      setIsSidebarOpen(false); // Close sidebar after selecting chat
 
       // Scroll to bottom
       setTimeout(() => {
@@ -375,9 +459,6 @@ function ChatbotTab() {
         if (role === 'user') {
           setFirstMessageData({ userMessage: content, chatId });
         }
-
-        // Refresh sidebar
-        await refreshChatList(currentUser, true);
       }
 
       // Save the message
@@ -388,13 +469,27 @@ function ChatbotTab() {
       });
       console.log('Message saved successfully');
 
-      // Refresh sidebar to update updatedAt ordering
-      await refreshChatList(currentUser, true);
-
       return chatId;
     } catch (error) {
       console.error('Error saving message:', error);
       return null;
+    }
+  };
+
+  const callRagAPI = async (message) => {
+    try {
+      const response = await authFetch('/api/rag/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message })
+      });
+
+      return {
+        text: response.response,
+        sources: response.sources || []
+      };
+    } catch (error) {
+      console.error('RAG API call failed:', error);
+      throw error;
     }
   };
 
@@ -735,17 +830,21 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
     }
   };
 
-  const generateChatTitle = async (chatId, userMessage) => {
+  const generateChatTitle = async (chatId, userMessage, preservePrefix = false) => {
     if (!currentUser || !chatId) return;
     try {
       const words = userMessage.split(' ').slice(0, 6).join(' ');
-      const generatedTitle = words.length > 0 ? words : userMessage.substring(0, 40);
+      let generatedTitle = words.length > 0 ? words : userMessage.substring(0, 40);
+      
+      // For tourism mode, preserve the [Tourism Data] prefix
+      if (preservePrefix && chatMode === 'tourism') {
+        generatedTitle = `[Tourism Data] ${generatedTitle}`;
+      }
+      
       await authFetch(`/api/chat/${chatId}/rename`, {
         method: 'PUT',
         body: JSON.stringify({ title: generatedTitle })
       });
-      await refreshChatList();
-      console.log('Chat title updated:', generatedTitle);
     } catch (error) {
       console.error('Error generating chat title:', error);
     }
@@ -767,44 +866,147 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
     setIsLoading(true);
 
-    // The backend /api/chat/ask handles saving both user message and AI response,
-    // so we do NOT call saveMessageToBackend for the user message here.
     let chatIdForThisMessage = currentChatId;
 
     try {
-      // Call backend Gemini API — it saves the user message + AI response to Firestore
-      const response = await authFetch('/api/chat/ask', {
-        method: 'POST',
-        body: JSON.stringify({
-          message: userMessage,
-          chat_id: chatIdForThisMessage
-        })
-      });
+      let response;
+      
+      if (chatMode === 'tourism') {
+        // For tourism mode, create chat first if needed
+        if (!chatIdForThisMessage) {
+          const title = `[Tourism Data] ${userMessage.length > 50 ? userMessage.substring(0, 50) : userMessage}`;
+          const newChat = await authFetch('/api/chat/create', {
+            method: 'POST',
+            body: JSON.stringify({ title })
+          });
+          chatIdForThisMessage = newChat.chatId;
+          setCurrentChatId(chatIdForThisMessage);
+        }
+        
+        // Use RAG API for Tourism Data Assistant
+        response = await callRagAPI(userMessage);
+        
+        // Save both user message and response
+        await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
+        await saveMessageToBackend('assistant', response.text, response.sources, chatIdForThisMessage);
+        
+        // Refresh only tourism chat list (no auto-load to prevent disappearing)
+        await refreshTourismChatList(currentUser, true);
+        
+      } else {
+        // Use existing Gemini API (handles saving internally)
+        try {
+          const responseData = await authFetch('/api/chat/ask', {
+            method: 'POST',
+            body: JSON.stringify({
+              message: userMessage,
+              chat_id: chatIdForThisMessage
+            })
+          });
+          
+          console.log('Gemini API response:', responseData);
+          
+          // Handle different response structures
+          let responseText = '';
+          let responseSources = [];
+          let responseChatId = null;
+          
+          if (responseData.response) {
+            responseText = responseData.response;
+          } else if (responseData.text) {
+            responseText = responseData.text;
+          } else if (responseData.message) {
+            responseText = responseData.message;
+          } else {
+            console.warn('Unexpected response structure:', responseData);
+            responseText = 'I received a response but couldn\'t parse it properly.';
+          }
+          
+          responseSources = responseData.sources || [];
+          responseChatId = responseData.chat_id || responseData.chatId || null;
+          
+          response = {
+            text: responseText,
+            sources: responseSources,
+            chat_id: responseChatId
+          };
+          console.log('Processed Gemini response:', response);
+        } catch (geminiError) {
+          console.error('Gemini API call failed:', geminiError);
+          throw geminiError; // Re-throw to be handled by the main catch block
+        }
+      }
 
-      setMessages(prev => [...prev, { text: response.response, sender: 'bot', sources: response.sources || [] }]);
+      setMessages(prev => [...prev, { text: response.text, sender: 'bot', sources: response.sources || [] }]);
 
-      // Update current chat ID if this was a new chat
-      if (!currentChatId && response.chat_id) {
+      // Update current chat ID if this was a new chat (only for Gemini mode)
+      if (chatMode === 'gemini' && !currentChatId && response.chat_id) {
         setCurrentChatId(response.chat_id);
         chatIdForThisMessage = response.chat_id;
-        await refreshChatList(currentUser, true);
-        // Generate a readable title for the new chat
         generateChatTitle(response.chat_id, userMessage);
+        // Refresh only Gemini chat list for new Gemini chat
+        await refreshGeminiChatList(currentUser, true);
+      } else if (chatMode === 'gemini' && currentChatId) {
+        // For existing Gemini chats, refresh to show updated messages
+        console.log('Refreshing Gemini chat list for existing chat:', currentChatId);
+        await refreshGeminiChatList(currentUser, true);
+      } else if (chatMode === 'tourism' && !currentChatId && chatIdForThisMessage) {
+        generateChatTitle(chatIdForThisMessage, userMessage, true); // Preserve prefix for tourism
       } else if (firstMessageData?.chatId === chatIdForThisMessage) {
-        generateChatTitle(chatIdForThisMessage, userMessage);
+        generateChatTitle(chatIdForThisMessage, userMessage, chatMode === 'tourism'); // Preserve prefix for tourism
         setFirstMessageData(null);
       }
 
       setIsLoading(false);
+      
+      // Don't auto-refresh for tourism mode to prevent message disappearing
+      // Chat list will be updated when user switches modes or manually refreshes
     } catch (error) {
       console.error('Error sending message:', error);
 
-      // Fallback response
-      const fallbackResponse = "I apologize, but I'm having trouble connecting to the AI service. Please try again later.";
+      // Better error handling based on error type
+      let fallbackResponse = "I apologize, but I'm having trouble connecting to the AI service. Please try again later.";
+      
+      // Check for specific Gemini API errors
+      if (error.message) {
+        if (error.message.includes('quota') || error.message.includes('429') || error.message.includes('rate limit')) {
+          fallbackResponse = "I've reached my usage limit for the moment. Please try again in a few minutes, or consider using the Tourism Data Assistant which has different limits.";
+        } else if (error.message.includes('API key') || error.message.includes('authentication')) {
+          fallbackResponse = "There's an issue with the API configuration. Please contact support or try the Tourism Data Assistant.";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          fallbackResponse = "I'm having trouble connecting to the service. Please check your internet connection and try again.";
+        }
+      }
+
       setMessages(prev => [...prev, { text: fallbackResponse, sender: 'bot', sources: [] }]);
 
+      // For Gemini mode, ensure chat is created and saved even on error
+      if (chatMode === 'gemini' && !chatIdForThisMessage) {
+        try {
+          // Create a new chat for Gemini mode on error
+          const title = userMessage.length > 50 ? userMessage.substring(0, 50) : userMessage;
+          console.log('Creating Gemini chat on error with title:', title);
+          const newChat = await authFetch('/api/chat/create', {
+            method: 'POST',
+            body: JSON.stringify({ title })
+          });
+          chatIdForThisMessage = newChat.chatId;
+          setCurrentChatId(chatIdForThisMessage);
+          console.log('Gemini chat created on error with ID:', chatIdForThisMessage);
+        } catch (createError) {
+          console.error('Failed to create Gemini chat on error:', createError);
+        }
+      }
+
       if (chatIdForThisMessage) {
+        await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
         await saveMessageToBackend('assistant', fallbackResponse, [], chatIdForThisMessage);
+        
+        // Refresh Gemini chat list after saving error message
+        if (chatMode === 'gemini') {
+          console.log('Refreshing Gemini chat list after error save');
+          await refreshGeminiChatList(currentUser, true);
+        }
       }
 
       setIsLoading(false);
@@ -812,11 +1014,26 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
   };
 
   const handleNewChat = () => {
+    // Clear current state
     setMessages([]);
     setCurrentChatId(null);
     setInputMessage('');
     setFirstMessageData(null);
     setIsSidebarOpen(false);
+  };
+
+  const handleModeSwitch = (newMode) => {
+    if (newMode === chatMode) return; // No change needed
+    
+    // Clear current chat when switching modes
+    setMessages([]);
+    setCurrentChatId(null);
+    setInputMessage('');
+    setFirstMessageData(null);
+    
+    // Switch mode
+    setChatMode(newMode);
+    setIsSidebarOpen(false); // Close sidebar when switching modes
   };
 
   const handleDeleteChat = async (chatId) => {
@@ -827,7 +1044,12 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         setMessages([]);
         setCurrentChatId(null);
       }
-      await refreshChatList();
+      // Refresh only the current mode's chat list
+      if (chatMode === 'tourism') {
+        await refreshTourismChatList(currentUser, true);
+      } else {
+        await refreshGeminiChatList(currentUser, true);
+      }
       console.log('Chat deleted successfully');
     } catch (error) {
       console.error('Error deleting chat:', error);
@@ -841,7 +1063,12 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         method: 'PUT',
         body: JSON.stringify({ title: newTitle })
       });
-      await refreshChatList();
+      // Refresh only the current mode's chat list
+      if (chatMode === 'tourism') {
+        await refreshTourismChatList(currentUser, true);
+      } else {
+        await refreshGeminiChatList(currentUser, true);
+      }
       console.log('Chat renamed successfully');
     } catch (error) {
       console.error('Error renaming chat:', error);
@@ -883,6 +1110,62 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
         {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Mode Selector */}
+          <div className="border-b border-gray-200 bg-white px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-semibold text-gray-700">Assistant Mode:</span>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleModeSwitch('gemini')}
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      chatMode === 'gemini'
+                        ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <MessageCircle className="h-4 w-4" />
+                      <span>Gemini Assistant</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleModeSwitch('tourism')}
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      chatMode === 'tourism'
+                        ? 'bg-green-600 text-white shadow-lg transform scale-105'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Database className="h-4 w-4" />
+                      <span>Tourism Data</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                {chatMode === 'gemini' ? (
+                  <div className="flex items-center space-x-2 text-xs text-gray-500">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    <span>General AI Assistant</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2 text-xs text-gray-500">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>Statistical Reports (2010-2025)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {chatMode === 'tourism' && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700">
+                  📊 <strong>Tourism Data Assistant</strong>: Uses tourism statistical reports for data-driven insights. Ask about visitor numbers, trends, and historical data.
+                </p>
+              </div>
+            )}
+          </div>
           {/* Messages Area */}
           <div
             className="flex-1 overflow-y-auto py-2 px-4"
@@ -891,9 +1174,21 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-gray-500">
-                  <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg">Start a conversation with the AI assistant</p>
-                  <p className="text-sm mt-2">Ask about tourism trends, forecasts, or analytics</p>
+                  {chatMode === 'tourism' ? (
+                    <Database className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  ) : (
+                    <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  )}
+                  <p className="text-lg">
+                    {chatMode === 'tourism' 
+                      ? 'Ask about tourism statistics and data (2010–2025)' 
+                      : 'Start a conversation with the AI assistant'}
+                  </p>
+                  <p className="text-sm mt-2">
+                    {chatMode === 'tourism'
+                      ? 'Get data-driven insights from tourism reports'
+                      : 'Ask about tourism trends, forecasts, or analytics'}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -999,6 +1294,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         onRenameChat={handleRenameChat}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
+        chatMode={chatMode}
       />
     </div>
   );

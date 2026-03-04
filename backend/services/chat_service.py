@@ -199,6 +199,7 @@ async def call_gemini_api(message: str, context: Dict[str, str]) -> Dict[str, An
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
 
     genai.configure(api_key=api_key)
+    # Use gemini-2.5-flash for general chat (different from RAG system)
     model = genai.GenerativeModel("gemini-2.5-flash")
 
     # Construct intelligent system prompt with context engineering

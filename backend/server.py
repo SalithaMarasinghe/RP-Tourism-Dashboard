@@ -15,6 +15,7 @@ from routers import (
     chat_router,
     core_router,
     forecast_router,
+    rag_router,
     search_router,
     tdms_router,
 )
@@ -53,5 +54,6 @@ app.include_router(core_router.router)
 app.include_router(auth_router.router)
 app.include_router(chat_router.router)
 app.include_router(forecast_router.router)
+app.include_router(rag_router.router)
 app.include_router(tdms_router.router)
 app.include_router(search_router.router)

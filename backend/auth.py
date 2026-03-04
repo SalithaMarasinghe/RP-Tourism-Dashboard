@@ -44,7 +44,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
     """
     token = credentials.credentials
     try:
-        decoded_token = auth.verify_id_token(token)
+        # Add clock skew tolerance to handle "Token used too early" errors
+        decoded_token = auth.verify_id_token(token, clock_skew_seconds=60)
         return decoded_token
     except Exception as e:
         raise HTTPException(
@@ -60,7 +61,8 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
     Verifies the Firebase ID token and returns the decoded payload.
     """
     try:
-        return auth.verify_id_token(credentials.credentials)
+        # Add clock skew tolerance to handle "Token used too early" errors
+        return auth.verify_id_token(credentials.credentials, clock_skew_seconds=60)
     except Exception as e:
         raise HTTPException(
             status_code=401,
