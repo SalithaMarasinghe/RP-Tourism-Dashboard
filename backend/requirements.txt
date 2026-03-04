@@ -12,6 +12,7 @@ chromadb==0.4.22
 sentence-transformers==2.2.2
 rank-bm25==0.2.2
 
-# Use CPU-only PyTorch to save ~1.5GB
-torch==2.1.0
-torchvision==0.16.0
+# Compatible PyTorch + Transformers versions
+torch==2.0.1
+torchvision==0.15.2
+transformers==4.35.2
