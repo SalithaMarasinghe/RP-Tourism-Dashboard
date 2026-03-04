@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install requirements with CPU-only PyTorch
-RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+# Upgrade pip and install requirements with compatible versions
+RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user -r requirements.txt
 
 # Production stage
 FROM python:3.10-slim
