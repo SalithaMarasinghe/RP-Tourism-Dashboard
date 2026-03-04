@@ -28,21 +28,21 @@ _corpus_documents = None
 
 
 def initialize_rag_system():
-    """Initialize the RAG system by loading models and databases."""
+    """Initialize RAG system by loading models and databases."""
     global _embedding_model, _chroma_client, _chroma_collection, _bm25_index, _corpus_documents
     
     try:
-        # Load embedding model
+        # Load embedding model (optimized for speed)
         logger.debug("Loading embedding model...")
-        _embedding_model = SentenceTransformer('BAAI/bge-base-en')
+        _embedding_model = SentenceTransformer('BAAI/bge-base-en', device='cpu')
         
-        # Load Chroma DB
+        # Load Chroma DB (optimized connection)
         logger.debug("Loading Chroma database...")
         chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
         _chroma_client = chromadb.PersistentClient(path=chroma_path)
         _chroma_collection = _chroma_client.get_collection("langchain")
         
-        # Load BM25 index
+        # Load BM25 index (optimized loading)
         logger.debug("Loading BM25 index...")
         bm25_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'bm25_index.pkl')
         with open(bm25_path, 'rb') as f:

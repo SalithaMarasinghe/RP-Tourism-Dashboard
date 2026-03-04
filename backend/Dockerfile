@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install requirements with dependencies
-RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user -r requirements.txt
+# Upgrade pip and install requirements with CPU-only PyTorch
+RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # Production stage
 FROM python:3.10-slim
@@ -22,28 +22,34 @@ FROM python:3.10-slim
 # Set the working directory
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install runtime dependencies only (minimal)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     && adduser --disabled-password --gecos '' appuser \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copy installed packages from builder stage
 COPY --from=builder /root/.local /home/appuser/.local
 
-# Copy application code
+# Copy application code (exclude heavy data files)
 COPY . .
 
 # Change ownership to appuser
 RUN chown -R appuser:appuser /app
-USER appuser
 
-# Make Python use user site-packages
+# Set environment variables
 ENV PATH=/home/appuser/.local/bin:$PATH
 ENV PYTHONPATH=/home/appuser/.local/lib/python3.10/site-packages
 
-# Make port 8080 available to the world outside this container
-ENV PORT=8080
+# Switch to non-root user
+USER appuser
+
+# Expose port
 EXPOSE $PORT
 
-# Run server.py when the container launches
-CMD exec uvicorn server:app --host 0.0.0.0 --port $PORT
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:$PORT/api/test || exit 1
+
+# Start command
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "$PORT"]

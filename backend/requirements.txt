@@ -14,14 +14,13 @@ google-generativeai==0.3.2
 pandas==2.0.3
 numpy==1.24.3
 
-# RAG - essential only
+# RAG - lightweight alternatives
 chromadb==0.4.22
 sentence-transformers==2.2.2
 rank-bm25==0.2.2
 
-# ML - minimal compatible versions
-torch==2.0.1
-transformers==4.35.2
+# ML - minimal CPU-only versions
+torch==2.0.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
-# Removed heavy packages - use built-in alternatives
-# torchvision==0.15.2  # REMOVED - not used
+# Remove heavy packages - use built-in alternatives
+# transformers==4.35.2  # REMOVED - heavy, use sentence-transformers directly
