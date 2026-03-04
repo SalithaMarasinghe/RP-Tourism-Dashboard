@@ -896,34 +896,39 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
       } else {
         // Use existing Gemini API (handles saving internally)
         try {
-          const geminiResponse = await authFetch('/api/chat/ask', {
+          const responseData = await authFetch('/api/chat/ask', {
             method: 'POST',
             body: JSON.stringify({
               message: userMessage,
               chat_id: chatIdForThisMessage
             })
           });
-
-          if (!geminiResponse.ok) {
-            const errorText = await geminiResponse.text();
-            let errorMessage = 'Gemini API error';
-            
-            try {
-              const errorData = JSON.parse(errorText);
-              errorMessage = errorData.error?.message || errorData.message || errorMessage;
-            } catch {
-              errorMessage = errorText || errorMessage;
-            }
-            
-            throw new Error(`${errorMessage}`);
-          }
-
-          const responseData = await geminiResponse.json();
+          
           console.log('Gemini API response:', responseData);
+          
+          // Handle different response structures
+          let responseText = '';
+          let responseSources = [];
+          let responseChatId = null;
+          
+          if (responseData.response) {
+            responseText = responseData.response;
+          } else if (responseData.text) {
+            responseText = responseData.text;
+          } else if (responseData.message) {
+            responseText = responseData.message;
+          } else {
+            console.warn('Unexpected response structure:', responseData);
+            responseText = 'I received a response but couldn\'t parse it properly.';
+          }
+          
+          responseSources = responseData.sources || [];
+          responseChatId = responseData.chat_id || responseData.chatId || null;
+          
           response = {
-            text: responseData.response,
-            sources: responseData.sources || [],
-            chat_id: responseData.chat_id
+            text: responseText,
+            sources: responseSources,
+            chat_id: responseChatId
           };
           console.log('Processed Gemini response:', response);
         } catch (geminiError) {
