@@ -1,18 +1,27 @@
+# Core API - minimal versions
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-dotenv==1.0.0
 pydantic[email]==2.4.0
 python-multipart==0.0.6
 requests==2.31.0
+
+# Firebase & Google - minimal versions
 firebase-admin==6.2.0
 google-generativeai==0.3.2
+
+# Data processing - minimal versions
 pandas==2.0.3
 numpy==1.24.3
+
+# RAG - essential only
 chromadb==0.4.22
 sentence-transformers==2.2.2
 rank-bm25==0.2.2
 
-# Compatible PyTorch + Transformers versions
+# ML - minimal compatible versions
 torch==2.0.1
-torchvision==0.15.2
 transformers==4.35.2
+
+# Removed heavy packages - use built-in alternatives
+# torchvision==0.15.2  # REMOVED - not used

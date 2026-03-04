@@ -10,12 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and setuptools first
-RUN pip install --upgrade pip setuptools
-
-# Copy and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Upgrade pip and add parallel support
+RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user --no-deps -r requirements.txt
 
 # Production stage
 FROM python:3.10-slim

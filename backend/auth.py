@@ -1,11 +1,15 @@
 import os
 import json
+import logging
 import firebase_admin
 from firebase_admin import credentials, auth
 from fastapi import HTTPException, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from functools import lru_cache
 from dotenv import load_dotenv
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -22,19 +26,19 @@ if cred_json:
         cred_dict = json.loads(cred_json)
         cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
-        print("Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT_JSON.")
+        logger.debug("Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT_JSON.")
     except (json.JSONDecodeError, ValueError) as e:
-        print(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}")
+        logger.error(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}")
 elif os.path.exists(cred_path):
     try:
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
-        print("Firebase Admin initialized from file.")
+        logger.debug("Firebase Admin initialized from file.")
     except ValueError:
         # App already initialized
         pass
 else:
-    print(f"Warning: Firebase credentials not found. Set FIREBASE_SERVICE_ACCOUNT_JSON or provide {cred_path}.")
+    logger.warning(f"Firebase credentials not found. Set FIREBASE_SERVICE_ACCOUNT_JSON or provide {cred_path}.")
 
 security = HTTPBearer()
 
