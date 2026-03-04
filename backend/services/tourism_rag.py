@@ -33,17 +33,17 @@ def initialize_rag_system():
     
     try:
         # Load embedding model
-        logger.info("Loading embedding model...")
+        logger.debug("Loading embedding model...")
         _embedding_model = SentenceTransformer('BAAI/bge-base-en')
         
         # Load Chroma DB
-        logger.info("Loading Chroma database...")
+        logger.debug("Loading Chroma database...")
         chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
         _chroma_client = chromadb.PersistentClient(path=chroma_path)
         _chroma_collection = _chroma_client.get_collection("langchain")
         
         # Load BM25 index
-        logger.info("Loading BM25 index...")
+        logger.debug("Loading BM25 index...")
         bm25_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'bm25_index.pkl')
         with open(bm25_path, 'rb') as f:
             bm25_data = pickle.load(f)
@@ -560,7 +560,7 @@ Please provide a comprehensive analysis using ONLY the available data above."""
         
         # Check if it's a quota/rate limit error
         if "quota" in str(e).lower() or "429" in str(e) or "rate limit" in str(e).lower():
-            logger.info("Gemini API quota exceeded, using fallback response")
+            logger.debug("Gemini API quota exceeded, using fallback response")
             return generate_fallback_response(question, context)
         
         # For other errors, still raise
