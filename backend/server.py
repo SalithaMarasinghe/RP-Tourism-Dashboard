@@ -5,10 +5,13 @@ Application bootstrap: creates the FastAPI app, registers middleware,
 and mounts all routers. No business logic lives here.
 """
 import logging
+import os
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
-from pathlib import Path
 
 from routers import (
     auth_router,
@@ -31,8 +34,6 @@ logging.basicConfig(
 app = FastAPI(title="Tourism Dashboard API")
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-import os
-
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 app.add_middleware(
@@ -44,9 +45,21 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+# ── Static Files (for production) ───────────────────────────────────────────
+if os.path.exists(ROOT_DIR / "../frontend/build"):
+    app.mount("/static", StaticFiles(directory=ROOT_DIR / "../frontend/build/static"), name="static")
+
+@app.get("/", include_in_schema=False)
+async def read_index():
+    """Serve the React app in production."""
+    build_path = ROOT_DIR / "../frontend/build/index.html"
+    if build_path.exists():
+        return FileResponse(build_path)
+    return {"message": "Tourism Dashboard API is running"}
+
 @app.get("/healthz", tags=["Health"])
 async def health_check():
-    """Endpoint for Render health checks."""
+    """Endpoint for Railway health checks."""
     return {"status": "ok"}
 
 # ── Routers ───────────────────────────────────────────────────────────────────

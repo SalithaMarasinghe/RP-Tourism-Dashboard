@@ -50,5 +50,35 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
-# Firebase keys (should be environment variables)
+# Firebase keys
 serviceAccountKey.json
+
+# Documentation
+*.md
+README.md
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Development dependencies
+pytest/
+black/
+isort/
+flake8/
+mypy/
+
+# Cache and temporary files
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Exclude large model files but keep the directories
+vector database/*.pkl
+vector database/*.bin
+vector database/*.model
+forecasts/*.pkl
+forecasts/*.model
+forecasts/*.bin
