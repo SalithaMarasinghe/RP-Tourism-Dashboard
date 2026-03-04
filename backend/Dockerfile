@@ -15,7 +15,7 @@ RUN pip install --upgrade pip setuptools
 
 # Copy and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir --user --parallel -r requirements.txt
 
 # Production stage
 FROM python:3.10-slim

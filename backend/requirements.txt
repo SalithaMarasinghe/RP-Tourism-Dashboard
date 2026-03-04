@@ -12,7 +12,6 @@ chromadb==0.4.22
 sentence-transformers==2.2.2
 rank-bm25==0.2.2
 
-# Fix dependency resolution conflicts
-grpcio-status==1.62.3
-opentelemetry-proto==1.27.0
-opentelemetry-instrumentation-fastapi==0.48b0
+# Use CPU-only PyTorch to save ~1.5GB
+torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+torchvision==0.16.0+cpu --index-url https://download.pytorch.org/whl/cpu
