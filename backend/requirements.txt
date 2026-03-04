@@ -13,5 +13,5 @@ sentence-transformers==2.2.2
 rank-bm25==0.2.2
 
 # Use CPU-only PyTorch to save ~1.5GB
-torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
-torchvision==0.16.0+cpu --index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0
+torchvision==0.16.0
