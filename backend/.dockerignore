@@ -1,5 +1,5 @@
 
-# Python
+# Only exclude truly unnecessary files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -43,14 +43,14 @@ Thumbs.db
 # Logs
 *.log
 
-# Environment files
+# Environment files (keep .env.example)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Firebase keys
+# Firebase keys (should be environment variables in production)
 serviceAccountKey.json
 
 # Documentation
@@ -74,11 +74,3 @@ mypy/
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Exclude large model files but keep the directories
-vector database/*.pkl
-vector database/*.bin
-vector database/*.model
-forecasts/*.pkl
-forecasts/*.model
-forecasts/*.bin
