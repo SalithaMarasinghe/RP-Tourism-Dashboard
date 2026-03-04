@@ -210,20 +210,21 @@ Your role:
 - Always cite sources and years when using specific data
 - Explain your reasoning when making inferences
 
-Guidelines:
-- Use the context as your primary source
-- If the exact year/metric isn't available, find the closest available data
-- Mention when you're using related or proxy data
-- Be transparent about data limitations
-- Provide insights and trends, not just raw numbers
-- If no relevant information exists at all, say so politely
+IMPORTANT GUIDELINES:
+- CAREFULLY examine ALL provided context before concluding data is unavailable
+- Look for specific demographic data, population statistics, and visitor numbers
+- If the context mentions 2020 data is available, search thoroughly for the specific details
+- Check multiple sources in the context - data might be in different documents
+- If you find general mentions of data availability, look for the actual numbers in other context sections
+- Be thorough in examining all context sections before saying data is not available
 
 Response format:
 Provide a natural, helpful response that:
 - Directly answers the user's question
 - Uses available data effectively
 - Explains any limitations or approximations
-- Cites sources appropriately"""
+- Cites sources appropriately
+- If specific data is mentioned as available, make every effort to find and present it"""
         
         full_prompt = f"""{system_prompt}
 
@@ -308,7 +309,27 @@ async def handle_tourism_rag_query(question: str) -> Dict[str, Any]:
                 raise HTTPException(status_code=500, detail="Failed to initialize RAG system")
         
         # Perform hybrid retrieval with more chunks for better context
-        retrieved_chunks = hybrid_retrieval(question, top_k=12)
+        retrieved_chunks = hybrid_retrieval(question, top_k=15)
+        
+        # If we don't have enough relevant chunks, try a broader search
+        if len(retrieved_chunks) < 8 or all(chunk.get('score', 0) < 0.3 for chunk in retrieved_chunks):
+            logger.info("Low relevance results, performing broader search for demographic data")
+            # Try a broader search with demographic-related terms
+            broader_query = question
+            # Add demographic terms if not present
+            if 'demograph' not in question.lower() and 'population' not in question.lower():
+                broader_query += " demographic population data statistics"
+            
+            additional_chunks = hybrid_retrieval(broader_query, top_k=10)
+            # Combine and deduplicate
+            seen_contents = set(chunk.get('content', '') for chunk in retrieved_chunks)
+            for chunk in additional_chunks:
+                if chunk.get('content', '') not in seen_contents:
+                    retrieved_chunks.append(chunk)
+            
+            # Re-sort by score and keep top 15
+            retrieved_chunks.sort(key=lambda x: x.get('score', 0), reverse=True)
+            retrieved_chunks = retrieved_chunks[:15]
         
         # Build context
         context = build_context(retrieved_chunks)
