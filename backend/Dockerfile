@@ -1,4 +1,21 @@
-# Use Debian slim for better compatibility with ML packages
+# Use Node.js for frontend build
+FROM node:18-alpine as frontend-builder
+
+WORKDIR /app
+
+# Copy frontend package files
+COPY frontend/package*.json ./
+
+# Install frontend dependencies
+RUN npm ci --only=production
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Build frontend
+RUN npm run build
+
+# Use Python for backend
 FROM python:3.10-slim as builder
 
 # Set the working directory
@@ -32,6 +49,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy installed packages from builder stage
 COPY --from=builder /root/.local /home/appuser/.local
+
+# Copy frontend build from frontend-builder
+COPY --from=frontend-builder /app/build ./frontend/build
 
 # Copy application code (exclude heavy data files)
 COPY . .
