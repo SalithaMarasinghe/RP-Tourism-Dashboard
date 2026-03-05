@@ -57,7 +57,7 @@ def initialize_rag_system():
             logger.error(f"Failed to load embedding model: {e}")
             raise
         
-        # Load Chroma DB - should work with the correct version
+        # Load Chroma DB - simple initialization
         logger.debug("Loading Chroma database...")
         chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
         
