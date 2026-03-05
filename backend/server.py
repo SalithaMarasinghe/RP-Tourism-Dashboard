@@ -22,6 +22,7 @@ from routers import (
     search_router,
     tdms_router,
 )
+from services import tourism_rag
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -32,6 +33,17 @@ logging.basicConfig(
 )
 
 app = FastAPI(title="Tourism Dashboard API")
+
+# ── Startup Events ─────────────────────────────────────────────────────────────
+@app.on_event("startup")
+async def startup_event():
+    """Initialize RAG system on application startup."""
+    logging.info("Initializing RAG system...")
+    success = tourism_rag.initialize_rag_system()
+    if success:
+        logging.info("RAG system initialized successfully")
+    else:
+        logging.error("Failed to initialize RAG system")
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
