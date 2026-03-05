@@ -14,6 +14,7 @@ import chromadb
 import numpy as np
 from rank_bm25 import BM25Okapi
 from fastapi import HTTPException
+from langchain_chroma import Chroma
 from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
 # Set up logger
@@ -54,51 +55,22 @@ def initialize_rag_system():
             logger.error(f"Failed to load embedding model: {e}")
             raise
         
-        # Load Chroma DB using native client
-        logger.debug("Loading Chroma database using native client...")
+        # Load Chroma DB using the same method as your indexing script
+        logger.debug("Loading Chroma database using LangChain...")
+        chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
+        
         try:
-            chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
-            logger.debug(f"Chroma path: {chroma_path}")
+            # Use the exact same approach as your indexing script
+            _vector_store = Chroma(
+                persist_directory=chroma_path,
+                embedding_function=_embedding_model,
+                collection_name="langchain"
+            )
             
+            # Also get direct access to the collection for metadata
             _chroma_client = chromadb.PersistentClient(path=chroma_path)
-            logger.debug("Chroma client created")
-            
             _chroma_collection = _chroma_client.get_collection("langchain")
-            logger.debug("Chroma collection retrieved")
-            
-            # Create a simple wrapper for compatibility
-            class ChromaWrapper:
-                def __init__(self, collection, embedding_function):
-                    self.collection = collection
-                    self.embedding_function = embedding_function
-                
-                def similarity_search_with_score(self, query, k=10):
-                    query_embedding = self.embedding_function.embed_query(query)
-                    results = self.collection.query(
-                        query_embeddings=[query_embedding],
-                        n_results=k,
-                        include=["documents", "distances", "metadatas"]
-                    )
-                    
-                    documents = []
-                    for i in range(len(results["documents"][0])):
-                        doc_content = results["documents"][0][i]
-                        distance = results["distances"][0][i]
-                        metadata = results["metadatas"][0][i]
-                        
-                        # Create a simple document-like object
-                        class SimpleDocument:
-                            def __init__(self, page_content, metadata):
-                                self.page_content = page_content
-                                self.metadata = metadata
-                        
-                        doc = SimpleDocument(doc_content, metadata)
-                        documents.append((doc, distance))
-                    
-                    return documents
-            
-            _vector_store = ChromaWrapper(_chroma_collection, _embedding_model)
-            logger.debug("Chroma wrapper created")
+            logger.debug("Chroma collection retrieved successfully")
         except Exception as e:
             logger.error(f"Failed to load Chroma database: {e}")
             raise
