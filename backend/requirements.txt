@@ -14,9 +14,9 @@ google-generativeai==0.7.2
 pandas==2.2.0
 numpy==1.26.0
 
-# RAG - matching your local environment
+# RAG - compatible versions to avoid conflicts
 chromadb==1.5.2
 rank-bm25==0.2.2
-langchain-chroma==1.1.0
+langchain-chroma==0.1.2
 langchain-google-genai==1.0.7
 
