@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
 from routers import (
@@ -32,11 +33,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-app = FastAPI(title="Tourism Dashboard API")
-
-# ── Startup Events ─────────────────────────────────────────────────────────────
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Initialize RAG system on application startup."""
     logging.info("Initializing RAG system...")
     success = tourism_rag.initialize_rag_system()
@@ -44,6 +42,11 @@ async def startup_event():
         logging.info("RAG system initialized successfully")
     else:
         logging.error("Failed to initialize RAG system")
+    yield
+    # Cleanup on shutdown (if needed)
+    logging.info("Application shutting down...")
+
+app = FastAPI(title="Tourism Dashboard API", lifespan=lifespan)
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
