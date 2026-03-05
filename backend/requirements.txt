@@ -10,9 +10,9 @@ requests==2.31.0
 firebase-admin==6.2.0
 google-generativeai==0.7.2
 
-# Data processing - minimal versions
-pandas==2.0.3
-numpy==1.24.3
+# Data processing - Python 3.12 compatible versions
+pandas==2.2.0
+numpy==1.26.0
 
 # RAG - matching your local environment
 chromadb==1.5.2
