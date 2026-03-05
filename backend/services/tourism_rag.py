@@ -47,51 +47,68 @@ def initialize_rag_system():
     try:
         # Load lightweight ONNX embedding model
         logger.debug("Loading lightweight ONNX embedding model...")
-        _embedding_model = LightweightONNXEmbeddings()
+        try:
+            _embedding_model = LightweightONNXEmbeddings()
+            logger.debug("Embedding model loaded successfully")
+        except Exception as e:
+            logger.error(f"Failed to load embedding model: {e}")
+            raise
         
         # Load Chroma DB using native client
         logger.debug("Loading Chroma database using native client...")
-        chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
-        _chroma_client = chromadb.PersistentClient(path=chroma_path)
-        _chroma_collection = _chroma_client.get_collection("langchain")
-        
-        # Create a simple wrapper for compatibility
-        class ChromaWrapper:
-            def __init__(self, collection, embedding_function):
-                self.collection = collection
-                self.embedding_function = embedding_function
+        try:
+            chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
+            logger.debug(f"Chroma path: {chroma_path}")
             
-            def similarity_search_with_score(self, query, k=10):
-                query_embedding = self.embedding_function.embed_query(query)
-                results = self.collection.query(
-                    query_embeddings=[query_embedding],
-                    n_results=k,
-                    include=["documents", "distances", "metadatas"]
-                )
+            _chroma_client = chromadb.PersistentClient(path=chroma_path)
+            logger.debug("Chroma client created")
+            
+            _chroma_collection = _chroma_client.get_collection("langchain")
+            logger.debug("Chroma collection retrieved")
+            
+            # Create a simple wrapper for compatibility
+            class ChromaWrapper:
+                def __init__(self, collection, embedding_function):
+                    self.collection = collection
+                    self.embedding_function = embedding_function
                 
-                documents = []
-                for i in range(len(results["documents"][0])):
-                    doc_content = results["documents"][0][i]
-                    distance = results["distances"][0][i]
-                    metadata = results["metadatas"][0][i]
+                def similarity_search_with_score(self, query, k=10):
+                    query_embedding = self.embedding_function.embed_query(query)
+                    results = self.collection.query(
+                        query_embeddings=[query_embedding],
+                        n_results=k,
+                        include=["documents", "distances", "metadatas"]
+                    )
                     
-                    # Create a simple document-like object
-                    class SimpleDocument:
-                        def __init__(self, page_content, metadata):
-                            self.page_content = page_content
-                            self.metadata = metadata
+                    documents = []
+                    for i in range(len(results["documents"][0])):
+                        doc_content = results["documents"][0][i]
+                        distance = results["distances"][0][i]
+                        metadata = results["metadatas"][0][i]
+                        
+                        # Create a simple document-like object
+                        class SimpleDocument:
+                            def __init__(self, page_content, metadata):
+                                self.page_content = page_content
+                                self.metadata = metadata
+                        
+                        doc = SimpleDocument(doc_content, metadata)
+                        documents.append((doc, distance))
                     
-                    doc = SimpleDocument(doc_content, metadata)
-                    documents.append((doc, distance))
-                
-                return documents
-        
-        _vector_store = ChromaWrapper(_chroma_collection, _embedding_model)
+                    return documents
+            
+            _vector_store = ChromaWrapper(_chroma_collection, _embedding_model)
+            logger.debug("Chroma wrapper created")
+        except Exception as e:
+            logger.error(f"Failed to load Chroma database: {e}")
+            raise
         
         # Load BM25 index (optimized loading with compatibility fallback)
         logger.debug("Loading BM25 index...")
-        bm25_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'bm25_index.pkl')
         try:
+            bm25_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'bm25_index.pkl')
+            logger.debug(f"BM25 path: {bm25_path}")
+            
             with open(bm25_path, 'rb') as f:
                 bm25_data = pickle.load(f)
                 _bm25_index = bm25_data[0]  # BM25 index is first element
@@ -129,6 +146,8 @@ def initialize_rag_system():
         
     except Exception as e:
         logger.error(f"Failed to initialize RAG system: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return False
 
 
