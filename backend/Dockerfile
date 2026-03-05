@@ -1,27 +1,11 @@
-# Use Node.js for frontend build
-FROM node:18-alpine as frontend-builder
-
-WORKDIR /app
-
-# Copy frontend package files
-COPY frontend/package*.json ./
-
-# Install frontend dependencies
-RUN npm ci --only=production
-
-# Copy frontend source
-COPY frontend/ ./
-
-# Build frontend
-RUN npm run build
-
-# Use Python for backend
+# Use Debian slim for better compatibility with ML packages
 FROM python:3.10-slim as builder
 
+# Set the working directory
 WORKDIR /app
 
 # Copy requirements FIRST
-COPY backend/requirements.txt ./
+COPY requirements.txt .
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -29,14 +13,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     build-essential \
     cmake \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js for frontend build
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
 # Upgrade pip and install requirements with compatible versions
 RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user -r requirements.txt
 
+# Build frontend in the same builder stage
+WORKDIR /app
+COPY ../frontend/package*.json ./
+RUN npm ci --only=production
+COPY ../frontend/ ./
+RUN npm run build
+
 # Production stage
 FROM python:3.10-slim
 
+# Set the working directory
 WORKDIR /app
 
 # Install runtime dependencies only (minimal)
@@ -48,12 +45,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy installed packages from builder stage
 COPY --from=builder /root/.local /home/appuser/.local
 
-# Copy frontend build from frontend-builder
-COPY --from=frontend-builder /app/build ./frontend/build
+# Copy frontend build from builder stage
+COPY --from=builder /app/build ./frontend/build
 
 # Copy application code (exclude heavy data files)
-COPY backend/ ./backend/
-COPY frontend/ ./frontend/
+COPY . .
 
 # Change ownership to appuser
 RUN chown -R appuser:appuser /app
@@ -73,4 +69,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:$PORT/api/test || exit 1
 
 # Start command
-CMD ["sh", "-c", "cd backend && uvicorn server:app --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port $PORT"]
