@@ -41,4 +41,4 @@ langchain-google-genai==1.0.7
 apscheduler>=3.10.0
 
 groq>=0.4.0
-tavily-python>=0.3.3i
+tavily-python>=0.3.3
