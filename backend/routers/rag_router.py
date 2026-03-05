@@ -55,7 +55,7 @@ async def rag_status(
         return {
             "status": "ready",
             "message": "RAG system initialized and ready",
-            "embedding_model": "BAAI/bge-base-en",
+            "embedding_model": "all-MiniLM-L6-v2 (ONNX)",
             "vector_db": "Chroma",
             "keyword_index": "BM25"
         }

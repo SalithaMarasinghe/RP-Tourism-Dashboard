@@ -13,11 +13,24 @@ from typing import Any, Dict, List, Optional
 import chromadb
 import numpy as np
 from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
 from fastapi import HTTPException
+from langchain_chroma import Chroma
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
 # Set up logger
 logger = logging.getLogger(__name__)
+
+class LightweightONNXEmbeddings:
+    def __init__(self):
+        from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
+        self.ef = DefaultEmbeddingFunction()
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return self.ef(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.ef([text])[0]
+
 
 # Global variables for loaded models and databases
 _embedding_model = None
@@ -25,20 +38,28 @@ _chroma_client = None
 _chroma_collection = None
 _bm25_index = None
 _corpus_documents = None
+_vector_store = None
 
 
 def initialize_rag_system():
     """Initialize RAG system by loading models and databases."""
-    global _embedding_model, _chroma_client, _chroma_collection, _bm25_index, _corpus_documents
+    global _embedding_model, _chroma_client, _chroma_collection, _bm25_index, _corpus_documents, _vector_store
     
     try:
-        # Load embedding model (optimized for speed)
-        logger.debug("Loading embedding model...")
-        _embedding_model = SentenceTransformer('BAAI/bge-base-en', device='cpu')
+        # Load lightweight ONNX embedding model
+        logger.debug("Loading lightweight ONNX embedding model...")
+        _embedding_model = LightweightONNXEmbeddings()
         
-        # Load Chroma DB (optimized connection)
-        logger.debug("Loading Chroma database...")
+        # Load Chroma DB using LangChain Chroma wrapper
+        logger.debug("Loading Chroma database using LangChain...")
         chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
+        _vector_store = Chroma(
+            persist_directory=chroma_path,
+            embedding_function=_embedding_model,
+            collection_name="langchain"
+        )
+        
+        # Also maintain direct Chroma access for metadata
         _chroma_client = chromadb.PersistentClient(path=chroma_path)
         _chroma_collection = _chroma_client.get_collection("langchain")
         
@@ -50,7 +71,7 @@ def initialize_rag_system():
             _bm25_index = bm25_data[0]  # BM25 index is first element
             _corpus_documents = bm25_data[1]  # Documents are second element
         
-        logger.info("RAG system initialized successfully")
+        logger.info("RAG system initialized successfully with lightweight ONNX embeddings")
         return True
         
     except Exception as e:
@@ -82,14 +103,18 @@ def hybrid_retrieval(query: str, top_k: int = 12) -> List[Dict[str, Any]]:
         is_numerical_query = bool(re.search(r'\b\d+\b', query))
         is_table_query = any(term in query.lower() for term in ['table', 'data', 'statistics', 'figures', 'numbers'])
         
-        # 1. Enhanced semantic search with metadata filtering
-        query_embedding = _embedding_model.encode([query], convert_to_numpy=True)
+        # 1. Enhanced semantic search with metadata filtering using LangChain Chroma
+        query_embedding = _embedding_model.embed_query(query)
         
-        # Get more results initially for better filtering
-        semantic_results = _chroma_collection.query(
-            query_embeddings=query_embedding.tolist(),
-            n_results=min(top_k * 4, 40)
-        )
+        # Use LangChain Chroma for similarity search
+        semantic_docs = _vector_store.similarity_search_with_score(query, k=min(top_k * 4, 40))
+        
+        # Convert LangChain results to expected format
+        semantic_results = {
+            'documents': [[doc.page_content for doc, score in semantic_docs]],
+            'distances': [[score for doc, score in semantic_docs]],
+            'metadatas': [[doc.metadata for doc, score in semantic_docs]]
+        }
         
         # 2. BM25 keyword search
         tokenized_query = query.lower().split()

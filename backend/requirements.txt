@@ -16,10 +16,7 @@ numpy==1.24.3
 
 # RAG - compatible versions only
 chromadb==0.4.22
-sentence-transformers==2.3.1
 rank-bm25==0.2.2
-
-# ML - compatible versions (required by sentence-transformers 2.3.1)
-torch==2.1.0
-transformers==4.36.0
-huggingface_hub==0.19.4
+langchain-chroma==0.1.2
+langchain-google-genai==1.0.7
+google-generativeai==0.3.2
