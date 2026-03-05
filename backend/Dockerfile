@@ -1,5 +1,5 @@
 # Use Debian slim for better compatibility with ML packages
-FROM python:3.11-slim as builder
+FROM python:3.12-slim as builder
 
 # Set the working directory
 WORKDIR /app
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user -r requirements.txt
 
 # Production stage
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set the working directory
 WORKDIR /app
@@ -41,7 +41,7 @@ RUN chown -R appuser:appuser /app
 
 # Set environment variables
 ENV PATH=/home/appuser/.local/bin:$PATH
-ENV PYTHONPATH=/home/appuser/.local/lib/python3.11/site-packages
+ENV PYTHONPATH=/home/appuser/.local/lib/python3.12/site-packages
 
 # Switch to non-root user
 USER appuser
