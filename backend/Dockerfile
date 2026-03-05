@@ -11,6 +11,8 @@ COPY requirements.txt .
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
+    build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip and install requirements with compatible versions
