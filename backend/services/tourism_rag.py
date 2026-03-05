@@ -8,6 +8,8 @@ import logging
 import os
 import pickle
 import re
+import time
+import shutil
 from typing import Any, Dict, List, Optional
 
 import chromadb
@@ -55,74 +57,48 @@ def initialize_rag_system():
             logger.error(f"Failed to load embedding model: {e}")
             raise
         
-        # Load Chroma DB using direct client access to bypass configuration issues
-        logger.debug("Loading Chroma database using direct client access...")
+        # Load Chroma DB - should work with the correct version
+        logger.debug("Loading Chroma database...")
         chroma_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'chroma_tourism_db')
         
-        try:
-            # Create Chroma client
-            _chroma_client = chromadb.PersistentClient(path=chroma_path)
+        _chroma_client = chromadb.PersistentClient(path=chroma_path)
+        _chroma_collection = _chroma_client.get_collection("langchain")
+        logger.debug("Chroma collection retrieved successfully")
+        
+        # Create a custom vector store that uses our existing collection
+        class CompatibleChromaStore:
+            def __init__(self, collection, embedding_function):
+                self._collection = collection
+                self._embedding_function = embedding_function
             
-            # Try to get collection normally first
-            try:
-                _chroma_collection = _chroma_client.get_collection("langchain")
-                logger.debug("Chroma collection retrieved successfully")
-            except Exception as collection_error:
-                if "'_type'" in str(collection_error):
-                    logger.warning("Collection configuration incompatible, using direct access...")
-                    # Bypass the configuration validation by accessing the underlying server directly
-                    try:
-                        # Get the collection through the server directly
-                        _chroma_collection = _chroma_client._server.get_collection(
-                            namespace="chromadb",
-                            name="langchain"
-                        )
-                        logger.debug("Collection accessed through direct server call")
-                    except:
-                        # If that fails, create a new collection
-                        logger.warning("Creating new collection as fallback")
-                        _chroma_collection = _chroma_client.create_collection("langchain")
-                else:
-                    raise collection_error
-            
-            # Create a custom vector store that uses our existing collection
-            class CompatibleChromaStore:
-                def __init__(self, collection, embedding_function):
-                    self._collection = collection
-                    self._embedding_function = embedding_function
+            def similarity_search_with_score(self, query, k=10):
+                query_embedding = self._embedding_function.embed_query(query)
+                results = self._collection.query(
+                    query_embeddings=[query_embedding],
+                    n_results=k,
+                    include=["documents", "distances", "metadatas"]
+                )
                 
-                def similarity_search_with_score(self, query, k=10):
-                    query_embedding = self._embedding_function.embed_query(query)
-                    results = self._collection.query(
-                        query_embeddings=[query_embedding],
-                        n_results=k,
-                        include=["documents", "distances", "metadatas"]
-                    )
-                    
-                    documents = []
-                    if results["documents"] and results["documents"][0]:
-                        for i in range(len(results["documents"][0])):
-                            doc_content = results["documents"][0][i]
-                            distance = results["distances"][0][i]
-                            metadata = results["metadatas"][0][i]
-                            
-                            # Create LangChain-compatible document
-                            class CompatibleDocument:
-                                def __init__(self, page_content, metadata):
-                                    self.page_content = page_content
-                                    self.metadata = metadata
-                            
-                            doc = CompatibleDocument(doc_content, metadata)
-                            documents.append((doc, distance))
-                    
-                    return documents
-            
-            _vector_store = CompatibleChromaStore(_chroma_collection, _embedding_model)
-            logger.debug("Compatible vector store created")
-            
-        except Exception as e:
-            logger.error(f"Failed to load Chroma database: {e}")
-            raise
+                documents = []
+                if results["documents"] and results["documents"][0]:
+                    for i in range(len(results["documents"][0])):
+                        doc_content = results["documents"][0][i]
+                        distance = results["distances"][0][i]
+                        metadata = results["metadatas"][0][i]
+                        
+                        # Create LangChain-compatible document
+                        class CompatibleDocument:
+                            def __init__(self, page_content, metadata):
+                                self.page_content = page_content
+                                self.metadata = metadata
+                        
+                        doc = CompatibleDocument(doc_content, metadata)
+                        documents.append((doc, distance))
+                
+                return documents
+        
+        _vector_store = CompatibleChromaStore(_chroma_collection, _embedding_model)
+        logger.debug("Compatible vector store created")
         
         # Load BM25 index (optimized loading with compatibility fallback)
         logger.debug("Loading BM25 index...")
