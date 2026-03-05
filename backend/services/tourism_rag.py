@@ -63,13 +63,41 @@ def initialize_rag_system():
         _chroma_client = chromadb.PersistentClient(path=chroma_path)
         _chroma_collection = _chroma_client.get_collection("langchain")
         
-        # Load BM25 index (optimized loading)
+        # Load BM25 index (optimized loading with compatibility fallback)
         logger.debug("Loading BM25 index...")
         bm25_path = os.path.join(os.path.dirname(__file__), '..', 'vector database', 'bm25_index.pkl')
-        with open(bm25_path, 'rb') as f:
-            bm25_data = pickle.load(f)
-            _bm25_index = bm25_data[0]  # BM25 index is first element
-            _corpus_documents = bm25_data[1]  # Documents are second element
+        try:
+            with open(bm25_path, 'rb') as f:
+                bm25_data = pickle.load(f)
+                _bm25_index = bm25_data[0]  # BM25 index is first element
+                # Extract documents from second element (could be list or Document objects)
+                documents_data = bm25_data[1]
+                if hasattr(documents_data[0], 'page_content'):
+                    # LangChain Document objects
+                    _corpus_documents = [doc.page_content for doc in documents_data]
+                else:
+                    # Plain strings
+                    _corpus_documents = documents_data
+                logger.info(f"BM25 loaded successfully with {len(_corpus_documents)} documents")
+        except Exception as bm25_error:
+            logger.warning(f"Failed to load BM25 index with standard method: {bm25_error}")
+            # Try alternative loading methods
+            try:
+                with open(bm25_path, 'rb') as f:
+                    bm25_data = pickle.load(f, encoding='latin1')
+                    _bm25_index = bm25_data[0]
+                    documents_data = bm25_data[1]
+                    if hasattr(documents_data[0], 'page_content'):
+                        _corpus_documents = [doc.page_content for doc in documents_data]
+                    else:
+                        _corpus_documents = documents_data
+                logger.info("Successfully loaded BM25 with latin1 encoding")
+            except Exception as alt_error:
+                logger.error(f"Failed to load BM25 index with all methods: {alt_error}")
+                # Create a fallback BM25 index if loading fails
+                logger.warning("Creating fallback BM25 index - this may reduce search quality")
+                _bm25_index = None
+                _corpus_documents = []
         
         logger.info("RAG system initialized successfully with lightweight ONNX embeddings")
         return True
@@ -91,8 +119,12 @@ def hybrid_retrieval(query: str, top_k: int = 12) -> List[Dict[str, Any]]:
     Returns:
         List of retrieved chunks with enhanced scoring and metadata filtering
     """
-    if not all([_embedding_model, _chroma_collection, _bm25_index, _corpus_documents]):
+    # Check if essential components are available (BM25 is optional)
+    if not all([_embedding_model, _chroma_collection]):
         raise HTTPException(status_code=500, detail="RAG system not initialized")
+    
+    # Handle BM25 being None (fallback to semantic-only search)
+    bm25_available = _bm25_index is not None and _corpus_documents is not None
     
     try:
         # Extract years from query for metadata targeting
@@ -116,9 +148,14 @@ def hybrid_retrieval(query: str, top_k: int = 12) -> List[Dict[str, Any]]:
             'metadatas': [[doc.metadata for doc, score in semantic_docs]]
         }
         
-        # 2. BM25 keyword search
-        tokenized_query = query.lower().split()
-        bm25_scores = _bm25_index.get_scores(tokenized_query)
+        # 2. BM25 keyword search (if available)
+        if bm25_available:
+            tokenized_query = query.lower().split()
+            bm25_scores = _bm25_index.get_scores(tokenized_query)
+        else:
+            # Fallback: create dummy scores (all zeros) for semantic-only search
+            logger.warning("BM25 not available, using semantic-only search")
+            bm25_scores = [0.0] * len(semantic_results['documents'][0]) if semantic_results['documents'] else [0.0]
         
         # 3. Enhanced results combination with metadata filtering
         combined_results = []
@@ -158,42 +195,59 @@ def hybrid_retrieval(query: str, top_k: int = 12) -> List[Dict[str, Any]]:
                     'metadata': metadata
                 }
         
-        # Process BM25 results with enhanced scoring
-        for i, (doc, bm25_score) in enumerate(zip(_corpus_documents, bm25_scores)):
-            if bm25_score > 0:
-                doc_str = str(doc) if hasattr(doc, 'page_content') else doc
-                
-                # Get semantic info
-                semantic_info = semantic_map.get(doc_str, {'semantic_score': 0, 'metadata': {}})
-                semantic_score = semantic_info['semantic_score']
-                metadata = semantic_info['metadata']
-                
-                # Normalize BM25 score
-                if len(bm25_scores) > 1 and np.max(bm25_scores) > np.min(bm25_scores):
-                    bm25_normalized = (bm25_score - np.min(bm25_scores)) / (np.max(bm25_scores) - np.min(bm25_scores))
-                else:
-                    bm25_normalized = bm25_score
-                
-                # Enhanced scoring with metadata considerations
-                base_score = 0.7 * semantic_score + 0.3 * bm25_normalized
-                
-                # Additional metadata-based boosts
-                if target_year and metadata.get('year') == int(target_year):
-                    base_score *= 1.4
-                
-                if is_numerical_query and metadata.get('numeric_heavy', False):
-                    base_score *= 1.2
-                
-                if is_table_query and metadata.get('content_type') == 'table':
-                    base_score *= 1.2
-                
-                combined_results.append({
-                    'content': doc_str,
-                    'score': base_score,
-                    'semantic_score': semantic_score,
-                    'bm25_score': bm25_normalized,
-                    'metadata': metadata
-                })
+        # Process BM25 results with enhanced scoring (if available)
+        if bm25_available and _corpus_documents:
+            for i, (doc, bm25_score) in enumerate(zip(_corpus_documents, bm25_scores)):
+                if bm25_score > 0:
+                    doc_str = str(doc) if hasattr(doc, 'page_content') else doc
+                    
+                    # Get semantic info
+                    semantic_info = semantic_map.get(doc_str, {'semantic_score': 0, 'metadata': {}})
+                    semantic_score = semantic_info['semantic_score']
+                    metadata = semantic_info['metadata']
+                    
+                    # Normalize BM25 score
+                    if len(bm25_scores) > 1 and np.max(bm25_scores) > np.min(bm25_scores):
+                        bm25_normalized = (bm25_score - np.min(bm25_scores)) / (np.max(bm25_scores) - np.min(bm25_scores))
+                    else:
+                        bm25_normalized = bm25_score
+                    
+                    # Enhanced scoring with metadata considerations
+                    base_score = 0.7 * semantic_score + 0.3 * bm25_normalized
+                    
+                    # Additional metadata-based boosts
+                    if target_year and metadata.get('year') == int(target_year):
+                        base_score *= 1.4
+                    
+                    if is_numerical_query and metadata.get('numeric_heavy', False):
+                        base_score *= 1.2
+                    
+                    if is_table_query and metadata.get('content_type') == 'table':
+                        base_score *= 1.2
+                    
+                    combined_results.append({
+                        'content': doc_str,
+                        'score': base_score,
+                        'semantic_score': semantic_score,
+                        'bm25_score': bm25_normalized,
+                        'metadata': metadata
+                    })
+        else:
+            # Fallback: use only semantic results
+            logger.warning("Using semantic-only results due to BM25 unavailability")
+            for i, doc in enumerate(semantic_docs):
+                if i < len(semantic_distances) and i < len(semantic_metadatas):
+                    doc_str = str(doc) if hasattr(doc, 'page_content') else doc
+                    metadata = semantic_metadatas[i]
+                    semantic_score = 1 - semantic_distances[i]
+                    
+                    combined_results.append({
+                        'content': doc_str,
+                        'score': semantic_score,
+                        'semantic_score': semantic_score,
+                        'bm25_score': 0.0,
+                        'metadata': metadata
+                    })
         
         # Sort by enhanced score and return top_k
         combined_results.sort(key=lambda x: x['score'], reverse=True)
