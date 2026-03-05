@@ -23,6 +23,7 @@ import GeopoliticalTile from './GeopoliticalTile';
 function makeTile(overrides = {}) {
     return {
         tile_type: 'GEOPOLITICAL_SITUATION_ADJUSTMENT',
+        forecast_month: 'March 2026',
         situation_summary: {
             headline: 'Middle East tensions are suppressing regional travel demand.',
             severity_level: overrides.severity || 'GREEN',
@@ -93,6 +94,7 @@ test('1: renders tile correctly with complete mock JSON response', async () => {
     render(<GeopoliticalTile />);
     await waitFor(() => expect(screen.getByText('265,815')).toBeInTheDocument());
     expect(screen.getByText('Situation-Adjusted Forecast')).toBeInTheDocument();
+    expect(screen.getByText('March 2026')).toBeInTheDocument();
     expect(screen.getByText(/-8.5%/)).toBeInTheDocument();
     expect(screen.getByText(/Middle East tensions/)).toBeInTheDocument();
     expect(screen.getByText('Stable')).toBeInTheDocument();
