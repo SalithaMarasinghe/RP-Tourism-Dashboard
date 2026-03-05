@@ -13,22 +13,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     build-essential \
     cmake \
-    curl \
     && rm -rf /var/lib/apt/lists/*
-
-# Install Node.js for frontend build
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
 
 # Upgrade pip and install requirements with compatible versions
 RUN pip install --upgrade pip setuptools && pip install --no-cache-dir --user -r requirements.txt
-
-# Build frontend in the same builder stage
-WORKDIR /app
-COPY ../frontend/package*.json ./
-RUN npm ci --only=production
-COPY ../frontend/ ./
-RUN npm run build
 
 # Production stage
 FROM python:3.10-slim
@@ -44,9 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy installed packages from builder stage
 COPY --from=builder /root/.local /home/appuser/.local
-
-# Copy frontend build from builder stage
-COPY --from=builder /app/build ./frontend/build
 
 # Copy application code (exclude heavy data files)
 COPY . .
