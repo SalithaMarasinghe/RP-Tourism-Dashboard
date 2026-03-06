@@ -5,6 +5,9 @@ Server-side cache decision logic for the Geopolitical Tile feature.
 Determines whether to run the full Gemini pipeline or serve cached data.
 """
 from datetime import datetime, timezone
+from typing import Optional, Tuple
+
+from models.geopolitical_models import GeopoliticalTileResponse
 
 
 def now_utc() -> datetime:
@@ -16,9 +19,9 @@ def parse_iso_datetime(dt_string: str) -> datetime:
 
 
 def determine_trigger(
-    cached_data: dict | None,
+    cached_data: Optional[GeopoliticalTileResponse],
     current_baseline_arrivals: int
-) -> tuple[bool, str]:
+) -> Tuple[bool, str]:
     """
     Evaluates cache state and returns:
       (should_run_pipeline: bool, trigger_type: str)
@@ -35,17 +38,17 @@ def determine_trigger(
         return True, "INITIAL_LOAD"
 
     cached_at = parse_iso_datetime(
-        cached_data["cache_metadata"]["cached_at"]
+        cached_data.cache_metadata.cached_at
     )
     hours_since_cache = (now_utc() - cached_at).total_seconds() / 3600
 
     # Rule 2: RED severity + more than 48 hours since last cache
-    severity = cached_data["situation_summary"]["severity_level"]
+    severity = cached_data.situation_summary.severity_level
     if severity == "RED" and hours_since_cache > 48:
         return True, "RED_ALERT_REFRESH"
 
     # Rule 3: Baseline arrivals drifted more than ±15%
-    cached_baseline = cached_data["adjustment"]["baseline_arrivals"]
+    cached_baseline = cached_data.adjustment.baseline_arrivals
     if cached_baseline > 0:
         drift_pct = abs(
             current_baseline_arrivals - cached_baseline
