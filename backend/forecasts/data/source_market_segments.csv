@@ -1,0 +1,25 @@
+Country,ISO3,Segment,Cluster_ID,Confidence,CAGR_pct,Latest_Arrivals,Peak_Year,Color
+Belgium,BEL,Declining,2,Low,4.14,9915,2012,#6C757D
+Finland,FIN,Declining,2,Medium,2.69,2903,2012,#6C757D
+Austria,AUT,Emerging,0,High,8.12,12664,2014,#6C757D
+Denmark,DNK,Emerging,0,High,6.46,11239,2014,#6C757D
+Italy,ITA,Emerging,0,High,4.18,21116,2014,#6C757D
+Japan,JPN,Emerging,0,High,6.96,39358,2015,#7209B7
+Netherlands,NLD,Emerging,0,Low,8.36,59589,2025,#FFB703
+Norway,NOR,Emerging,0,High,5.82,9237,2014,#6C757D
+Spain,ESP,Emerging,0,High,6.77,11914,2014,#6C757D
+Sweden,SWE,Emerging,0,High,4.76,14259,2014,#6C757D
+Switzerland,CHE,Emerging,0,Medium,5.18,20097,2014,#6C757D
+Australia,AUS,Mature,1,Medium,7.18,94667,2018,#06D6A0
+Bangladesh,BGD,Mature,1,Low,0.0,55110,2010,#80B918
+Canada,CAN,Mature,1,Medium,5.0,43944,2019,#3A86FF
+China,CHN,Mature,1,Low,5.53,121671,2016,#E9C46A
+France,FRA,Mature,1,High,8.18,101771,2018,#8338EC
+Germany,DEU,Mature,1,Medium,7.28,131259,2018,#2A9D8F
+India,IND,Mature,1,Medium,9.2,474796,2025,#FF6B35
+Maldives,MDV,Mature,1,Low,1.86,47222,2016,#FB8500
+Poland,POL,Mature,1,Low,7.2,43119,2025,#F72585
+Russia,RUS,Mature,1,Low,17.98,158593,2024,#E63946
+Ukraine,UKR,Mature,1,Low,1.41,7037,2013,#FFBE0B
+United Kingdom,GBR,Mature,1,Medium,4.06,191742,2018,#457B9D
+United States,USA,Mature,1,Medium,7.62,57449,2018,#118AB2

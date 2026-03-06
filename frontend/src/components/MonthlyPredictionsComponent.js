@@ -7,6 +7,7 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from 'recharts';
+import GeopoliticalTile from './GeopoliticalTile';
 
 // Monthly Predictions Tab Component
 function MonthlyPredictionsComponent() {
@@ -334,6 +335,9 @@ function MonthlyPredictionsComponent() {
           </Button>
         </div>
       </div>
+
+      {/* Geopolitical Situation-Adjusted Prediction Tile */}
+      <GeopoliticalTile />
 
       {/* Date and Scenario Selector */}
       <Card className="power-bi-card">
