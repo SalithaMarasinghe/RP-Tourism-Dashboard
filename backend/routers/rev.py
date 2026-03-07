@@ -164,55 +164,67 @@ async def get_revenue_summary(
     valid_scenarios = ["baseline", "optimistic", "pessimistic", "historical"]
     
     # Determine the scenario to use
-    # If year is in the past, it should be 'Historical'
+    # If year is in the past, it should be 'historical'
     # If year is future and scenario is missing, default to baseline
     input_scenario = (scenario or "").strip().lower()
     
     if year < 2024 or input_scenario == 'historical':
-        target_scenario = 'Historical'
+        target_scenario = 'historical'
     else:
         # Business logic: default to baseline for future years if none specified
         target_scenario = input_scenario if input_scenario in ["baseline", "optimistic", "pessimistic"] else "baseline"
 
-    # Normalize target_scenario for service layer (which expects capitalized versions for Historical/Baseline etc)
-    # The rev_service usually handles 'Historical' specifically.
-    service_scenario = target_scenario.capitalize() if target_scenario.lower() == 'historical' else target_scenario.lower()
+    # Normalize target_scenario for service layer (keep all scenarios lowercase)
+    # The data stores all scenarios in lowercase format
+    service_scenario = target_scenario.lower()
 
     try:
+        # Special handling: if requesting historical data for a forecast year (>= 2024),
+        # fall back to the most recent historical year instead
+        request_year = year
+        if service_scenario == "historical" and year >= 2024:
+            # Fetch all historical data to find the most recent year
+            df_hist_all = rev_service.get_annual_data(scenario="historical")
+            if not df_hist_all.empty:
+                df_hist_filtered = df_hist_all[df_hist_all['scenario'].astype(str).str.lower() == "historical"]
+                if not df_hist_filtered.empty:
+                    request_year = int(df_hist_filtered['year'].max())
+                    print(f"[DEBUG] Requested historical data for year {year} (forecast year), using most recent historical year: {request_year}")
+
         # Fetch annual data for the exact year and scenario
         df_ann = rev_service.get_annual_data(
             scenario=service_scenario,
-            start_year=year,
-            end_year=year
+            start_year=request_year,
+            end_year=request_year
         )
         
         if df_ann.empty:
             raise HTTPException(
                 status_code=404,
-                detail=f"No revenue data found for year {year} and scenario '{target_scenario}'."
+                detail=f"No revenue data found for year {request_year} and scenario '{target_scenario}'."
             )
             
-        # Try finding the exact scenario first
-        row_mask = (df_ann['year'] == year)
-        if service_scenario == "Historical":
-            # If historical requested, we match specifically
-            row_mask &= (df_ann['scenario'] == "Historical")
+        # Try finding the exact scenario first - use case-insensitive comparison
+        row_mask = (df_ann['year'] == request_year)
+        if service_scenario == "historical":
+            # If historical requested, we match specifically (case-insensitive)
+            row_mask &= (df_ann['scenario'].astype(str).str.lower() == "historical")
         else:
-            # If forecast scenario requested, try to find it
-            row_mask &= (df_ann['scenario'] == service_scenario)
+            # If forecast scenario requested, try to find it (case-insensitive)
+            row_mask &= (df_ann['scenario'].astype(str).str.lower() == service_scenario)
             
         final_row = df_ann[row_mask]
         
         # Fallback: if forecast scenario requested but not found (e.g. for a historical year),
-        # try to return the 'Historical' row for that year instead.
-        if final_row.empty and service_scenario != "Historical":
-             row_mask_fallback = (df_ann['year'] == year) & (df_ann['scenario'] == "Historical")
+        # try to return the 'historical' row for that year instead (case-insensitive).
+        if final_row.empty and service_scenario != "historical":
+             row_mask_fallback = (df_ann['year'] == request_year) & (df_ann['scenario'].astype(str).str.lower() == "historical")
              final_row = df_ann[row_mask_fallback]
         
         if final_row.empty:
              raise HTTPException(
                 status_code=404,
-                detail=f"No data matching year {year} (scenario '{service_scenario}' or 'Historical') was found."
+                detail=f"No data matching year {request_year} (scenario '{service_scenario}' or 'historical') was found."
             )
             
         row = final_row.iloc[0]

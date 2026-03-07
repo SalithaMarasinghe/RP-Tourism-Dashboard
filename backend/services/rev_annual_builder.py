@@ -31,7 +31,7 @@ def build_annual_revenue_dataset(
     }
     df_hist.rename(columns=rename_mapping_hist, inplace=True, errors='ignore')
 
-    df_hist['scenario'] = 'Historical'
+    df_hist['scenario'] = 'historical'
     df_hist['is_forecast'] = False
     
     if 'tourist_nights_mn' in df_hist.columns and 'avg_los' not in df_hist.columns:
@@ -145,7 +145,7 @@ def build_annual_revenue_dataset(
     # To properly calculate YoY for a forecast's first year, we need the last historical year as a base.
     # Let's create a full timeline per scenario by appending the historical data to each forecast scenario temporarily.
     
-    hist_only = df_combined[df_combined['scenario'] == 'Historical'].copy()
+    hist_only = df_combined[df_combined['scenario'] == 'historical'].copy()
     hist_only.sort_values('year', inplace=True)
     historical_yoy = hist_only['revenue_usd_mn'].pct_change() * 100
     hist_only['rev_yoy_pct'] = historical_yoy

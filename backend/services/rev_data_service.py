@@ -107,7 +107,7 @@ class RevenueDataService:
         # Filter by scenario (keep historical OR matching forecast scenario)
         if scenario:
             scenario_clean = scenario.strip().lower()
-            df = df[(df['scenario'] == 'Historical') | (df['scenario'] == scenario_clean)]
+            df = df[(df['scenario'].astype(str).str.lower() == 'historical') | (df['scenario'].astype(str).str.lower() == scenario_clean)]
             
         # Filter by year range
         if start_year is not None:
@@ -139,7 +139,7 @@ class RevenueDataService:
         
         if scenario:
             scenario_clean = scenario.strip().lower()
-            df = df[(df['scenario'] == 'Historical') | (df['scenario'] == scenario_clean)]
+            df = df[(df['scenario'].astype(str).str.lower() == 'historical') | (df['scenario'].astype(str).str.lower() == scenario_clean)]
             
         if start_year is not None:
             df = df[df['year'] >= start_year]
@@ -147,7 +147,6 @@ class RevenueDataService:
             df = df[df['year'] <= end_year]
             
         return df.copy()
-        
     def get_combined_kpis(
         self,
         scenario: str = "baseline",
@@ -231,16 +230,24 @@ class RevenueDataService:
         # Sum the columns
         summed = df_year.sum(numeric_only=True)
         
-        # Total revenue for the year
-        total_rev = summed.get("forecast_usd_mn", 0.0)
-        if total_rev == 0:
-            total_rev = summed.get("yhat", 0.0)
+        # Calculate total revenue as the sum of all driver channels
+        # This is more reliable than using a single forecast_usd_mn or yhat column
+        driver_values = {}
+        total_rev = 0.0
+        for name, col in driver_cols.items():
+            val = float(summed.get(col, 0.0))
+            driver_values[name] = val
+            total_rev += val
         
-        total_rev = float(total_rev)
+        # Fallback: if no driver data, try to use forecast_usd_mn or yhat
+        if total_rev == 0:
+            total_rev = float(summed.get("forecast_usd_mn", 0.0))
+            if total_rev == 0:
+                total_rev = float(summed.get("yhat", 0.0))
         
         drivers = []
         for name, col in driver_cols.items():
-            val = summed.get(col, 0.0)
+            val = driver_values.get(name, 0.0)
             share = (val / total_rev * 100) if total_rev > 0 else 0.0
             drivers.append({
                 "name": name,
