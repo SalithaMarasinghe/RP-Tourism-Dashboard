@@ -1,0 +1,96 @@
+{
+  "result": {
+    "tile_type": "GEOPOLITICAL_REVENUE_ADJUSTMENT",
+    "generated_at": "2026-03-07T17:21:40ZZ",
+    "forecast_month": "March 2026",
+    "situation_summary": {
+      "headline": "Conflict and advisory impact",
+      "severity_level": "ORANGE",
+      "severity_rationale": "Due to confirmed signals of conflict and travel advisory updates affecting tourist arrivals and spend.",
+      "search_scope_note": "Intelligence sourced from Tavily search results provided in the runtime context.",
+      "active_signals": [
+        {
+          "signal_name": "Middle East Conflict",
+          "relevance_score": 0.8,
+          "impact_direction": "NEGATIVE",
+          "impact_magnitude": "MEDIUM",
+          "impact_channel": [
+            "ARRIVAL_SUPPRESSION",
+            "SPEND_REDUCTION"
+          ],
+          "confirmed": true,
+          "source_domain": "Tavily",
+          "source_summary": "Ongoing conflict in the Middle East affecting South Asia tourism."
+        },
+        {
+          "signal_name": "Travel Advisory Update",
+          "relevance_score": 0.7,
+          "impact_direction": "NEGATIVE",
+          "impact_magnitude": "LOW",
+          "impact_channel": [
+            "TRAVEL_ADVISORY_FRICTION"
+          ],
+          "confirmed": true,
+          "source_domain": "Tavily",
+          "source_summary": "Recent travel advisory update for Sri Lanka mentions increased caution."
+        }
+      ]
+    },
+    "adjustment": {
+      "baseline_revenue_usd_mn": 295.88,
+      "baseline_revenue_lkr_mn": 89335.05,
+      "adjustment_percentage": -8.0,
+      "adjusted_revenue_usd_mn": 272.31,
+      "adjusted_revenue_lkr_mn": 82091.19,
+      "monthly_revenue_at_risk_usd_mn": 23.57,
+      "weekly_revenue_at_risk_usd_mn": 5.41,
+      "monthly_revenue_at_risk_lkr_mn": 7083.86,
+      "adjusted_revenue_usd_mn_lower_bound": 251.29,
+      "adjusted_revenue_usd_mn_upper_bound": 293.33,
+      "adjustment_basis": "The adjustment is based on confirmed signals of Middle East conflict and travel advisory updates. These signals indicate a potential decrease in tourist arrivals and spend."
+    },
+    "tile_display": {
+      "primary_label": "Situation-Adjusted Revenue Forecast",
+      "primary_value": "$272.31M",
+      "secondary_value": "LKR 82,091M",
+      "delta_label": "vs. Baseline",
+      "delta_value": "-8.0%",
+      "delta_direction": "DOWN",
+      "risk_label": "Revenue at Risk",
+      "risk_value": "$23.57M / month",
+      "weekly_risk_label": "Weekly Risk",
+      "weekly_risk_value": "$5.41M / week",
+      "confidence_range_label": "Estimated Range",
+      "confidence_range_value": "$251.29M - $293.33M",
+      "situation_badge": "ORANGE",
+      "situation_badge_text": "At Risk",
+      "data_freshness_label": "Updated today",
+      "staleness_warning": null,
+      "tooltip_summary": "Dominant signals include Middle East conflict and travel advisory updates, leading to an 8% revenue adjustment and $23.57M at risk."
+    },
+    "suggestions": [
+      "Monitor travel advisories and conflict updates closely.",
+      "Develop contingency plans for potential decreases in tourist arrivals.",
+      "Enhance marketing efforts to attract tourists from less affected source markets."
+    ],
+    "data_quality": {
+      "search_freshness": "2026-03-07",
+      "signal_count_evaluated": 7,
+      "signal_count_applied": 2,
+      "signal_count_unconfirmed": 5,
+      "domains_with_results": [
+        "Tavily"
+      ],
+      "domains_with_no_results": [],
+      "data_gaps": [],
+      "confidence_note": "The analysis is based on the most recent Tavily search results and may not reflect real-time developments."
+    },
+    "cache_metadata": {
+      "cached_at": "2026-03-07T17:21:40ZZ",
+      "cache_expires_at": "2026-03-14T17:21:40ZZ",
+      "trigger_type": "MANUAL_OVERRIDE",
+      "next_scheduled_refresh": "2026-03-14"
+    }
+  },
+  "written_at": "2026-03-07T17:21:45.380606Z"
+}

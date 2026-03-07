@@ -43,7 +43,8 @@ class GroqRevenueAgentService:
             raise ValueError("GROQ_API_KEY not provided and not found in environment")
         
         self.client = Groq(api_key=self.api_key)
-        self.model = "mixtral-8x7b-32768"  # Fast, cost-effective reasoning model
+        primary_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.models = [primary_model, "mixtral-8x7b-32768"]
 
     async def analyze_revenue_impact(
         self,
@@ -61,44 +62,40 @@ class GroqRevenueAgentService:
         Returns:
             RevenueGeoTileResponse or None if parsing fails
         """
-        try:
-            # Call Groq API
-            logger.info(f"Calling Groq API with model {self.model}")
-            
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": system_instruction
-                    },
-                    {
-                        "role": "user",
-                        "content": task_prompt
-                    }
-                ],
-                temperature=0.2,  # Low temperature for consistent, deterministic output
-                max_tokens=4096,
-                top_p=1.0
-            )
+        messages = [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": task_prompt},
+        ]
 
-            # Extract response text
-            response_text = response.choices[0].message.content.strip()
-            logger.info(f"Groq response received: {len(response_text)} characters")
+        last_error = None
+        for model in self.models:
+            try:
+                logger.info("Calling Groq API with model %s", model)
+                response = self.client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=0.2,
+                    max_tokens=4096,
+                    top_p=1.0
+                )
+                response_text = (response.choices[0].message.content or "").strip()
+                if not response_text:
+                    logger.warning("Groq returned an empty response for model %s", model)
+                    continue
 
-            # Parse JSON from response
-            tile_response = self._parse_response_json(response_text)
+                logger.info("Groq response received: %s characters", len(response_text))
+                tile_response = self._parse_response_json(response_text)
+                if tile_response:
+                    logger.info("Successfully parsed Groq response using model %s", model)
+                    return tile_response
+                logger.error("Failed to parse Groq response JSON for model %s", model)
+            except Exception as exc:
+                last_error = exc
+                logger.error("Groq API error with model %s: %s", model, exc)
 
-            if tile_response:
-                logger.info("Successfully parsed Groq response into RevenueGeoTileResponse")
-                return tile_response
-            else:
-                logger.error("Failed to parse Groq response JSON")
-                return None
-
-        except Exception as e:
-            logger.error(f"Groq API error: {e}")
-            return None
+        if last_error:
+            logger.error("Groq analysis failed for all configured models: %s", last_error)
+        return None
 
     def _parse_response_json(self, response_text: str) -> Optional[RevenueGeoTileResponse]:
         """
@@ -162,7 +159,7 @@ class GroqRevenueAgentService:
             RevenueGeoTileResponse with GREEN severity and 0% adjustment
         """
         now = datetime.utcnow()
-        cache_expires = now + timedelta(days=7)
+        cache_expires = now + timedelta(hours=6)
 
         return RevenueGeoTileResponse(
             tile_type="GEOPOLITICAL_REVENUE_ADJUSTMENT",
@@ -226,6 +223,6 @@ class GroqRevenueAgentService:
                 "cached_at": now.isoformat() + "Z",
                 "cache_expires_at": cache_expires.isoformat() + "Z",
                 "trigger_type": trigger_type,
-                "next_scheduled_refresh": (now + timedelta(days=7)).date().isoformat()
+                "next_scheduled_refresh": (now + timedelta(hours=6)).date().isoformat()
             }
         )

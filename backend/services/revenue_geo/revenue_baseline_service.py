@@ -70,6 +70,12 @@ class RevenueBaselineService:
             avg_spend_per_tourist_usd = summary.get("avg_spend_per_tourist_usd", 1500.0)
             avg_length_of_stay = summary.get("avg_length_of_stay", 7.5)
 
+            # Forecast rows may contain zero placeholders for per-tourist metrics.
+            if not avg_spend_per_tourist_usd or avg_spend_per_tourist_usd <= 0:
+                avg_spend_per_tourist_usd = 1500.0
+            if not avg_length_of_stay or avg_length_of_stay <= 0:
+                avg_length_of_stay = 7.5
+
             # Get current month name
             month_name = datetime(current_year, current_month, 1).strftime("%B")
 

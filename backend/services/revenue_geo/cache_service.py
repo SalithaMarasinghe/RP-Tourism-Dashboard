@@ -31,11 +31,17 @@ class RevenueGeoCacheService:
 
     def __init__(self):
         """Initialize cache directory path."""
-        self.cache_dir = Path(__file__).parent.parent.parent / "backend" / "cache"
+        backend_root = Path(__file__).resolve().parents[2]
+        self.cache_dir = backend_root / "cache"
         self.cache_file = self.cache_dir / "revenue_geo_cache.json"
+        legacy_cache_file = backend_root / "backend" / "cache" / "revenue_geo_cache.json"
         
         # Create cache directory if it doesn't exist
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # One-time migration from legacy wrong path if present.
+        if not self.cache_file.exists() and legacy_cache_file.exists():
+            self.cache_file.write_text(legacy_cache_file.read_text(encoding="utf-8"), encoding="utf-8")
 
     def read_cache(self) -> Optional[Dict[str, Any]]:
         """

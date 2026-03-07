@@ -22,7 +22,10 @@ class PromptBuilder:
 
     def __init__(self):
         """Initialize by loading the prompt file."""
-        self.prompt_path = Path(__file__).parent.parent / "prompts" / "revenue_geo_agent_prompt.txt"
+        backend_root = Path(__file__).resolve().parents[2]
+        primary_path = backend_root / "prompts" / "revenue_geo_agent_prompt.txt"
+        legacy_path = Path(__file__).resolve().parents[1] / "prompts" / "revenue_geo_agent_prompt.txt"
+        self.prompt_path = primary_path if primary_path.exists() else legacy_path
         self._load_prompt()
 
     def _load_prompt(self) -> None:

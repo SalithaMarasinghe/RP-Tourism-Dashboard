@@ -20,11 +20,11 @@ Orchestrates: PromptBuilder, TavilySearchService, GroqRevenueAgentService,
 import os
 import logging
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
 
-from models.revenue_geo_models import RevenueGeoTileResponse
+from models.revenue_geo_models import RevenueGeoTileResponse, RevenueGeoActiveSignal
 from services.revenue_geo import (
     PromptBuilder,
     TavilySearchService,
@@ -43,6 +43,142 @@ _tavily_service: Optional[TavilySearchService] = None
 _groq_service: Optional[GroqRevenueAgentService] = None
 _cache_service: Optional[RevenueGeoCacheService] = None
 _baseline_service: Optional[RevenueBaselineService] = None
+
+_RISK_KEYWORDS = [
+    "iran", "united states", "u.s.", "us strike", "middle east",
+    "red sea", "gulf", "strait of hormuz", "missile", "airstrike",
+    "travel advisory", "airspace closure", "oil price spike"
+]
+
+
+def _normalize_iso_utc(value: Optional[str], fallback: Optional[datetime] = None) -> str:
+    """
+    Normalize potentially malformed UTC timestamps (e.g. ending with 'ZZ').
+    """
+    candidate = (value or "").strip()
+    if candidate.endswith("ZZ"):
+        candidate = candidate[:-1]
+    if candidate.endswith("Z"):
+        candidate = candidate[:-1] + "+00:00"
+
+    try:
+        parsed = datetime.fromisoformat(candidate)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
+    except Exception:
+        fallback_dt = fallback or datetime.utcnow()
+        return fallback_dt.isoformat() + "Z"
+
+
+def _extract_risk_keyword_hits(tavily_results: dict) -> list[str]:
+    """
+    Return matched geopolitical-risk keywords from result titles/descriptions/answers.
+    """
+    corpus_parts = []
+    for category in tavily_results.get("categories", {}).values():
+        corpus_parts.append(str(category.get("answer", "")))
+        for result in category.get("results", []):
+            corpus_parts.append(str(result.get("title", "")))
+            corpus_parts.append(str(result.get("description", "")))
+    corpus = " ".join(corpus_parts).lower()
+    return [kw for kw in _RISK_KEYWORDS if kw in corpus]
+
+
+def _apply_risk_guardrail(
+    tile_response: RevenueGeoTileResponse,
+    baseline: dict,
+    tavily_results: dict
+) -> None:
+    """
+    Escalate to ORANGE when conflict keywords are present but model output is neutral.
+    """
+    keyword_hits = _extract_risk_keyword_hits(tavily_results)
+    if not keyword_hits:
+        return
+
+    current_severity = (tile_response.situation_summary.severity_level or "").upper()
+    if current_severity in {"ORANGE", "RED"}:
+        return
+
+    baseline_usd = float(baseline["baseline_revenue_usd_mn"])
+    baseline_lkr = float(baseline["baseline_revenue_lkr_mn"])
+
+    # Enforce a conservative at-risk floor when conflict signals are present.
+    current_adj = float(tile_response.adjustment.adjustment_percentage)
+    enforced_adj = current_adj if current_adj <= -3.0 else -3.0
+    adjusted_usd = round(baseline_usd * (1 + enforced_adj / 100.0), 2)
+    adjusted_lkr = round(baseline_lkr * (1 + enforced_adj / 100.0), 2)
+    monthly_risk_usd = round(max(0.0, baseline_usd - adjusted_usd), 2)
+    weekly_risk_usd = round(monthly_risk_usd / 4.345, 2)
+    monthly_risk_lkr = round(max(0.0, baseline_lkr - adjusted_lkr), 2)
+
+    tile_response.situation_summary.severity_level = "ORANGE"
+    tile_response.situation_summary.headline = (
+        "Heightened geopolitical volatility implies near-term revenue downside risk."
+    )
+    tile_response.situation_summary.severity_rationale = (
+        f"Conflict-related signals detected ({', '.join(keyword_hits[:3])}); "
+        "guardrail escalated risk status."
+    )
+
+    if not tile_response.situation_summary.active_signals:
+        tile_response.situation_summary.active_signals.append(
+            RevenueGeoActiveSignal(
+                signal_name="Conflict Escalation Risk",
+                relevance_score=0.6,
+                impact_direction="NEGATIVE",
+                impact_magnitude="MEDIUM",
+                impact_channel=["ARRIVAL_SUPPRESSION", "AIRLINE_COST_PRESSURE"],
+                confirmed=True,
+                source_domain="MULTI_SOURCE",
+                source_summary="Conflict and travel disruption keywords detected in live search context."
+            )
+        )
+
+    tile_response.adjustment.adjustment_percentage = round(enforced_adj, 2)
+    tile_response.adjustment.adjusted_revenue_usd_mn = adjusted_usd
+    tile_response.adjustment.adjusted_revenue_lkr_mn = adjusted_lkr
+    tile_response.adjustment.monthly_revenue_at_risk_usd_mn = monthly_risk_usd
+    tile_response.adjustment.weekly_revenue_at_risk_usd_mn = weekly_risk_usd
+    tile_response.adjustment.monthly_revenue_at_risk_lkr_mn = monthly_risk_lkr
+    tile_response.adjustment.adjusted_revenue_usd_mn_lower_bound = round(adjusted_usd * 0.93, 2)
+    tile_response.adjustment.adjusted_revenue_usd_mn_upper_bound = round(adjusted_usd * 1.07, 2)
+    tile_response.adjustment.adjustment_basis = (
+        "Deterministic risk guardrail applied due to conflict-related signal keywords in "
+        "retrieved sources."
+    )
+
+    tile_response.tile_display.delta_value = f"{enforced_adj:.1f}%"
+    tile_response.tile_display.delta_direction = "DOWN"
+    tile_response.tile_display.primary_value = f"${adjusted_usd:.2f}M"
+    tile_response.tile_display.secondary_value = f"LKR {adjusted_lkr:,.0f}M"
+    tile_response.tile_display.risk_value = f"${monthly_risk_usd:.2f}M / month"
+    tile_response.tile_display.weekly_risk_value = f"${weekly_risk_usd:.2f}M / week"
+    tile_response.tile_display.confidence_range_value = (
+        f"${tile_response.adjustment.adjusted_revenue_usd_mn_lower_bound:.2f}M - "
+        f"${tile_response.adjustment.adjusted_revenue_usd_mn_upper_bound:.2f}M"
+    )
+    tile_response.tile_display.situation_badge = "ORANGE"
+    tile_response.tile_display.situation_badge_text = "At Risk"
+    tile_response.tile_display.tooltip_summary = (
+        f"Guardrail applied: conflict-linked signals imply downside risk. "
+        f"Estimated revenue at risk ${monthly_risk_usd:.2f}M per month."
+    )
+
+    if "Guardrail risk escalation applied from detected conflict signals." not in tile_response.data_quality.data_gaps:
+        tile_response.data_quality.data_gaps.append(
+            "Guardrail risk escalation applied from detected conflict signals."
+        )
+    tile_response.data_quality.signal_count_evaluated = max(
+        tile_response.data_quality.signal_count_evaluated, 1
+    )
+    tile_response.data_quality.signal_count_applied = max(
+        tile_response.data_quality.signal_count_applied, 1
+    )
+    tile_response.data_quality.confidence_note = (
+        "Conflict-related signals were detected and a deterministic risk floor was applied."
+    )
 
 
 def validate_env_vars() -> None:
@@ -66,12 +202,25 @@ def get_services():
     global _prompt_builder, _tavily_service, _groq_service, _cache_service, _baseline_service
     
     if _prompt_builder is None:
-        validate_env_vars()
-        _prompt_builder = PromptBuilder()
-        _tavily_service = TavilySearchService()
-        _groq_service = GroqRevenueAgentService()
-        _cache_service = RevenueGeoCacheService()
-        _baseline_service = RevenueBaselineService()
+        try:
+            validate_env_vars()
+            _prompt_builder = PromptBuilder()
+            _tavily_service = TavilySearchService()
+            _groq_service = GroqRevenueAgentService()
+            _cache_service = RevenueGeoCacheService()
+            _baseline_service = RevenueBaselineService()
+        except FileNotFoundError as exc:
+            logger.error("Revenue geo prompt file missing: %s", exc)
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+        except ValueError as exc:
+            logger.error("Revenue geo configuration error: %s", exc)
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except Exception as exc:
+            logger.exception("Revenue geo service initialization failed")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Revenue geo service initialization failed: {exc}"
+            ) from exc
     
     return {
         "prompt": _prompt_builder,
@@ -126,6 +275,15 @@ async def execute_full_pipeline(
         
         # Extract domain information
         domains_with_results, domains_no_results = services["tavily"].extract_domains(tavily_results)
+        search_error_count = sum(
+            1
+            for category in tavily_results.get("categories", {}).values()
+            if category.get("error")
+        )
+        total_search_results = sum(
+            category.get("result_count", 0)
+            for category in tavily_results.get("categories", {}).values()
+        )
         
         # Step 4: Build prompt with injected variables
         logger.info("Step 4: Building prompt with variable injection")
@@ -166,14 +324,70 @@ async def execute_full_pipeline(
                 current_year=baseline["current_year"],
                 trigger_type=trigger_type
             )
-        
+
+        now = datetime.utcnow()
+        tile_response.generated_at = _normalize_iso_utc(tile_response.generated_at, fallback=now)
+        tile_response.cache_metadata.cached_at = _normalize_iso_utc(
+            tile_response.cache_metadata.cached_at,
+            fallback=now
+        )
+        tile_response.cache_metadata.cache_expires_at = _normalize_iso_utc(
+            tile_response.cache_metadata.cache_expires_at,
+            fallback=now + timedelta(days=7)
+        )
+
+        # Deterministic post-check: don't allow neutral output if conflict signals are present.
+        _apply_risk_guardrail(tile_response, baseline, tavily_results)
+
+        if search_error_count > 0 and tile_response.situation_summary.severity_level == "GREEN":
+            tile_response.situation_summary.severity_level = "YELLOW"
+            tile_response.situation_summary.headline = (
+                "Live geopolitical signal retrieval is degraded; risk should be monitored."
+            )
+            tile_response.situation_summary.severity_rationale = (
+                "One or more search providers failed during this run, so neutral risk cannot be "
+                "treated as fully reliable."
+            )
+            tile_response.tile_display.situation_badge = "YELLOW"
+            tile_response.tile_display.situation_badge_text = "Monitor"
+            tile_response.tile_display.tooltip_summary = (
+                "Search retrieval errors detected. Current adjustment may understate risk."
+            )
+            if "Search retrieval degraded during runtime." not in tile_response.data_quality.data_gaps:
+                tile_response.data_quality.data_gaps.append(
+                    "Search retrieval degraded during runtime."
+                )
+            tile_response.data_quality.confidence_note = (
+                "External search retrieval had errors; treat this assessment with caution."
+            )
+
         # Step 6: Post-process based on severity
         if tile_response.situation_summary.severity_level == "RED":
             # RED severity: shorten cache to 48 hours
             now = datetime.utcnow()
             expires = now + timedelta(hours=48)
             tile_response.cache_metadata.cache_expires_at = expires.isoformat() + "Z"
+            tile_response.cache_metadata.next_scheduled_refresh = expires.date().isoformat()
             logger.info("RED severity detected: cache expires in 48 hours")
+        elif tile_response.situation_summary.severity_level == "ORANGE":
+            now = datetime.utcnow()
+            expires = now + timedelta(hours=24)
+            tile_response.cache_metadata.cache_expires_at = expires.isoformat() + "Z"
+            tile_response.cache_metadata.next_scheduled_refresh = expires.date().isoformat()
+            logger.info("ORANGE severity detected: cache expires in 24 hours")
+        elif tile_response.situation_summary.severity_level == "YELLOW":
+            now = datetime.utcnow()
+            expires = now + timedelta(hours=12)
+            tile_response.cache_metadata.cache_expires_at = expires.isoformat() + "Z"
+            tile_response.cache_metadata.next_scheduled_refresh = expires.date().isoformat()
+            logger.info("YELLOW severity detected: cache expires in 12 hours")
+        elif total_search_results == 0:
+            # Avoid pinning stale "no-signal" outputs for a full week.
+            now = datetime.utcnow()
+            expires = now + timedelta(hours=6)
+            tile_response.cache_metadata.cache_expires_at = expires.isoformat() + "Z"
+            tile_response.cache_metadata.next_scheduled_refresh = expires.date().isoformat()
+            logger.warning("No external search signals found: cache expires in 6 hours")
         
         # Step 7: Write to cache
         logger.info("Step 7: Writing result to cache")

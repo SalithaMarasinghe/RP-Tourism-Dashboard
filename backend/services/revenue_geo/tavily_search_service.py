@@ -15,12 +15,14 @@ Executes 7 revenue-specific search queries:
 Results are aggregated, deduplicated by domain, and formatted for Groq analysis.
 """
 
-import aiohttp
-import json
+import asyncio
 import logging
 from typing import Dict, List, Any
 from datetime import datetime
 import os
+import requests
+from urllib.parse import quote_plus, urlparse
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
@@ -69,22 +71,77 @@ class TavilySearchService:
             "topic": "news"
         }
 
+        def _request() -> Dict[str, Any]:
+            response = requests.post(
+                self.base_url,
+                json=payload,
+                timeout=30
+            )
+            if response.status_code == 200:
+                return response.json()
+
+            logger.error(
+                "Tavily search failed with status %s: %s",
+                response.status_code,
+                response.text
+            )
+            return {"results": [], "answer": "", "error": f"HTTP_{response.status_code}"}
+
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    self.base_url,
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=30)
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data
-                    else:
-                        logger.error(f"Tavily search failed with status {response.status}: {await response.text()}")
-                        return {"results": [], "answer": ""}
+            result = await asyncio.to_thread(_request)
+            if result.get("results"):
+                return result
+            rss_result = await asyncio.to_thread(self._fallback_rss_search, query, max_results)
+            if rss_result.get("results"):
+                return rss_result
+            return {"results": [], "answer": "", "error": "NO_RESULTS"}
         except Exception as e:
             logger.error(f"Tavily search error: {e}")
-            return {"results": [], "answer": ""}
+            rss_result = await asyncio.to_thread(self._fallback_rss_search, query, max_results)
+            if rss_result.get("results"):
+                return rss_result
+            return {"results": [], "answer": "", "error": str(e)}
+
+    def _fallback_rss_search(self, query: str, max_results: int = 10) -> Dict[str, Any]:
+        """
+        Fallback search when Tavily is unavailable.
+        Uses Google News RSS and maps results into Tavily-like shape.
+        """
+        rss_url = (
+            "https://news.google.com/rss/search?q="
+            f"{quote_plus(query)}&hl=en-US&gl=US&ceid=US:en"
+        )
+        try:
+            response = requests.get(rss_url, timeout=20)
+            response.raise_for_status()
+            root = ET.fromstring(response.content)
+
+            items = []
+            for item in root.findall("./channel/item")[:max_results]:
+                title = (item.findtext("title") or "").strip()
+                link = (item.findtext("link") or "").strip()
+                pub_date = (item.findtext("pubDate") or "").strip()
+                source_domain = urlparse(link).netloc if link else "news.google.com"
+                items.append(
+                    {
+                        "title": title or "Untitled",
+                        "source": link or source_domain,
+                        "url": link,
+                        "description": title,
+                        "published_date": pub_date,
+                    }
+                )
+
+            if items:
+                logger.info("RSS fallback returned %s results for query: %s", len(items), query)
+                return {
+                    "results": items,
+                    "answer": "Fallback source: Google News RSS."
+                }
+        except Exception as exc:
+            logger.error("RSS fallback search error: %s", exc)
+
+        return {"results": [], "answer": "", "error": "RSS_FALLBACK_FAILED"}
 
     async def execute_revenue_impact_searches(self) -> Dict[str, Any]:
         """
@@ -94,7 +151,7 @@ class TavilySearchService:
             Aggregated results with category labels and metadata
         """
         queries = {
-            "CONFLICT": "Middle East conflict tourism impact South Asia current month",
+            "CONFLICT": "Iran United States conflict escalation tourism impact Sri Lanka current month",
             "TRAVEL_ADVISORY": "Sri Lanka travel advisory update current month",
             "AIRLINE_DISRUPTION": "Dubai Doha Abu Dhabi airline disruption South Asia current month",
             "OIL_PRICE": "oil price airline fares travel demand impact current month",
@@ -106,7 +163,6 @@ class TavilySearchService:
         results = {}
         
         # Execute searches in parallel
-        import asyncio
         tasks = [
             self.execute_search(query, max_results=10)
             for query in queries.values()
@@ -122,6 +178,7 @@ class TavilySearchService:
                     "results": result.get("results", []),
                     "answer": result.get("answer", ""),
                     "result_count": len(result.get("results", [])),
+                    "error": result.get("error"),
                     "search_timestamp": datetime.utcnow().isoformat() + "Z"
                 }
             else:
@@ -130,6 +187,7 @@ class TavilySearchService:
                     "results": [],
                     "answer": "",
                     "result_count": 0,
+                    "error": result.get("error"),
                     "search_timestamp": datetime.utcnow().isoformat() + "Z"
                 }
 
@@ -166,7 +224,8 @@ class TavilySearchService:
             if data.get("results"):
                 for idx, result in enumerate(data["results"], 1):
                     formatted.append(f"  [{idx}] {result.get('title', 'No title')}")
-                    formatted.append(f"      Source: {result.get('source', 'Unknown')}")
+                    source = result.get("source") or result.get("url") or "Unknown"
+                    formatted.append(f"      Source: {source}")
                     formatted.append(f"      {result.get('description', 'No description')[:200]}")
                     formatted.append("")
 
@@ -198,11 +257,10 @@ class TavilySearchService:
         for category, data in categories.items():
             if data.get("results"):
                 for result in data["results"]:
-                    source = result.get("source", "")
+                    source = result.get("source") or result.get("url") or ""
                     if source:
                         # Extract domain from source URL
                         try:
-                            from urllib.parse import urlparse
                             domain = urlparse(source).netloc or source
                             domains.add(domain)
                         except:

@@ -262,6 +262,64 @@ class RevenueDataService:
             "drivers": drivers
         }
 
+    def get_monthly_summary_forecast(
+        self,
+        year: int,
+        month: int,
+        scenario: str = "baseline"
+    ) -> Optional[dict]:
+        """
+        Returns one month summary row for a forecast scenario.
+        """
+        df = self.get_monthly_data(
+            scenario=scenario,
+            start_year=year,
+            end_year=year
+        )
+
+        if df.empty:
+            return None
+
+        month_df = df[
+            (df["year"] == year)
+            & (df["month"] == month)
+            & (df["scenario"].astype(str).str.lower() == scenario.strip().lower())
+        ]
+        if month_df.empty:
+            return None
+
+        row = month_df.iloc[-1]
+
+        def to_float(value, default=0.0):
+            if pd.isna(value):
+                return default
+            try:
+                return float(value)
+            except Exception:
+                return default
+
+        def to_int(value, default=0):
+            if pd.isna(value):
+                return default
+            try:
+                return int(value)
+            except Exception:
+                return default
+
+        return {
+            "year": int(row["year"]),
+            "month": int(row["month"]),
+            "scenario": str(row["scenario"]),
+            "total_revenue_usd_mn": to_float(row.get("revenue_usd_mn")),
+            "total_revenue_lkr_mn": to_float(row.get("revenue_lkr_mn")),
+            "arrivals": to_int(row.get("arrivals")),
+            "avg_spend_per_tourist_usd": to_float(row.get("rpt_usd")),
+            "avg_spend_per_tourist_day_usd": to_float(row.get("rptd_usd")),
+            "avg_length_of_stay": to_float(row.get("los_days")),
+            "usd_lkr_rate": to_float(row.get("usd_lkr"), default=330.0),
+            "ds": row["ds"].isoformat() if hasattr(row.get("ds"), "isoformat") else None,
+        }
+
 # FastAPI Dependency
 def get_revenue_data_service() -> RevenueDataService:
     """
