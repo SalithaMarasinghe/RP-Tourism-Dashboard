@@ -6,6 +6,7 @@ import OverviewTab from './OverviewTab';
 import MonthlyPredictionsComponent from './MonthlyPredictionsComponent';
 import DailyPredictionsComponent from './DailyPredictionsComponent';
 import TDMSComponent from './TDMSComponent';
+import SourceMarketIntelligence from './SourceMarketIntelligence';
 import ChatbotTab from '../ChatbotTab';
 import {
   BarChart3,
@@ -18,7 +19,8 @@ import {
   MessageCircle,
   ChevronDown,
   LogOut,
-  Settings
+  Settings,
+  TrendingUp,
 } from 'lucide-react';
 
 function PowerBIDashboard() {
@@ -138,9 +140,8 @@ function PowerBIDashboard() {
 
       {/* Floating Sidebar Navigation */}
       <div
-        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transform transition-transform duration-250 ease-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transform transition-transform duration-250 ease-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-6">
@@ -159,6 +160,7 @@ function PowerBIDashboard() {
               { id: 'predictions', label: 'Monthly Predictions', icon: Calendar },
               { id: 'daily-predictions', label: 'Daily Predictions', icon: CalendarDays },
               { id: 'tdms', label: 'Distribution Management', icon: MapPin },
+              { id: 'source-markets', label: 'Source Markets', icon: TrendingUp },
               { id: 'chatbot', label: 'AI Assistant', icon: MessageCircle }
             ].map((tab) => (
               <button
@@ -270,6 +272,7 @@ function PowerBIDashboard() {
             {activeTab === 'predictions' && <MonthlyPredictionsComponent />}
             {activeTab === 'daily-predictions' && <DailyPredictionsComponent />}
             {activeTab === 'tdms' && <TDMSComponent />}
+            {activeTab === 'source-markets' && <SourceMarketIntelligence />}
             {activeTab === 'chatbot' && <div className="h-full p-0"><ChatbotTab /></div>}
           </div>
         </div>

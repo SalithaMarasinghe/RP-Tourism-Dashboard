@@ -37,7 +37,7 @@ async def signup(body: SignupRequest):
 @router.post("/google")
 async def google_auth(body: GoogleAuthRequest):
     """Verify Google OAuth idToken, ensure Firestore user profile exists."""
-    return auth_service.verify_google_token(body.idToken)
+    return auth_service.verify_google_token(body.id_token)
 
 
 @router.get("/me")

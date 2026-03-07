@@ -403,40 +403,148 @@ function OverviewTab() {
       </div>
 
       {/* ML Model Performance Summary */}
-      <Card className="power-bi-card">
+      <Card className="power-bi-card col-span-1 md:col-span-2 lg:col-span-4 mt-6">
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center">
             <Brain className="h-5 w-5 mr-2 text-purple-600" />
-            ML Model Performance Summary
+            Final Model Metrics Comparison
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">
-                {nextMonthPrediction ? nextMonthPrediction.formatted : '2.85M'}
+          <div className="space-y-8">
+
+            {/* 1. Individual Model Performance */}
+            <div>
+              <h3 className="text-md font-bold mb-4 text-gray-800">1. Individual Model Performance</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* TSFormer */}
+                <div className="border rounded-lg overflow-hidden border-gray-200 shadow-sm">
+                  <div className="bg-gray-50 px-4 py-3 border-b font-semibold text-sm text-gray-700">
+                    TSFormer Performance (BO Optimized)
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                      <thead className="bg-white">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Dataset</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">RMSE</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">R²</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">MAPE</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-100">
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800">Train</td>
+                          <td className="px-4 py-3 text-right text-gray-600">585.29</td>
+                          <td className="px-4 py-3 text-right text-gray-600">0.9065</td>
+                          <td className="px-4 py-3 text-right text-gray-600">14.59</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800">Validation</td>
+                          <td className="px-4 py-3 text-right text-gray-600">232.43</td>
+                          <td className="px-4 py-3 text-right text-gray-600">0.9651</td>
+                          <td className="px-4 py-3 text-right text-gray-600">18.82</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800 font-medium">Test</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">378.39</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">0.9379</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">4.14</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* SVR */}
+                <div className="border rounded-lg overflow-hidden border-gray-200 shadow-sm">
+                  <div className="bg-gray-50 px-4 py-3 border-b font-semibold text-sm text-gray-700">
+                    SVR Performance (Optimized by Bayesian Optimization)
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                      <thead className="bg-white">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Dataset</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">RMSE</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">R²</th>
+                          <th className="px-4 py-3 text-right font-medium text-gray-500">MAPE</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-100">
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800">Train</td>
+                          <td className="px-4 py-3 text-right text-gray-600">294.11</td>
+                          <td className="px-4 py-3 text-right text-gray-600">0.9794</td>
+                          <td className="px-4 py-3 text-right text-gray-600">3.98</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800">Validation</td>
+                          <td className="px-4 py-3 text-right text-gray-600">182.29</td>
+                          <td className="px-4 py-3 text-right text-gray-600">0.9858</td>
+                          <td className="px-4 py-3 text-right text-gray-600">4.19</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-3 text-gray-800 font-medium">Test</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">429.53</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">0.9207</td>
+                          <td className="px-4 py-3 text-right text-gray-900 font-medium">3.57</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">
-                {nextMonthPrediction ? `${nextMonthPrediction.month} Prediction` : 'January 2026 Prediction'}
-              </div>
-              <Badge className="mt-2 bg-blue-100 text-blue-800">
-                {nextMonthPrediction ? `${nextMonthPrediction.confidence}% Confidence` : '94% Confidence'}
-              </Badge>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-600">
-                {predictedGrowth ? predictedGrowth.formatted : '+15.0%'}
+
+            {/* 2. Final Ensemble Model */}
+            <div className="flex flex-col items-center border-t border-gray-100 pt-8 mt-4">
+              <h3 className="text-md font-bold mb-4 text-gray-800 flex flex-col sm:flex-row items-center gap-2">
+                2. Final Ensemble Model Performance
+                <span className="text-xs font-normal text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+                  Genetic Algorithm Optimized
+                </span>
+              </h3>
+              <div className="border rounded-lg overflow-hidden border-purple-200 shadow-sm w-full max-w-2xl">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead className="bg-white">
+                      <tr>
+                        <th className="px-6 py-4 text-left font-medium text-gray-500 bg-purple-50/50">Dataset</th>
+                        <th className="px-6 py-4 text-right font-medium text-gray-500 bg-purple-50/50">RMSE</th>
+                        <th className="px-6 py-4 text-right font-medium text-gray-500 bg-purple-50/50">R²</th>
+                        <th className="px-6 py-4 text-right font-medium text-gray-500 bg-purple-50/50">MAPE</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      <tr>
+                        <td className="px-6 py-4 text-gray-800 font-medium">Train</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">346.16</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">0.9714</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">9.82</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-gray-800 font-medium">Validation</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">186.57</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">0.9843</td>
+                        <td className="px-6 py-4 text-right text-purple-700 font-medium">5.35</td>
+                      </tr>
+                      <tr className="bg-purple-50">
+                        <td className="px-6 py-4 text-gray-900 font-bold flex items-center gap-2">
+                          Test
+                          <span title="Final evaluation metric" className="text-purple-500 text-lg leading-none">★</span>
+                        </td>
+                        <td className="px-6 py-4 text-right text-purple-800 font-bold text-base">350.79</td>
+                        <td className="px-6 py-4 text-right text-purple-800 font-bold text-base">0.9495</td>
+                        <td className="px-6 py-4 text-right text-purple-800 font-bold text-base">3.24</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">
-                {predictedGrowth ? `Predicted Growth (${predictedGrowth.comparison})` : 'Predicted Growth'}
-              </div>
-              <Badge className={`mt-2 ${predictedGrowth?.confidence === 'High' ? 'bg-emerald-100 text-emerald-800' :
-                predictedGrowth?.confidence === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-orange-100 text-orange-800'
-                }`}>
-                {predictedGrowth ? `${predictedGrowth.confidence} Confidence` : 'High Confidence'}
-              </Badge>
             </div>
+
           </div>
         </CardContent>
       </Card>
