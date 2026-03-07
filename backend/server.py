@@ -29,6 +29,7 @@ from routers import (
     source_market_geo_router,
     rev,
     revenue_geo,
+    demo,
 )
 from routers.geopolitical_tile import validate_env_vars, ConfigurationError
 from services.geopolitical_tile_scheduler import run_scheduled_pipeline
@@ -126,3 +127,4 @@ app.include_router(source_markets_router.router)
 app.include_router(source_market_geo_router.router)
 app.include_router(rev.router)
 app.include_router(revenue_geo.router)
+app.include_router(demo.router)
