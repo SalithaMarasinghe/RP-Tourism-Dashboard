@@ -27,6 +27,7 @@ from routers import (
     tdms_router,
     source_markets_router,
     source_market_geo_router,
+    rev,
 )
 from routers.geopolitical_tile import validate_env_vars, ConfigurationError
 from services.geopolitical_tile_scheduler import run_scheduled_pipeline
@@ -122,3 +123,4 @@ app.include_router(tdms_router.router)
 app.include_router(search_router.router)
 app.include_router(source_markets_router.router)
 app.include_router(source_market_geo_router.router)
+app.include_router(rev.router)

@@ -11,6 +11,7 @@ import DailyPredictionsComponent from './components/DailyPredictionsComponent';
 import ChatbotTab from './ChatbotTab';
 import PowerBIDashboard from './components/PowerBIDashboard';
 import OverviewTab from './components/OverviewTab';
+import RevenueDashboard from './pages/RevenueDashboard';
 import LandingPage from './components/Landing/LandingPage';
 
 const App = () => {
@@ -56,6 +57,22 @@ const App = () => {
               <ProtectedRoute>
 
                 <PowerBIDashboard />
+
+              </ProtectedRoute>
+
+            }
+
+          />
+
+          <Route
+
+            path="/revenue"
+
+            element={
+
+              <ProtectedRoute>
+
+                <RevenueDashboard />
 
               </ProtectedRoute>
 

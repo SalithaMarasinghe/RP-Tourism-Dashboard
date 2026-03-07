@@ -8,6 +8,7 @@ import DailyPredictionsComponent from './DailyPredictionsComponent';
 import TDMSComponent from './TDMSComponent';
 import SourceMarketIntelligence from './SourceMarketIntelligence';
 import ChatbotTab from '../ChatbotTab';
+import RevenueDashboard from '../pages/RevenueDashboard';
 import {
   BarChart3,
   Calendar,
@@ -21,6 +22,7 @@ import {
   LogOut,
   Settings,
   TrendingUp,
+  Wallet,
 } from 'lucide-react';
 
 function PowerBIDashboard() {
@@ -157,6 +159,7 @@ function PowerBIDashboard() {
           <nav className="space-y-1">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'revenue', label: 'Revenue Intelligence', icon: Wallet },
               { id: 'predictions', label: 'Monthly Predictions', icon: Calendar },
               { id: 'daily-predictions', label: 'Daily Predictions', icon: CalendarDays },
               { id: 'tdms', label: 'Distribution Management', icon: MapPin },
@@ -269,6 +272,7 @@ function PowerBIDashboard() {
           {/* Tab Content */}
           <div className="flex-1 overflow-auto p-6">
             {activeTab === 'overview' && <OverviewTab />}
+            {activeTab === 'revenue' && <RevenueDashboard />}
             {activeTab === 'predictions' && <MonthlyPredictionsComponent />}
             {activeTab === 'daily-predictions' && <DailyPredictionsComponent />}
             {activeTab === 'tdms' && <TDMSComponent />}
