@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/rag", tags=["rag"])
 security = HTTPBearer()
 
-
 @router.post("/chat")
 async def rag_chat(
     body: ChatRequest,
@@ -28,7 +27,8 @@ async def rag_chat(
     decoded = await verify_token(credentials)
     
     try:
-        result = await tourism_rag.handle_tourism_rag_query(body.message)
+        # NEW: Pass both message and history to the RAG engine
+        result = await tourism_rag.handle_tourism_rag_query(body.message, body.history)
         return {
             "response": result["response"],
             "sources": result["sources"],
@@ -39,7 +39,6 @@ async def rag_chat(
         logger.error(f"RAG chat error: {e}")
         raise
 
-
 @router.get("/status")
 async def rag_status(
     credentials: HTTPAuthorizationCredentials = Security(security),
@@ -48,7 +47,6 @@ async def rag_status(
     decoded = await verify_token(credentials)
     
     try:
-        # Check if RAG system is initialized
         if tourism_rag._embedding_model is None:
             return {"status": "not_initialized", "message": "RAG system not loaded"}
         

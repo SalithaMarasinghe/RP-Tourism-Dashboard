@@ -297,7 +297,6 @@ function ChatbotTab() {
   // Initialize user and load chat list
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed. User:', user?.uid);
       setCurrentUser(user);
 
       if (user) {
@@ -312,7 +311,6 @@ function ChatbotTab() {
         
         return () => clearInterval(refreshInterval);
       } else {
-        console.log('User not authenticated');
         setAuthWarning(true);
         setMessages([]);
         setCurrentChatId(null);
@@ -324,14 +322,12 @@ function ChatbotTab() {
     return () => unsubscribe();
   }, []);
 
-  // Update chats when mode changes only (not when chat lists update)
+  // Update chats when mode changes only
   useEffect(() => {
     if (currentUser) {
       const newChats = chatMode === 'tourism' ? tourismChats : geminiChats;
       setChats(newChats);
       
-      // Clear current chat if it doesn't belong to the current mode
-      // Only clear if we're not loading and not in the middle of operations
       if (currentChatId && !isLoading && !isSidebarOpen) {
         const chatBelongsToCurrentMode = newChats.some(chat => chat.id === currentChatId);
         if (!chatBelongsToCurrentMode) {
@@ -340,17 +336,15 @@ function ChatbotTab() {
         }
       }
     }
-  }, [chatMode, currentUser]); // Only depend on mode and user, not chat lists
+  }, [chatMode, currentUser]); 
 
-  // Update chats display when chat lists change (without clearing messages)
   useEffect(() => {
     if (currentUser) {
       const newChats = chatMode === 'tourism' ? tourismChats : geminiChats;
       setChats(newChats);
     }
-  }, [geminiChats, tourismChats, chatMode, currentUser]); // Update display when lists change
+  }, [geminiChats, tourismChats, chatMode, currentUser]); 
 
-  // Separate chat list management for each mode
   const refreshGeminiChatList = async (user, skipAutoLoad = false) => {
     try {
       const token = await (user || auth.currentUser).getIdToken();
@@ -361,14 +355,9 @@ function ChatbotTab() {
       const data = await res.json();
       const chatsList = data.chats || [];
       
-      // Only get Gemini chats (no [Tourism Data] prefix)
       const gemini = chatsList.filter(chat => !chat.title?.includes('[Tourism Data]'));
-      console.log('Gemini refresh - all chats:', chatsList.map(c => ({ id: c.id, title: c.title })));
-      console.log('Gemini refresh - filtered chats:', gemini.map(c => ({ id: c.id, title: c.title })));
-      console.log('Gemini refresh - current chat ID:', currentChatId);
       setGeminiChats(gemini);
       
-      // Auto-load only if in Gemini mode and no current chat
       if (chatMode === 'gemini' && !skipAutoLoad && !currentChatId && gemini.length > 0) {
         await loadChat(gemini[0].id);
       }
@@ -387,11 +376,9 @@ function ChatbotTab() {
       const data = await res.json();
       const chatsList = data.chats || [];
       
-      // Only get Tourism chats (with [Tourism Data] prefix)
       const tourism = chatsList.filter(chat => chat.title?.includes('[Tourism Data]'));
       setTourismChats(tourism);
       
-      // Auto-load only if in Tourism mode and no current chat
       if (chatMode === 'tourism' && !skipAutoLoad && !currentChatId && tourism.length > 0) {
         await loadChat(tourism[0].id);
       }
@@ -401,14 +388,12 @@ function ChatbotTab() {
   };
 
   const refreshChatList = async (user, skipAutoLoad = false) => {
-    // Refresh both chat lists
     await refreshGeminiChatList(user, skipAutoLoad);
     await refreshTourismChatList(user, skipAutoLoad);
   };
 
   const loadChat = async (chatId) => {
     try {
-      console.log('Loading chat:', chatId);
       setCurrentChatId(chatId);
 
       const data = await authFetch(`/api/chat/${chatId}`);
@@ -420,9 +405,8 @@ function ChatbotTab() {
       }));
 
       setMessages(loadedMessages);
-      setIsSidebarOpen(false); // Close sidebar after selecting chat
+      setIsSidebarOpen(false); 
 
-      // Scroll to bottom
       setTimeout(() => {
         const messagesElement = document.querySelector('[data-messages-container]');
         if (messagesElement) {
@@ -434,26 +418,19 @@ function ChatbotTab() {
     }
   };
 
-  // Save a message to the backend and return chatId
   const saveMessageToBackend = async (role, content, sources = [], chatIdOverride = null) => {
-    if (!currentUser) {
-      console.warn('No user logged in');
-      return null;
-    }
+    if (!currentUser) return null;
 
     try {
       let chatId = chatIdOverride || currentChatId;
 
-      // Create a new chat if this is the first message
       if (!chatId) {
-        console.log('Creating new chat...');
         const title = content.length > 60 ? content.substring(0, 60) : content;
         const newChat = await authFetch('/api/chat/create', {
           method: 'POST',
           body: JSON.stringify({ title })
         });
         chatId = newChat.chatId;
-        console.log('New chat created with ID:', chatId);
         setCurrentChatId(chatId);
 
         if (role === 'user') {
@@ -461,13 +438,10 @@ function ChatbotTab() {
         }
       }
 
-      // Save the message
-      console.log('Saving message to chat:', chatId);
       await authFetch(`/api/chat/${chatId}/message`, {
         method: 'POST',
         body: JSON.stringify({ role, content, sources: sources || [] })
       });
-      console.log('Message saved successfully');
 
       return chatId;
     } catch (error) {
@@ -476,11 +450,12 @@ function ChatbotTab() {
     }
   };
 
-  const callRagAPI = async (message) => {
+  // --- NEW RAG API FUNCTION WITH HISTORY ---
+  const callRagAPI = async (message, history = []) => {
     try {
       const response = await authFetch('/api/rag/chat', {
         method: 'POST',
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message, history })
       });
 
       return {
@@ -493,14 +468,13 @@ function ChatbotTab() {
     }
   };
 
+  // --- YOUR EXACT ORIGINAL GEMINI API FUNCTION (UNTRUNCATED) ---
   const callGeminiAPI = async (message) => {
     const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 
     if (!apiKey) {
       throw new Error('Gemini API key not configured');
     }
-
-    console.log('Attempting Gemini API call with key:', apiKey.substring(0, 10) + '...');
 
     try {
       // Gather context from multiple sources
@@ -791,24 +765,18 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         })
       });
 
-      console.log('Gemini API response status:', response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Gemini API error response:', errorText);
-
         let errorData;
         try {
           errorData = JSON.parse(errorText);
         } catch (e) {
           errorData = { error: { message: errorText } };
         }
-
         throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
       }
 
       const data = await response.json();
-      console.log('Gemini API response data:', data);
 
       if (data.candidates && data.candidates.length > 0) {
         const text = data.candidates[0].content.parts[0].text;
@@ -836,7 +804,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
       const words = userMessage.split(' ').slice(0, 6).join(' ');
       let generatedTitle = words.length > 0 ? words : userMessage.substring(0, 40);
       
-      // For tourism mode, preserve the [Tourism Data] prefix
       if (preservePrefix && chatMode === 'tourism') {
         generatedTitle = `[Tourism Data] ${generatedTitle}`;
       }
@@ -861,9 +828,13 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
     const userMessage = inputMessage;
     setInputMessage('');
 
-    // Add user message to local state (for instant UI feedback)
-    setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
+    // --- NEW: Map the current local messages state to send as history ---
+    const chatHistoryPayload = messages.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+    }));
 
+    setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
     setIsLoading(true);
 
     let chatIdForThisMessage = currentChatId;
@@ -872,7 +843,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
       let response;
       
       if (chatMode === 'tourism') {
-        // For tourism mode, create chat first if needed
         if (!chatIdForThisMessage) {
           const title = `[Tourism Data] ${userMessage.length > 50 ? userMessage.substring(0, 50) : userMessage}`;
           const newChat = await authFetch('/api/chat/create', {
@@ -883,18 +853,15 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           setCurrentChatId(chatIdForThisMessage);
         }
         
-        // Use RAG API for Tourism Data Assistant
-        response = await callRagAPI(userMessage);
+        // --- NEW: Pass the mapped history payload to callRagAPI ---
+        response = await callRagAPI(userMessage, chatHistoryPayload);
         
-        // Save both user message and response
         await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
         await saveMessageToBackend('assistant', response.text, response.sources, chatIdForThisMessage);
         
-        // Refresh only tourism chat list (no auto-load to prevent disappearing)
         await refreshTourismChatList(currentUser, true);
         
       } else {
-        // Use existing Gemini API (handles saving internally)
         try {
           const responseData = await authFetch('/api/chat/ask', {
             method: 'POST',
@@ -904,9 +871,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
             })
           });
           
-          console.log('Gemini API response:', responseData);
-          
-          // Handle different response structures
           let responseText = '';
           let responseSources = [];
           let responseChatId = null;
@@ -918,7 +882,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           } else if (responseData.message) {
             responseText = responseData.message;
           } else {
-            console.warn('Unexpected response structure:', responseData);
             responseText = 'I received a response but couldn\'t parse it properly.';
           }
           
@@ -930,44 +893,35 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
             sources: responseSources,
             chat_id: responseChatId
           };
-          console.log('Processed Gemini response:', response);
         } catch (geminiError) {
           console.error('Gemini API call failed:', geminiError);
-          throw geminiError; // Re-throw to be handled by the main catch block
+          throw geminiError; 
         }
       }
 
       setMessages(prev => [...prev, { text: response.text, sender: 'bot', sources: response.sources || [] }]);
 
-      // Update current chat ID if this was a new chat (only for Gemini mode)
       if (chatMode === 'gemini' && !currentChatId && response.chat_id) {
         setCurrentChatId(response.chat_id);
         chatIdForThisMessage = response.chat_id;
         generateChatTitle(response.chat_id, userMessage);
-        // Refresh only Gemini chat list for new Gemini chat
         await refreshGeminiChatList(currentUser, true);
       } else if (chatMode === 'gemini' && currentChatId) {
-        // For existing Gemini chats, refresh to show updated messages
-        console.log('Refreshing Gemini chat list for existing chat:', currentChatId);
         await refreshGeminiChatList(currentUser, true);
       } else if (chatMode === 'tourism' && !currentChatId && chatIdForThisMessage) {
-        generateChatTitle(chatIdForThisMessage, userMessage, true); // Preserve prefix for tourism
+        generateChatTitle(chatIdForThisMessage, userMessage, true); 
       } else if (firstMessageData?.chatId === chatIdForThisMessage) {
-        generateChatTitle(chatIdForThisMessage, userMessage, chatMode === 'tourism'); // Preserve prefix for tourism
+        generateChatTitle(chatIdForThisMessage, userMessage, chatMode === 'tourism'); 
         setFirstMessageData(null);
       }
 
       setIsLoading(false);
       
-      // Don't auto-refresh for tourism mode to prevent message disappearing
-      // Chat list will be updated when user switches modes or manually refreshes
     } catch (error) {
       console.error('Error sending message:', error);
 
-      // Better error handling based on error type
       let fallbackResponse = "I apologize, but I'm having trouble connecting to the AI service. Please try again later.";
       
-      // Check for specific Gemini API errors
       if (error.message) {
         if (error.message.includes('quota') || error.message.includes('429') || error.message.includes('rate limit')) {
           fallbackResponse = "I've reached my usage limit for the moment. Please try again in a few minutes, or consider using the Tourism Data Assistant which has different limits.";
@@ -980,19 +934,15 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
       setMessages(prev => [...prev, { text: fallbackResponse, sender: 'bot', sources: [] }]);
 
-      // For Gemini mode, ensure chat is created and saved even on error
       if (chatMode === 'gemini' && !chatIdForThisMessage) {
         try {
-          // Create a new chat for Gemini mode on error
           const title = userMessage.length > 50 ? userMessage.substring(0, 50) : userMessage;
-          console.log('Creating Gemini chat on error with title:', title);
           const newChat = await authFetch('/api/chat/create', {
             method: 'POST',
             body: JSON.stringify({ title })
           });
           chatIdForThisMessage = newChat.chatId;
           setCurrentChatId(chatIdForThisMessage);
-          console.log('Gemini chat created on error with ID:', chatIdForThisMessage);
         } catch (createError) {
           console.error('Failed to create Gemini chat on error:', createError);
         }
@@ -1002,9 +952,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         await saveMessageToBackend('user', userMessage, [], chatIdForThisMessage);
         await saveMessageToBackend('assistant', fallbackResponse, [], chatIdForThisMessage);
         
-        // Refresh Gemini chat list after saving error message
         if (chatMode === 'gemini') {
-          console.log('Refreshing Gemini chat list after error save');
           await refreshGeminiChatList(currentUser, true);
         }
       }
@@ -1014,7 +962,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
   };
 
   const handleNewChat = () => {
-    // Clear current state
     setMessages([]);
     setCurrentChatId(null);
     setInputMessage('');
@@ -1023,17 +970,13 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
   };
 
   const handleModeSwitch = (newMode) => {
-    if (newMode === chatMode) return; // No change needed
-    
-    // Clear current chat when switching modes
+    if (newMode === chatMode) return; 
     setMessages([]);
     setCurrentChatId(null);
     setInputMessage('');
     setFirstMessageData(null);
-    
-    // Switch mode
     setChatMode(newMode);
-    setIsSidebarOpen(false); // Close sidebar when switching modes
+    setIsSidebarOpen(false);
   };
 
   const handleDeleteChat = async (chatId) => {
@@ -1044,13 +987,11 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         setMessages([]);
         setCurrentChatId(null);
       }
-      // Refresh only the current mode's chat list
       if (chatMode === 'tourism') {
         await refreshTourismChatList(currentUser, true);
       } else {
         await refreshGeminiChatList(currentUser, true);
       }
-      console.log('Chat deleted successfully');
     } catch (error) {
       console.error('Error deleting chat:', error);
     }
@@ -1063,13 +1004,11 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         method: 'PUT',
         body: JSON.stringify({ title: newTitle })
       });
-      // Refresh only the current mode's chat list
       if (chatMode === 'tourism') {
         await refreshTourismChatList(currentUser, true);
       } else {
         await refreshGeminiChatList(currentUser, true);
       }
-      console.log('Chat renamed successfully');
     } catch (error) {
       console.error('Error renaming chat:', error);
     }
@@ -1088,7 +1027,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
   return (
     <div className="flex flex-col w-full h-full">
-      {/* Auth Warning */}
       {authWarning && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-4">
           <p className="text-sm text-yellow-700">
@@ -1097,9 +1035,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         </div>
       )}
 
-      {/* Main Content - Full Width Chat */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Floating Chat History Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="fixed left-4 top-20 z-40 bg-blue-600 text-white p-3 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
@@ -1108,9 +1044,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           <History className="h-5 w-5" />
         </button>
 
-        {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Mode Selector */}
           <div className="border-b border-gray-200 bg-white px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -1166,7 +1100,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
               </div>
             )}
           </div>
-          {/* Messages Area */}
+          
           <div
             className="flex-1 overflow-y-auto py-2 px-4"
             data-messages-container
@@ -1233,14 +1167,23 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                           </ReactMarkdown>
                         </div>
                       )}
-                      {message.sources && message.sources.length > 0 && (
-                        <div className="mt-2 text-xs opacity-75 border-t pt-2">
-                          <p className="font-semibold">Sources:</p>
-                          {message.sources.map((source, idx) => (
-                            <p key={idx}>• {source}</p>
-                          ))}
+                      
+                      {/* --- NEW: PERPLEXITY-STYLE UI FOR SOURCES --- */}
+                      {message.sender === 'bot' && message.sources && message.sources.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                            <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <Database className="h-3 w-3" /> Sources Analyzed:
+                            </span>
+                            <div className="flex flex-wrap gap-2">
+                                {message.sources.map((source, idx) => (
+                                    <span key={idx} className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] rounded-full border border-blue-200 font-semibold shadow-sm flex items-center gap-1">
+                                        📄 {source}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
                       )}
+
                     </div>
                   </div>
                 ))}
@@ -1259,7 +1202,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
             )}
           </div>
 
-          {/* Input Bar */}
           <div className="flex space-x-2 pt-2 pb-2 border-t border-gray-200 px-4 bg-white">
             <input
               type="text"
@@ -1281,7 +1223,6 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         </div>
       </div>
 
-      {/* Chat History Sidebar - Floating */}
       <ChatHistorySidebar
         chats={chats}
         currentChatId={currentChatId}
