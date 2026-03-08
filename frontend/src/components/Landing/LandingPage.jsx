@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
+import Antigravity from './Antigravity';
 
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,29 +38,50 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* TOP BAR */}
-      <header className={`topbar ${isScrolled ? 'shadow' : ''}`} role="banner">
-        <div className="tb-left">
-          <span className="brand-pill">Sri Lanka Tourism Analytics</span>
+      <div className="hero-shell">
+        <div className="hero-antigravity" aria-hidden="true">
+          <Antigravity
+            count={460}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={2}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
         </div>
 
-        <nav className="tb-nav" aria-label="Main navigation">
-          <a href="#features">Features</a>
-          <a href="#audience">Who It's For</a>
-          <a href="#ai-assistant">AI Assistant</a>
-          <a href="#how-it-works">How It Works</a>
-        </nav>
+        {/* TOP BAR */}
+        <header className={`topbar ${isScrolled ? 'shadow' : ''}`} role="banner">
+          <div className="tb-left">
+            <span className="brand-pill">Sri Lanka Tourism Analytics</span>
+          </div>
 
-        <div className="tb-right">
-          <Link to="/login" className="btn btn-ghost">Sign In</Link>
-          <Link to="/signup" className="btn btn-blue">Register Now</Link>
-        </div>
-      </header>
+          <nav className="tb-nav" aria-label="Main navigation">
+            <a href="#features">Features</a>
+            <a href="#audience">Who It's For</a>
+            <a href="#ai-assistant">AI Assistant</a>
+            <a href="#how-it-works">How It Works</a>
+          </nav>
+
+          <div className="tb-right">
+            <Link to="/login" className="btn btn-ghost">Sign In</Link>
+            <Link to="/signup" className="btn btn-blue">Register Now</Link>
+          </div>
+        </header>
 
       {/* MOBILE PANEL - REMOVED */}
 
-      {/* HERO */}
-      <section className="hero" aria-label="Platform overview">
+        {/* HERO */}
+        <section className="hero" aria-label="Platform overview">
         <div className="hero-bg" aria-hidden="true"></div>
         <div className="hg hg1" aria-hidden="true"></div>
         <div className="hg hg2" aria-hidden="true"></div>
@@ -238,10 +260,30 @@ const LandingPage = () => {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      </div>
 
       {/* AUDIENCE */}
       <section className="sec" id="audience" aria-labelledby="aud-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal>
             <span className="eyebrow">Who It's For</span>
@@ -349,6 +391,25 @@ const LandingPage = () => {
 
       {/* FEATURES */}
       <section className="sec" id="features" style={{background: 'var(--white)'}} aria-labelledby="feat-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal style={{display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap'}}>
             <div>
@@ -433,6 +494,25 @@ const LandingPage = () => {
 
       {/* AI ASSISTANT */}
       <section className="ai-sec" id="ai-assistant" aria-labelledby="ai-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="ai-glow-1" aria-hidden="true"></div>
         <div className="ai-glow-2" aria-hidden="true"></div>
         <div className="pw">
@@ -542,6 +622,25 @@ const LandingPage = () => {
 
       {/* HOW IT WORKS */}
       <section className="sec proc-sec" id="how-it-works" aria-labelledby="proc-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal style={{textAlign: 'center'}}>
             <span className="eyebrow">Getting Started</span>
@@ -571,6 +670,25 @@ const LandingPage = () => {
 
       {/* REGISTER CTA */}
       <section className="cta-sec" id="register" aria-labelledby="cta-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="cta-glow" aria-hidden="true"></div>
         <div className="pw">
           <div className="cta-inner" data-reveal>
@@ -593,6 +711,25 @@ const LandingPage = () => {
 
       {/* FOOTER */}
       <footer role="contentinfo">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={120}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.5}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div className="foot-grid">
             <div>

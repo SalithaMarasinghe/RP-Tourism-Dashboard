@@ -20,6 +20,7 @@ import RevenueScenarioToggle from '../components/revenue/RevenueScenarioToggle';
 import RevenueDualAxisChart from '../components/revenue/RevenueDualAxisChart';
 import RevenueDriversChart from '../components/revenue/RevenueDriversChart';
 import RevenueInsightPanel from '../components/revenue/RevenueInsightPanel';
+import RevenueGeoAdjustmentTile from '../components/revenue/RevenueGeoAdjustmentTile';
 
 /**
  * RevenueDashboard
@@ -43,8 +44,8 @@ const RevenueDashboard = () => {
         refreshAllData
     } = useRevenueDashboard();
 
-    // Generate year options for the selector
-    const yearOptions = Array.from({ length: 2027 - 2013 + 1 }, (_, i) => 2013 + i).reverse();
+    // Generate year options for the selector (2013-2030)
+    const yearOptions = Array.from({ length: 2030 - 2013 + 1 }, (_, i) => 2013 + i).reverse();
 
     if (error) {
         return (
@@ -117,6 +118,11 @@ const RevenueDashboard = () => {
             {/* 2. KPI Cards Row */}
             <section>
                 <RevenueKpiCards summary={data.summary} loading={loading} />
+            </section>
+
+            {/* 2.5. Geopolitical Revenue Adjustment Tile */}
+            <section>
+                <RevenueGeoAdjustmentTile />
             </section>
 
             {/* 3. Main Visualization Row */}

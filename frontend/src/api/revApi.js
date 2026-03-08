@@ -20,21 +20,21 @@ const api = axios.create({
 
 /**
  * Internal helper to normalize scenario names for the backend.
- * Maps lowercase frontend values to capitalized backend expectations.
+ * Maps scenario names to lowercase backend expectations.
  */
 const normalizeParams = (params) => {
     if (!params || !params.scenario) return params;
 
     const mapping = {
-        'historical': 'Historical',
-        'baseline': 'Baseline',
-        'optimistic': 'Optimistic',
-        'pessimistic': 'Pessimistic'
+        'historical': 'historical',
+        'baseline': 'baseline',
+        'optimistic': 'optimistic',
+        'pessimistic': 'pessimistic'
     };
 
     return {
         ...params,
-        scenario: mapping[params.scenario.toLowerCase()] || params.scenario
+        scenario: mapping[params.scenario.toLowerCase()] || params.scenario.toLowerCase()
     };
 };
 

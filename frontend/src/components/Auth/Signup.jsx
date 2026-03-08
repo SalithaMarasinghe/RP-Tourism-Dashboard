@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import Antigravity from "../Landing/Antigravity";
 import "./AuthStyles.css";
 
 export default function Signup() {
@@ -39,14 +40,17 @@ export default function Signup() {
     }
 
     async function handleGoogleSignIn() {
+        setError("");
+        setLoading(true);
         try {
-            setError("");
-            setLoading(true);
             await googleSignIn();
             navigate("/dashboard");
         } catch (err) {
-            console.error(err);
-            setError("Failed to sign in with Google: " + err.message);
+            console.error("[Signup] Google Sign-In error:", err);
+            // Display user-friendly error message
+            const message = err.message || "Failed to sign in with Google. Please try again.";
+            setError(message);
+        } finally {
             setLoading(false);
         }
     }
@@ -55,6 +59,25 @@ export default function Signup() {
         <div className="auth-layout">
             {/* Left Panel - Wallpaper */}
             <div className="left-panel">
+                <div className="left-panel-antigravity" aria-hidden="true">
+                    <Antigravity
+                        count={220}
+                        magnetRadius={6}
+                        ringRadius={7}
+                        waveSpeed={0.4}
+                        waveAmplitude={1}
+                        particleSize={1.4}
+                        lerpSpeed={0.05}
+                        color="#3b5bdb"
+                        autoAnimate
+                        particleVariance={1}
+                        rotationSpeed={0}
+                        depthFactor={1}
+                        pulseSpeed={3}
+                        particleShape="capsule"
+                        fieldStrength={10}
+                    />
+                </div>
                 <div className="grid-texture" aria-hidden="true"></div>
                 <div className="glow g1" aria-hidden="true"></div>
                 <div className="glow g2" aria-hidden="true"></div>

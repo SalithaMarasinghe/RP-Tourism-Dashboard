@@ -7,7 +7,6 @@ import {
     TrendingDown,
     DollarSign,
     Calendar,
-    Users,
     Clock,
     Briefcase
 } from 'lucide-react';
@@ -46,13 +45,6 @@ const RevenueKpiCards = ({ summary, loading }) => {
             description: 'Annual revenue in LKR Billions'
         },
         {
-            title: 'Total Arrivals',
-            value: summary?.total_arrivals ? formatNumber(summary.total_arrivals) : 'N/A',
-            icon: Users,
-            color: 'purple',
-            description: 'Total tourist arrivals for the year'
-        },
-        {
             title: 'Growth (YoY)',
             value: summary?.revenue_yoy_pct !== undefined ? `${summary.revenue_yoy_pct > 0 ? '+' : ''}${summary.revenue_yoy_pct.toFixed(1)}%` : 'N/A',
             icon: summary?.revenue_yoy_pct >= 0 ? TrendingUp : TrendingDown,
@@ -85,7 +77,7 @@ const RevenueKpiCards = ({ summary, loading }) => {
     if (loading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[1, 2, 3, 4, 5, 6].map((i) => (
                     <Card key={i} className="shadow-sm border-gray-100">
                         <CardContent className="p-4">
                             <Skeleton className="h-4 w-24 mb-2" />

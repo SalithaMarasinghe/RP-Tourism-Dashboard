@@ -325,10 +325,17 @@ function MonthlyPredictionsComponent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Machine Learning Predictions</h2>
-        {isLoading && <span className="text-sm text-gray-500 ml-4">Loading data...</span>}
-        <div className="flex space-x-2">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Monthly <span className="text-blue-600">Predictions</span>
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            Executive monitoring of month-level forecasts and scenario signals.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+          {isLoading && <span className="text-sm text-gray-500">Loading data...</span>}
           <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportPredictions}>
             <Download className="h-4 w-4 mr-1" />
             Export Predictions

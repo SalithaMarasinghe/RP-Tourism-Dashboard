@@ -345,14 +345,27 @@ function DailyPredictionsComponent() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Daily <span className="text-blue-600">Predictions</span>
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            Executive monitoring of short-horizon tourism arrival forecasts.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportDailyPredictions}>
+            <Download className="h-4 w-4 mr-1" />
+            Export Predictions
+          </Button>
+        </div>
+      </div>
+
       <Card className="power-bi-card">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold">Daily Forecast Filters</CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportDailyPredictions}>
-              <Download className="h-4 w-4 mr-1" />
-              Export Predictions
-            </Button>
           </div>
         </CardHeader>
         <CardContent>

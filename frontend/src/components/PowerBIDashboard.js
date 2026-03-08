@@ -9,6 +9,7 @@ import TDMSComponent from './TDMSComponent';
 import SourceMarketIntelligence from './SourceMarketIntelligence';
 import ChatbotTab from '../ChatbotTab';
 import RevenueDashboard from '../pages/RevenueDashboard';
+import DemographicCohortTracker from '../pages/DemographicCohortTracker';
 import {
   BarChart3,
   Calendar,
@@ -22,6 +23,7 @@ import {
   LogOut,
   Settings,
   TrendingUp,
+  Users,
   Wallet,
 } from 'lucide-react';
 
@@ -159,11 +161,12 @@ function PowerBIDashboard() {
           <nav className="space-y-1">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'revenue', label: 'Revenue Intelligence', icon: Wallet },
               { id: 'predictions', label: 'Monthly Predictions', icon: Calendar },
               { id: 'daily-predictions', label: 'Daily Predictions', icon: CalendarDays },
-              { id: 'tdms', label: 'Distribution Management', icon: MapPin },
-              { id: 'source-markets', label: 'Source Markets', icon: TrendingUp },
+              { id: 'tdms', label: 'Tourist Flow Distribution', icon: MapPin },
+              { id: 'revenue', label: 'Revenue Intelligence', icon: Wallet },
+              { id: 'demographic', label: 'Demographic Cohorts', icon: Users },
+              { id: 'source-markets', label: 'Market Source Intelligence', icon: TrendingUp },
               { id: 'chatbot', label: 'AI Assistant', icon: MessageCircle }
             ].map((tab) => (
               <button
@@ -273,6 +276,7 @@ function PowerBIDashboard() {
           <div className="flex-1 overflow-auto p-6">
             {activeTab === 'overview' && <OverviewTab />}
             {activeTab === 'revenue' && <RevenueDashboard />}
+            {activeTab === 'demographic' && <DemographicCohortTracker />}
             {activeTab === 'predictions' && <MonthlyPredictionsComponent />}
             {activeTab === 'daily-predictions' && <DailyPredictionsComponent />}
             {activeTab === 'tdms' && <TDMSComponent />}

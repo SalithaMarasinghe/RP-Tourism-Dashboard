@@ -7,8 +7,8 @@
 }
 
 :root {
-  --topbar: #1e2330;
-  --topbar-2: #252b3b;
+  --topbar: #000000;
+  --topbar-2: #0b0b0b;
   --body-bg: #f0f2f7;
   --white: #ffffff;
   --blue: #3b5bdb;
@@ -64,7 +64,8 @@ body {
 
 /* TOP BAR */
 .topbar {
-  background: var(--topbar);
+  background: rgba(0, 0, 0, 0.66);
+  backdrop-filter: saturate(140%) blur(3px);
   height: 52px;
   display: flex;
   align-items: center;
@@ -252,12 +253,55 @@ body {
   padding: 0 20px;
 }
 
+.hero-shell {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+.hero-antigravity {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(52px + 660px);
+  z-index: 1;
+  pointer-events: auto;
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
+}
+
+.hero-antigravity canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.section-antigravity {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
+}
+
+.section-antigravity canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* HERO */
 .hero {
-  background: var(--topbar);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.86));
   padding: 68px 0 60px;
   position: relative;
   overflow: hidden;
+  z-index: 2;
 }
 
 .hero-bg {
@@ -266,6 +310,8 @@ body {
   pointer-events: none;
   background-image: linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
   background-size: 40px 40px;
+  z-index: 1;
+  opacity: 0.6;
 }
 
 .hg {
@@ -273,6 +319,7 @@ body {
   border-radius: 50%;
   filter: blur(90px);
   pointer-events: none;
+  z-index: 1;
 }
 
 .hg1 {
@@ -295,7 +342,7 @@ body {
 
 .hero-inner {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 52px;
@@ -649,6 +696,12 @@ body {
 /* SECTIONS */
 section.sec {
   padding: 68px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+#audience {
+  background: #ffffff;
 }
 
 .eyebrow {
@@ -870,7 +923,7 @@ section.sec {
 
 /* AI SECTION */
 .ai-sec {
-  background: var(--topbar);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.86), rgba(0, 0, 0, 0.92));
   padding: 76px 0;
   position: relative;
   overflow: hidden;
@@ -1243,7 +1296,7 @@ section.sec {
 
 /* CTA */
 .cta-sec {
-  background: var(--topbar);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.94));
   padding: 76px 0;
   position: relative;
   overflow: hidden;
@@ -1323,9 +1376,19 @@ section.sec {
 
 /* FOOTER */
 footer {
-  background: #141824;
+  background: #000;
   padding: 38px 0 26px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+section.sec > .pw,
+.ai-sec > .pw,
+.cta-sec > .pw,
+footer > .pw {
+  position: relative;
+  z-index: 2;
 }
 
 .foot-grid {
@@ -1468,6 +1531,10 @@ footer {
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
+  .hero-antigravity {
+    height: calc(52px + 760px);
+  }
+
   .hero-inner {
     grid-template-columns: 1fr;
   }
@@ -1492,6 +1559,11 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .hero-antigravity {
+    height: calc(52px + 820px);
+    opacity: 1;
+  }
+
   .tb-nav,
   .tb-right .btn-ghost,
   .tb-right .btn-blue {

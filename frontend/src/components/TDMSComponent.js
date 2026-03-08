@@ -1191,9 +1191,16 @@ export default function TDMSComponent() {
       )}
 
       {/* Header with Export Button */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Tourist Distribution Management System</h1>
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Tourist Flow <span className="text-blue-600">Distribution</span>
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            Executive monitoring of site capacity, visitor load, and redistribution strategy.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
           <div className="flex items-center space-x-2">
             <label className="text-sm font-medium text-gray-700">Select Date:</label>
             <select

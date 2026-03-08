@@ -39,7 +39,7 @@
 .left-panel {
   flex: 0 0 55%;
   width: 55%;
-  background: var(--navy);
+  background: #000;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -47,6 +47,18 @@
   justify-content: space-between;
   padding: 36px 44px;
   min-height: 100vh;
+}
+
+.left-panel-antigravity {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.left-panel-antigravity canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Grid texture */

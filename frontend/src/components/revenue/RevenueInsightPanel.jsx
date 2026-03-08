@@ -24,19 +24,53 @@ import {
  */
 const RevenueInsightPanel = ({ events, anomalies, selectedMetric = 'revenue_usd_mn' }) => {
 
+    // Consolidate events: group by label and find min/max dates
+    const consolidatedEvents = React.useMemo(() => {
+        if (!events || events.length === 0) return [];
+        
+        const grouped = {};
+        
+        // Group events by their label
+        events.forEach(ev => {
+            const label = ev.label || 'Unknown';
+            if (!grouped[label]) {
+                grouped[label] = {
+                    label,
+                    dates: [],
+                    type: ev.type
+                };
+            }
+            grouped[label].dates.push(new Date(ev.ds));
+        });
+        
+        // Convert to array and create date range display
+        return Object.values(grouped).map(group => {
+            const dates = group.dates.sort((a, b) => a - b);
+            const startDate = dates[0];
+            const endDate = dates[dates.length - 1];
+            
+            // If all dates are the same month/year, just show one date
+            // Otherwise show date range
+            const isSingleMonth = startDate.getFullYear() === endDate.getFullYear() && 
+                                   startDate.getMonth() === endDate.getMonth();
+            
+            return {
+                label: group.label,
+                type: group.type,
+                startDate,
+                endDate,
+                displayDate: isSingleMonth 
+                    ? startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                    : `${startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+            };
+        });
+    }, [events]);
+
     // Filter anomalies for the selected metric and sort by score (impact)
     const filteredAnomalies = (anomalies || [])
         .filter(a => a.metric === selectedMetric)
         .sort((a, b) => b.anomaly_score - a.anomaly_score)
         .slice(0, 10);
-
-    // Group events by type for better organization
-    const groupedEvents = (events || []).reduce((acc, ev) => {
-        const type = ev.type || 'event';
-        if (!acc[type]) acc[type] = [];
-        acc[type].push(ev);
-        return acc;
-    }, {});
 
     const renderBadge = (type) => {
         switch (type?.toLowerCase()) {
@@ -69,21 +103,21 @@ const RevenueInsightPanel = ({ events, anomalies, selectedMetric = 'revenue_usd_
 
                     {/* 1. Historical Shocks & Events */}
                     <div>
-                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center">
+                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center">
                             <Calendar className="h-3 w-3 mr-1" />
                             Historical Milestones
                         </h4>
 
-                        {(events?.length > 0) ? (
-                            <div className="space-y-3">
-                                {events.map((ev, i) => (
-                                    <div key={i} className="flex items-start space-x-3 group">
-                                        <div className="mt-1">
+                        {(consolidatedEvents?.length > 0) ? (
+                            <div className="space-y-2">
+                                {consolidatedEvents.map((ev, i) => (
+                                    <div key={i} className="flex items-start space-x-2 group">
+                                        <div className="mt-0.5">
                                             {renderBadge(ev.label?.toLowerCase().includes('recovery') ? 'recovery' : (ev.label?.toLowerCase().includes('attacks') || ev.label?.toLowerCase().includes('crisis') || ev.label?.toLowerCase().includes('covid') ? 'shock' : 'event'))}
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-xs font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{ev.label}</p>
-                                            <p className="text-[10px] text-gray-400">{formatDate(ev.ds)}</p>
+                                            <p className="text-[10px] text-gray-400">{ev.displayDate}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -95,15 +129,15 @@ const RevenueInsightPanel = ({ events, anomalies, selectedMetric = 'revenue_usd_
 
                     {/* 2. Statistical Anomalies */}
                     <div className="pt-2 border-t border-gray-50 mt-4">
-                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center">
+                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Detected Outliers
                         </h4>
 
                         {(filteredAnomalies.length > 0) ? (
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {filteredAnomalies.map((anom, i) => (
-                                    <div key={i} className="bg-gray-50/50 p-2.5 rounded-lg border border-gray-100/50 hover:border-amber-200 transition-all">
+                                    <div key={i} className="bg-gray-50/50 p-2 rounded-lg border border-gray-100/50 hover:border-amber-200 transition-all">
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-[10px] font-bold text-gray-900">{formatDate(anom.ds)}</span>
                                             <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold">

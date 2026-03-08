@@ -28,6 +28,13 @@ const fmt = (n) => (n == null ? '' : n.toLocaleString());
 // ── Build Plotly bar-chart-race figure ────────────────────────────────────────
 function buildFigure(apiData) {
     const { years, countries, rankings } = apiData;
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const compactLayout = viewportWidth < 768;
+    const controlsBottomMargin = compactLayout ? 250 : 185;
+    const sliderX = compactLayout ? 0.08 : 0.34;
+    const sliderLen = compactLayout ? 0.90 : 0.62;
+    const sliderY = compactLayout ? -0.18 : -0.22;
+    const buttonsY = compactLayout ? -0.56 : -0.22;
     const colorOf = {};
     countries.forEach((c) => { colorOf[c.country] = c.color; });
 
@@ -95,7 +102,7 @@ function buildFigure(apiData) {
     const layout = {
         autosize: true,
         height: 520,
-        margin: { l: 130, r: 110, t: 20, b: 100 },
+        margin: { l: 130, r: 110, t: 20, b: controlsBottomMargin },
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'rgba(248,250,252,0.6)',
         font: { family: 'Inter, system-ui, sans-serif', size: 13, color: '#1e293b' },
@@ -111,8 +118,9 @@ function buildFigure(apiData) {
         updatemenus: [{
             type: 'buttons',
             showactive: false,
-            x: 0, y: -0.24,
+            x: 0, y: buttonsY,
             xanchor: 'left', yanchor: 'top',
+            direction: 'down',
             buttons: [
                 {
                     label: '▶  Play',
@@ -135,7 +143,7 @@ function buildFigure(apiData) {
                 method: 'animate',
                 args: [[String(yr)], { mode: 'immediate', frame: { duration: 500, redraw: true }, transition: { duration: 300 } }],
             })),
-            x: 0.08, y: -0.16, len: 0.92,
+            x: sliderX, y: sliderY, len: sliderLen,
             xanchor: 'left', yanchor: 'top',
             currentvalue: { prefix: 'Year: ', visible: true, xanchor: 'center', font: { size: 13, color: '#475569' } },
             pad: { t: 20 },
@@ -241,9 +249,11 @@ export default function SourceMarketIntelligence() {
     return (
         <div className="space-y-6">
             {/* Section header */}
-            <div>
-                <h2 className="text-2xl font-bold text-gray-900">Source Market Intelligence</h2>
-                <p className="text-gray-500 mt-1 text-sm leading-relaxed">
+            <div className="space-y-1">
+                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    Source Market <span className="text-blue-600">Intelligence</span>
+                </h1>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
                     15-year animated view of Sri Lanka's top tourist source markets —
                     tracking growth, decline, and emerging players.
                 </p>
@@ -263,3 +273,4 @@ export default function SourceMarketIntelligence() {
         </div>
     );
 }
+

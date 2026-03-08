@@ -1099,23 +1099,21 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
       {/* Main Content - Full Width Chat */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Floating Chat History Toggle Button */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed left-4 top-20 z-40 bg-blue-600 text-white p-3 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
-          title="Toggle chat history"
-        >
-          <History className="h-5 w-5" />
-        </button>
-
         {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Mode Selector */}
           <div className="border-b border-gray-200 bg-white px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="bg-blue-600 text-white p-3 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
+                  title="Toggle chat history"
+                >
+                  <History className="h-5 w-5" />
+                </button>
                 <span className="text-sm font-semibold text-gray-700">Assistant Mode:</span>
-                <div className="flex space-x-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={() => handleModeSwitch('gemini')}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${

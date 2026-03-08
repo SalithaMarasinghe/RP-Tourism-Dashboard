@@ -7,16 +7,7 @@ import {
   Globe,
   Brain
 } from 'lucide-react';
-import {
-  LineChart as ReLineChart,
-  Line,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+import OverviewArrivalsTimelineChart from './OverviewArrivalsTimelineChart';
 
 function OverviewTab() {
   const [monthlyData, setMonthlyData] = useState([]);
@@ -24,17 +15,9 @@ function OverviewTab() {
   const [currentScenario, setCurrentScenario] = useState('baseline');
   const [nextMonthPrediction, setNextMonthPrediction] = useState(null);
   const [predictedGrowth, setPredictedGrowth] = useState(null);
-
-  const fiveYearTrendData = React.useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const years = [2026, 2027, 2028, 2029, 2030];
-    return years.flatMap(year =>
-      months.map((month, i) => ({
-        label: i === 0 ? `${year}` : '',
-        value: 250000 + (year - 2026) * 15000 + Math.sin((i / 12) * Math.PI * 2) * 25000
-      }))
-    );
-  }, []);
+  const [arrivalsTimeline, setArrivalsTimeline] = useState([]);
+  const [timelineLoading, setTimelineLoading] = useState(true);
+  const [timelineError, setTimelineError] = useState('');
 
   // Get next month name and year
   const getNextMonth = () => {
@@ -218,10 +201,50 @@ function OverviewTab() {
     fetchMonthlyData();
   }, [currentScenario]);
 
+  React.useEffect(() => {
+    const fetchArrivalsTimeline = async () => {
+      try {
+        setTimelineLoading(true);
+        setTimelineError('');
+        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${backendUrl}/api/forecasts/arrivals-timeline`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setArrivalsTimeline(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching arrivals timeline:', error);
+        setTimelineError('Failed to load arrivals timeline data.');
+        setArrivalsTimeline([]);
+      } finally {
+        setTimelineLoading(false);
+      }
+    };
+
+    fetchArrivalsTimeline();
+  }, []);
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Tourism Analytics Overview</h2>
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Tourism <span className="text-blue-600">Overview</span>
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            Executive monitoring of arrivals, revenue, and forecast movement.
+          </p>
+        </div>
         <div className="text-sm text-gray-600">Last updated: 2 minutes ago</div>
       </div>
 
@@ -361,45 +384,15 @@ function OverviewTab() {
         </Card>
       </div>
 
-      {/* 5-Year Monthly Arrival Trend */}
+      {/* Historical Arrivals Trend */}
       <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-        <h3 className="text-base font-semibold text-gray-800 mb-1">5-Year Monthly Arrival Trend</h3>
-        <p className="text-sm text-gray-500 mb-4">2026 – 2030 forecast trend</p>
-        <div style={{ width: '100%', height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ReLineChart data={fiveYearTrendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <defs>
-                <linearGradient id="fiveYearGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.01} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="label"
-                tick={{ fontSize: 12, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis hide={true} />
-              <Tooltip content={() => null} />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke="none"
-                fill="url(#fiveYearGradient)"
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#8b5cf6"
-                strokeWidth={3}
-                dot={false}
-                activeDot={false}
-              />
-            </ReLineChart>
-          </ResponsiveContainer>
-        </div>
+        <h3 className="text-base font-semibold text-gray-800 mb-1">Historical Arrivals (2010–2025)</h3>
+        <p className="text-sm text-gray-500 mb-4">Monthly tourist arrivals across the historical period</p>
+        <OverviewArrivalsTimelineChart
+          data={arrivalsTimeline}
+          isLoading={timelineLoading}
+          error={timelineError}
+        />
       </div>
 
       {/* ML Model Performance Summary */}
