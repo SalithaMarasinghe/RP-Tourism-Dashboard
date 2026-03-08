@@ -118,22 +118,22 @@ const CustomTooltip = ({ active, payload, label }) => {
     if (!row) return null;
 
     return (
-        <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-xl p-3 rounded-lg text-xs min-w-[170px]">
-            <p className="font-semibold text-gray-800 mb-2">{label}</p>
+        <div className="bg-[#151515] border border-[#2a2a2a] shadow-xl p-3 rounded-lg text-xs min-w-[170px]">
+            <p className="font-semibold text-white mb-2">{label}</p>
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-blue-600" />
-                        <span className="text-gray-600">Male</span>
+                        <span className="text-gray-300">Male</span>
                     </div>
-                    <span className="font-medium text-gray-900">{formatAxisTick(row.maleLeft)}</span>
+                    <span className="font-medium text-white">{formatAxisTick(row.maleLeft)}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-pink-500" />
-                        <span className="text-gray-600">Female</span>
+                        <span className="text-gray-300">Female</span>
                     </div>
-                    <span className="font-medium text-gray-900">{formatAxisTick(row.femaleRight)}</span>
+                    <span className="font-medium text-white">{formatAxisTick(row.femaleRight)}</span>
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
 
     if (loading) {
         return (
-            <Card className="shadow-sm border-gray-100 h-[480px]">
+            <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] h-[480px]">
                 <CardHeader className="pb-2">
                     <Skeleton className="h-6 w-64" />
                 </CardHeader>
@@ -160,14 +160,14 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
     }
 
     return (
-        <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-300">
+        <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-lg font-bold text-gray-800">
+                    <CardTitle className="text-lg font-bold text-white">
                         Population Pyramid
                     </CardTitle>
                     {reportYear && (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 border-[#2a2a2a] bg-[#1b1b1b] text-gray-200">
                             {reportYear}
                         </Badge>
                     )}
@@ -175,14 +175,14 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
             </CardHeader>
             <CardContent>
                 {estimated && (
-                    <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <div className="mb-3 rounded-md border border-amber-700 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
                         {estimationNote || 'Estimated from aggregate demographic ratios.'}
                     </div>
                 )}
 
                 <div className="h-[360px] w-full">
                     {rows.length === 0 ? (
-                        <div className="h-full w-full rounded-lg bg-gray-50 flex items-center justify-center text-sm text-gray-500">
+                        <div className="h-full w-full rounded-lg bg-[#1b1b1b] border border-[#2a2a2a] flex items-center justify-center text-sm text-gray-400">
                             No population pyramid data available.
                         </div>
                     ) : (
@@ -193,12 +193,12 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
                                 margin={{ top: 10, right: 16, left: 16, bottom: 8 }}
                                 barCategoryGap={8}
                             >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
                                 <XAxis
                                     type="number"
                                     domain={[-axisMax, axisMax]}
                                     tickFormatter={formatAxisTick}
-                                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
                                     tickLine={false}
                                     axisLine={false}
                                 />
@@ -206,18 +206,18 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
                                     type="category"
                                     dataKey="ageBand"
                                     width={78}
-                                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
                                     tickLine={false}
                                     axisLine={false}
                                 />
-                                <Tooltip content={<CustomTooltip />} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1b1b1b' }} />
                                 <Legend
                                     verticalAlign="top"
                                     align="right"
                                     iconType="circle"
-                                    wrapperStyle={{ fontSize: '11px', paddingBottom: '8px' }}
+                                    wrapperStyle={{ fontSize: '11px', paddingBottom: '8px', color: '#cbd5e1' }}
                                 />
-                                <ReferenceLine x={0} stroke="#94a3b8" />
+                                <ReferenceLine x={0} stroke="#475569" />
                                 <Bar dataKey="maleLeft" name="Male" fill="#2563eb" radius={[3, 0, 0, 3]} />
                                 <Bar dataKey="femaleRight" name="Female" fill="#ec4899" radius={[0, 3, 3, 0]} />
                             </BarChart>
@@ -230,4 +230,3 @@ const DemographicPopulationPyramid = ({ data, loading }) => {
 };
 
 export default DemographicPopulationPyramid;
-

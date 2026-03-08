@@ -16,6 +16,18 @@ export function useAuth() {
     return useContext(AuthContext);
 }
 
+function normalizeEmail(email) {
+    // Remove hidden whitespace characters and normalize casing.
+    return String(email || "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .trim()
+        .toLowerCase();
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // Helper: get Firebase ID token from current user
 async function getIdToken() {
     const user = auth.currentUser;
@@ -47,12 +59,16 @@ export function AuthProvider({ children }) {
     // ---------- Auth functions ----------
 
     async function signup(email, password, additionalData) {
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
         // 1. Backend creates the user + Firestore profile, returns custom token
         const res = await fetch(`${API_BASE}/api/auth/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                email,
+                email: normalizedEmail,
                 password,
                 firstName: additionalData.firstName,
                 lastName: additionalData.lastName
@@ -70,7 +86,11 @@ export function AuthProvider({ children }) {
         // credential validation; we keep this direct for simplicity since we are not
         // storing passwords on the backend.
         const { signInWithEmailAndPassword } = await import("firebase/auth");
-        const result = await signInWithEmailAndPassword(auth, email, password);
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
+        const result = await signInWithEmailAndPassword(auth, normalizedEmail, password);
         return result;
     }
 
@@ -133,7 +153,11 @@ export function AuthProvider({ children }) {
     }
 
     function resetPassword(email) {
-        return sendPasswordResetEmail(auth, email);
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
+        return sendPasswordResetEmail(auth, normalizedEmail);
     }
 
     async function changePassword(currentPassword, newPassword) {

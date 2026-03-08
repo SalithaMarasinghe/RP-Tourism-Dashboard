@@ -124,7 +124,7 @@ export default function Profile() {
     };
 
     const getPasswordStrength = (password) => {
-        if (!password) return { strength: 0, color: 'bg-gray-300', text: '' };
+        if (!password) return { strength: 0, color: 'bg-[#2a2a2a]', text: '' };
         if (password.length < 6) return { strength: 1, color: 'bg-red-500', text: 'Weak' };
         if (password.length < 10) return { strength: 2, color: 'bg-yellow-500', text: 'Fair' };
         if (password.length < 12) return { strength: 3, color: 'bg-blue-500', text: 'Good' };
@@ -139,12 +139,12 @@ export default function Profile() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-black text-gray-100">
             <div className="flex h-screen">
                 {/* Left Sidebar */}
-                <div className="w-60 bg-gray-100 border-r border-gray-200 flex-shrink-0">
+                <div className="w-60 bg-[#111111] border-r border-[#2a2a2a] flex-shrink-0">
                     <div className="p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-6">Settings</h2>
+                        <h2 className="text-lg font-semibold text-gray-100 mb-6">Settings</h2>
                         <nav className="space-y-1">
                             {sidebarItems.map((item) => {
                                 const Icon = item.icon;
@@ -154,14 +154,14 @@ export default function Profile() {
                                         onClick={() => setActiveSection(item.id)}
                                         className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
                                             activeSection === item.id
-                                                ? 'bg-white text-blue-600 border-l-4 border-blue-600 shadow-sm'
-                                                : 'text-gray-700 hover:bg-gray-200'
+                                                ? 'bg-[#151515] text-blue-400 border-l-4 border-blue-500 shadow-sm'
+                                                : 'text-gray-300 hover:bg-[#1b1b1b]'
                                         }`}
                                     >
                                         <Icon className="h-4 w-4 mr-3 flex-shrink-0" />
                                         <div className="text-left">
                                             <div className="font-medium">{item.label}</div>
-                                            <div className="text-xs text-gray-500">{item.description}</div>
+                                            <div className="text-xs text-gray-400">{item.description}</div>
                                         </div>
                                     </button>
                                 );
@@ -171,19 +171,19 @@ export default function Profile() {
                 </div>
 
                 {/* Right Content Panel */}
-                <div className="flex-1 overflow-auto">
+                <div className="flex-1 overflow-auto bg-black">
                     <div className="p-8">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">
+                                <h1 className="text-2xl font-bold text-gray-100">
                                     {sidebarItems.find(item => item.id === activeSection)?.label}
                                 </h1>
-                                <p className="text-gray-500 mt-1">
+                                <p className="text-gray-400 mt-1">
                                     {sidebarItems.find(item => item.id === activeSection)?.description}
                                 </p>
                             </div>
-                            <Link to="/dashboard" className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                            <Link to="/dashboard" className="text-blue-400 hover:text-blue-300 font-medium flex items-center">
                                 Back to Dashboard
                                 <ChevronRight className="h-4 w-4 ml-1" />
                             </Link>
@@ -191,19 +191,19 @@ export default function Profile() {
 
                         {/* Error/Success Messages */}
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                            <div className="bg-red-900/25 border border-red-800 text-red-300 px-4 py-3 rounded-lg mb-6">
                                 {error}
                             </div>
                         )}
                         {success && (
-                            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+                            <div className="bg-green-900/20 border border-green-800 text-green-300 px-4 py-3 rounded-lg mb-6">
                                 {success}
                             </div>
                         )}
 
                         {/* Account Section */}
                         {activeSection === 'account' && (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <div className="bg-[#151515] rounded-xl border border-[#2a2a2a] shadow-sm p-6">
                                 <div className="text-center">
                                     {/* Avatar */}
                                     <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
@@ -211,20 +211,20 @@ export default function Profile() {
                                     </div>
                                     
                                     {/* Name */}
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    <h3 className="text-2xl font-bold text-gray-100 mb-2">
                                         {userData?.firstName || ""} {userData?.lastName || ""}
                                     </h3>
                                     
                                     {/* Email */}
-                                    <p className="text-gray-600 mb-4">{currentUser?.email}</p>
+                                    <p className="text-gray-300 mb-4">{currentUser?.email}</p>
                                     
                                     {/* Role Badge */}
-                                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-4">
+                                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-900/40 text-blue-200 mb-4">
                                         {userData?.role || "USER"}
                                     </div>
                                     
                                     {/* Member Since */}
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-gray-400">
                                         Member since {getMemberSince()}
                                     </div>
                                 </div>
@@ -233,12 +233,12 @@ export default function Profile() {
 
                         {/* Edit Profile Section */}
                         {activeSection === 'profile' && (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                                <h3 className="text-xl font-semibold text-gray-900 mb-6 pb-4 border-b">Edit Profile</h3>
+                            <div className="bg-[#151515] rounded-xl border border-[#2a2a2a] shadow-sm p-6">
+                                <h3 className="text-xl font-semibold text-gray-100 mb-6 pb-4 border-b border-[#2a2a2a]">Edit Profile</h3>
                                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                                 First Name
                                             </label>
                                             <input
@@ -246,13 +246,13 @@ export default function Profile() {
                                                 value={editFirstName}
                                                 onChange={(e) => setEditFirstName(e.target.value)}
                                                 ref={firstNameRef}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
                                                 placeholder="Enter your first name"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                                 Last Name
                                             </label>
                                             <input
@@ -260,7 +260,7 @@ export default function Profile() {
                                                 value={editLastName}
                                                 onChange={(e) => setEditLastName(e.target.value)}
                                                 ref={lastNameRef}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
                                                 placeholder="Enter your last name"
                                                 required
                                             />
@@ -268,13 +268,13 @@ export default function Profile() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             Email
                                         </label>
-                                        <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
+                                        <div className="px-3 py-2 bg-[#1b1b1b] border border-[#2a2a2a] rounded-lg text-gray-300">
                                             {currentUser?.email}
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-1">Contact admin to change email</p>
+                                        <p className="text-xs text-gray-400 mt-1">Contact admin to change email</p>
                                     </div>
                                     
                                     <button
@@ -290,42 +290,42 @@ export default function Profile() {
 
                         {/* Security Section */}
                         {activeSection === 'security' && (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                                <h3 className="text-xl font-semibold text-gray-900 mb-6 pb-4 border-b">Security</h3>
+                            <div className="bg-[#151515] rounded-xl border border-[#2a2a2a] shadow-sm p-6">
+                                <h3 className="text-xl font-semibold text-gray-100 mb-6 pb-4 border-b border-[#2a2a2a]">Security</h3>
                                 <form onSubmit={handleUpdatePassword} className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             Current Password
                                         </label>
                                         <input
                                             type="password"
                                             value={securityData.currentPassword}
                                             onChange={(e) => setSecurityData({...securityData, currentPassword: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             required
                                         />
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             New Password
                                         </label>
                                         <input
                                             type="password"
                                             value={securityData.newPassword}
                                             onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             required
                                         />
                                         {securityData.newPassword && (
                                             <div className="mt-2 flex items-center space-x-2">
-                                                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                                <div className="flex-1 bg-[#2a2a2a] rounded-full h-2">
                                                     <div 
                                                         className={`h-2 rounded-full transition-all ${getPasswordStrength(securityData.newPassword).color}`}
                                                         style={{ width: `${(getPasswordStrength(securityData.newPassword).strength / 4) * 100}%` }}
                                                     />
                                                 </div>
-                                                <span className="text-xs text-gray-600">
+                                                <span className="text-xs text-gray-300">
                                                     {getPasswordStrength(securityData.newPassword).text}
                                                 </span>
                                             </div>
@@ -333,14 +333,14 @@ export default function Profile() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             Confirm New Password
                                         </label>
                                         <input
                                             type="password"
                                             value={securityData.confirmPassword}
                                             onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             required
                                         />
                                     </div>
@@ -358,14 +358,14 @@ export default function Profile() {
 
                         {/* Danger Zone Section */}
                         {activeSection === 'danger' && (
-                            <div className="bg-white rounded-xl border border-red-200 shadow-sm p-6">
-                                <h3 className="text-xl font-semibold text-red-600 mb-2">Delete My Account</h3>
-                                <p className="text-gray-600 mb-6">
+                            <div className="bg-[#151515] rounded-xl border border-red-800 shadow-sm p-6">
+                                <h3 className="text-xl font-semibold text-red-400 mb-2">Delete My Account</h3>
+                                <p className="text-gray-300 mb-6">
                                     This action is permanent and cannot be undone. All your data will be deleted.
                                 </p>
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
-                                    className="border border-red-600 text-red-600 hover:bg-red-50 font-medium py-2 px-4 rounded-lg transition-colors"
+                                    className="border border-red-600 text-red-400 hover:bg-red-900/30 font-medium py-2 px-4 rounded-lg transition-colors"
                                 >
                                     Delete Account
                                 </button>
@@ -378,22 +378,22 @@ export default function Profile() {
             {/* Delete Account Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                    <div className="bg-[#151515] border border-[#2a2a2a] rounded-xl p-6 max-w-md w-full mx-4">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Are you sure?</h3>
+                            <h3 className="text-lg font-semibold text-gray-100">Are you sure?</h3>
                             <button
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setDeleteConfirmText("");
                                     setError("");
                                 }}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-gray-400 hover:text-gray-200"
                             >
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
                         
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-300 mb-4">
                             Type DELETE to confirm account deletion
                         </p>
                         
@@ -402,7 +402,7 @@ export default function Profile() {
                             value={deleteConfirmText}
                             onChange={(e) => setDeleteConfirmText(e.target.value)}
                             placeholder="Type DELETE"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
+                            className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 placeholder:text-gray-500"
                         />
                         
                         <div className="flex space-x-3">
@@ -412,7 +412,7 @@ export default function Profile() {
                                     setDeleteConfirmText("");
                                     setError("");
                                 }}
-                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="flex-1 px-4 py-2 border border-[#2a2a2a] text-gray-200 rounded-lg hover:bg-[#1b1b1b] transition-colors"
                             >
                                 Cancel
                             </button>

@@ -74,11 +74,21 @@ const RevenueKpiCards = ({ summary, loading }) => {
         }
     ];
 
+    const iconClasses = {
+        blue: 'bg-blue-500/20 text-blue-300',
+        emerald: 'bg-emerald-500/20 text-emerald-300',
+        green: 'bg-green-500/20 text-green-300',
+        red: 'bg-red-500/20 text-red-300',
+        orange: 'bg-orange-500/20 text-orange-300',
+        indigo: 'bg-indigo-500/20 text-indigo-300',
+        pink: 'bg-pink-500/20 text-pink-300'
+    };
+
     if (loading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <Card key={i} className="shadow-sm border-gray-100">
+                    <Card key={i} className="shadow-sm !bg-[#151515] !border-[#2a2a2a]">
                         <CardContent className="p-4">
                             <Skeleton className="h-4 w-24 mb-2" />
                             <Skeleton className="h-8 w-32 mb-1" />
@@ -95,7 +105,7 @@ const RevenueKpiCards = ({ summary, loading }) => {
             {kpis.map((kpi, index) => {
                 const Icon = kpi.icon;
                 return (
-                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-gray-100 shadow-sm relative overflow-hidden group">
+                    <Card key={index} className="hover:shadow-md transition-shadow duration-200 !bg-[#151515] !border-[#2a2a2a] shadow-sm relative overflow-hidden group">
                         {/* Subtle background decoration */}
                         <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 bg-${kpi.color}-500 group-hover:scale-110 transition-transform duration-500`} />
 
@@ -103,20 +113,20 @@ const RevenueKpiCards = ({ summary, loading }) => {
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                     <div className="flex items-center space-x-2 mb-1">
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{kpi.title}</p>
+                                        <p className="text-xs font-medium text-gray-300 uppercase tracking-wider">{kpi.title}</p>
                                         {summary?.scenario && index === 0 && (
-                                            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 capitalize">
+                                            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 capitalize border-[#2a2a2a] bg-[#1b1b1b] text-gray-200">
                                                 {summary.scenario}
                                             </Badge>
                                         )}
                                     </div>
                                     <div className="flex items-baseline space-x-2">
-                                        <h3 className="text-2xl font-bold text-gray-900">{kpi.value}</h3>
+                                        <h3 className="text-2xl font-bold text-white">{kpi.value}</h3>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 mt-1 line-clamp-1">{kpi.description}</p>
+                                    <p className="text-[10px] text-gray-500 mt-1 line-clamp-1">{kpi.description}</p>
                                 </div>
 
-                                <div className={`p-2 rounded-lg bg-${kpi.color}-50 text-${kpi.color}-600`}>
+                                <div className={`p-2 rounded-lg ${iconClasses[kpi.color] || 'bg-[#1b1b1b] text-gray-300'}`}>
                                     <Icon className="h-5 w-5" />
                                 </div>
                             </div>

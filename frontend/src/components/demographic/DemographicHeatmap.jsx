@@ -192,15 +192,15 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
     const hasData = years.length > 0 && segments.length > 0;
 
     const getCellColor = (value) => {
-        if (value === null || value === undefined) return '#f8fafc';
-        if (max <= min) return '#93c5fd';
+        if (value === null || value === undefined) return '#1b1b1b';
+        if (max <= min) return '#3b82f6';
         const t = (value - min) / (max - min);
-        return interpolateHex('#dbeafe', '#1d4ed8', t);
+        return interpolateHex('#1f2937', '#2563eb', t);
     };
 
     if (loading) {
         return (
-            <Card className="shadow-sm border-gray-100 h-[460px]">
+            <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] h-[460px]">
                 <CardHeader className="pb-2">
                     <Skeleton className="h-6 w-56" />
                 </CardHeader>
@@ -212,34 +212,34 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
     }
 
     return (
-        <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-300">
+        <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-lg font-bold text-gray-800">
+                    <CardTitle className="text-lg font-bold text-white">
                         {GROUP_TITLES[group] || 'Demographic Heatmap'}
                     </CardTitle>
-                    <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">
+                    <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 border-[#2a2a2a] bg-[#1b1b1b] text-gray-200">
                         {group}
                     </Badge>
                 </div>
             </CardHeader>
             <CardContent>
                 {!hasData ? (
-                    <div className="h-[340px] w-full rounded-lg bg-gray-50 flex items-center justify-center text-sm text-gray-500">
+                    <div className="h-[340px] w-full rounded-lg bg-[#1b1b1b] border border-[#2a2a2a] flex items-center justify-center text-sm text-gray-400">
                         No heatmap data available.
                     </div>
                 ) : (
                     <div className="relative">
-                        <div className="mb-3 flex items-center justify-end gap-2 text-[11px] text-gray-500">
+                        <div className="mb-3 flex items-center justify-end gap-2 text-[11px] text-gray-300">
                             <span>{formatValue(min)}</span>
                             <div
                                 className="h-2 w-28 rounded-sm"
-                                style={{ background: 'linear-gradient(to right, #dbeafe, #1d4ed8)' }}
+                                style={{ background: 'linear-gradient(to right, #1f2937, #2563eb)' }}
                             />
                             <span>{formatValue(max)}</span>
                         </div>
 
-                        <div className="max-h-[340px] overflow-auto rounded-lg border border-gray-100">
+                        <div className="max-h-[340px] overflow-auto rounded-lg border border-[#2a2a2a]">
                             <div
                                 className="grid"
                                 style={{
@@ -247,13 +247,13 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
                                     minWidth: `${180 + years.length * 52}px`
                                 }}
                             >
-                                <div className="sticky top-0 z-20 bg-white border-b border-r border-gray-100 px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <div className="sticky top-0 z-20 bg-[#151515] border-b border-r border-[#2a2a2a] px-3 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider">
                                     Segment \ Year
                                 </div>
                                 {years.map((year) => (
                                     <div
                                         key={`head-${year}`}
-                                        className="sticky top-0 z-10 bg-white border-b border-gray-100 px-2 py-2 text-center text-xs font-semibold text-gray-600"
+                                        className="sticky top-0 z-10 bg-[#151515] border-b border-[#2a2a2a] px-2 py-2 text-center text-xs font-semibold text-gray-300"
                                     >
                                         {year}
                                     </div>
@@ -261,7 +261,7 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
 
                                 {segments.map((segment) => (
                                     <React.Fragment key={segment}>
-                                        <div className="border-r border-b border-gray-100 px-3 py-2 text-xs text-gray-700 bg-white font-medium">
+                                        <div className="border-r border-b border-[#2a2a2a] px-3 py-2 text-xs text-gray-200 bg-[#151515] font-medium">
                                             {humanize(segment)}
                                         </div>
 
@@ -274,7 +274,7 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
                                                 <button
                                                     key={`${segment}-${year}`}
                                                     type="button"
-                                                    className="h-10 border-b border-gray-100 transition-all"
+                                                    className="h-10 border-b border-[#2a2a2a] transition-all"
                                                     style={{ backgroundColor: bg }}
                                                     onMouseEnter={(e) => {
                                                         setHoveredCell({
@@ -300,15 +300,15 @@ const DemographicHeatmap = ({ data, group = 'age', loading }) => {
 
                         {hoveredCell && (
                             <div
-                                className="pointer-events-none fixed z-[100] rounded-md border border-gray-200 bg-white px-3 py-2 text-xs shadow-lg"
+                                className="pointer-events-none fixed z-[100] rounded-md border border-[#2a2a2a] bg-[#151515] px-3 py-2 text-xs shadow-lg text-gray-200"
                                 style={{
                                     left: hoveredCell.x + 12,
                                     top: hoveredCell.y + 12
                                 }}
                             >
-                                <div className="font-semibold text-gray-800">{hoveredCell.segment}</div>
-                                <div className="text-gray-600">Year: {hoveredCell.year}</div>
-                                <div className="text-gray-900 font-medium">Value: {formatValue(hoveredCell.value)}</div>
+                                <div className="font-semibold text-white">{hoveredCell.segment}</div>
+                                <div className="text-gray-300">Year: {hoveredCell.year}</div>
+                                <div className="text-white font-medium">Value: {formatValue(hoveredCell.value)}</div>
                             </div>
                         )}
                     </div>

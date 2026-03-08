@@ -53,7 +53,7 @@ const RevenueScenarioToggle = ({ value, onChange, isForecastYear = true }) => {
 
     return (
         <div className="flex flex-col space-y-2">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-1">
+            <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest px-1">
                 Scenario Mode
             </p>
             <Tabs
@@ -61,7 +61,7 @@ const RevenueScenarioToggle = ({ value, onChange, isForecastYear = true }) => {
                 onValueChange={onChange}
                 className="w-full max-w-2xl"
             >
-                <TabsList className="grid grid-cols-4 h-11 p-1 bg-gray-100/80">
+                <TabsList className="grid grid-cols-4 h-11 p-1 bg-[#151515] border border-[#2a2a2a]">
                     {scenarios.map((s) => {
                         const Icon = s.icon;
                         return (
@@ -69,9 +69,9 @@ const RevenueScenarioToggle = ({ value, onChange, isForecastYear = true }) => {
                                 key={s.id}
                                 value={s.id}
                                 disabled={s.disabled}
-                                className="flex items-center justify-center space-x-2 py-2 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                                className="flex items-center justify-center space-x-2 py-2 text-gray-300 data-[state=active]:bg-[#1b1b1b] data-[state=active]:text-blue-400 data-[state=active]:shadow-sm transition-all duration-200"
                             >
-                                <Icon className={`h-4 w-4 ${value === s.id ? 'text-blue-600' : 'text-gray-400'}`} />
+                                <Icon className={`h-4 w-4 ${value === s.id ? 'text-blue-400' : 'text-gray-400'}`} />
                                 <span className="hidden sm:inline text-xs font-semibold">{s.label}</span>
                             </TabsTrigger>
                         );

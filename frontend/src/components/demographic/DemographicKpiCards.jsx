@@ -11,23 +11,23 @@ import {
 
 const CARD_STYLES = {
     blue: {
-        iconWrap: 'bg-blue-50 text-blue-600',
+        iconWrap: 'bg-blue-500/20 text-blue-300',
         accent: 'bg-blue-500'
     },
     emerald: {
-        iconWrap: 'bg-emerald-50 text-emerald-600',
+        iconWrap: 'bg-emerald-500/20 text-emerald-300',
         accent: 'bg-emerald-500'
     },
     amber: {
-        iconWrap: 'bg-amber-50 text-amber-600',
+        iconWrap: 'bg-amber-500/20 text-amber-300',
         accent: 'bg-amber-500'
     },
     rose: {
-        iconWrap: 'bg-rose-50 text-rose-600',
+        iconWrap: 'bg-rose-500/20 text-rose-300',
         accent: 'bg-rose-500'
     },
     violet: {
-        iconWrap: 'bg-violet-50 text-violet-600',
+        iconWrap: 'bg-violet-500/20 text-violet-300',
         accent: 'bg-violet-500'
     }
 };
@@ -115,7 +115,7 @@ const DemographicKpiCards = ({ summary, loading }) => {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {Array.from({ length: 4 }).map((_, idx) => (
-                    <Card key={idx} className="border-gray-100 shadow-sm">
+                    <Card key={idx} className="!bg-[#151515] !border-[#2a2a2a] shadow-sm">
                         <CardContent className="p-4">
                             <div className="space-y-3">
                                 <Skeleton className="h-3 w-28" />
@@ -138,19 +138,19 @@ const DemographicKpiCards = ({ summary, loading }) => {
                 return (
                     <Card
                         key={item.key}
-                        className="relative overflow-hidden border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="relative overflow-hidden !bg-[#151515] !border-[#2a2a2a] shadow-sm hover:shadow-md transition-shadow duration-200"
                     >
                         <div className={`absolute left-0 top-0 h-full w-1 ${tone.accent}`} />
                         <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500">
+                                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-300">
                                         {item.title}
                                     </p>
-                                    <h3 className="mt-1 text-xl font-bold text-gray-900 truncate">
+                                    <h3 className="mt-1 text-xl font-bold text-white truncate">
                                         {item.value}
                                     </h3>
-                                    <p className="mt-1 text-[11px] text-gray-500 truncate">
+                                    <p className="mt-1 text-[11px] text-gray-400 truncate">
                                         {item.subtitle}
                                     </p>
                                 </div>
@@ -161,7 +161,7 @@ const DemographicKpiCards = ({ summary, loading }) => {
 
                             {summary?.report_year && (
                                 <div className="mt-3">
-                                    <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">
+                                    <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 border-[#2a2a2a] bg-[#1b1b1b] text-gray-200">
                                         {summary.report_year}
                                     </Badge>
                                 </div>

@@ -122,11 +122,11 @@ function ChatHistorySidebar({
 
       {/* Floating Sidebar */}
       <div
-        className={`fixed left-4 top-20 w-80 h-[calc(100vh-6rem)] bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col z-50 transform transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
+        className={`fixed left-4 top-20 w-80 h-[calc(100vh-6rem)] bg-black border border-[#2a2a2a] rounded-lg shadow-lg flex flex-col z-50 transform transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
           }`}
       >
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex-shrink-0">
+        <div className="p-4 border-b border-[#2a2a2a] flex-shrink-0">
           {/* AI Assistant Branding */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -136,25 +136,25 @@ function ChatHistorySidebar({
                 <MessageCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
               )}
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-gray-100">
                   {chatMode === 'tourism' ? 'Tourism Data Assistant' : 'AI Assistant'}
                 </h2>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {chatMode === 'tourism' ? 'Statistical insights & reports' : 'Tourism analytics & insights'}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-1 rounded-md hover:bg-[#151515] transition-colors"
               title="Close sidebar"
             >
-              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <p className="text-xs font-semibold text-gray-600 uppercase mb-3">
+          <p className="text-xs font-semibold text-gray-300 uppercase mb-3">
             {chatMode === 'tourism' ? 'Tourism Data Chats' : 'General Chats'}
           </p>
           <Button
@@ -171,7 +171,7 @@ function ChatHistorySidebar({
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
           {chats.length === 0 ? (
-            <div className="p-4 text-center text-sm text-gray-500">
+            <div className="p-4 text-center text-sm text-gray-400">
               No previous chats.
             </div>
           ) : (
@@ -180,8 +180,8 @@ function ChatHistorySidebar({
                 <div
                   key={chat.id}
                   className={`group flex flex-col p-3 rounded-md cursor-pointer transition-colors ${currentChatId === chat.id
-                    ? 'bg-blue-50'
-                    : 'hover:bg-gray-100'
+                    ? 'bg-[#151515]'
+                    : 'hover:bg-[#151515]'
                     }`}
                 >
                   {editingChatId === chat.id ? (
@@ -192,7 +192,7 @@ function ChatHistorySidebar({
                       onChange={(e) => setEditingTitle(e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, chat.id)}
                       onBlur={() => handleEditSave(chat.id)}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm bg-black text-gray-100 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => e.stopPropagation()}
                     />
                   ) : (
@@ -202,7 +202,7 @@ function ChatHistorySidebar({
                         onClick={() => onSelectChat(chat.id)}
                       >
                         <span
-                          className={`text-sm font-medium truncate flex-1 ${currentChatId === chat.id ? 'text-blue-600' : 'text-gray-900'
+                          className={`text-sm font-medium truncate flex-1 ${currentChatId === chat.id ? 'text-blue-400' : 'text-gray-100'
                             }`}
                           title={chat.title}
                         >
@@ -210,7 +210,7 @@ function ChatHistorySidebar({
                         </span>
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {formatRelativeTime(chat.updatedAt)}
                         </span>
                         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -219,17 +219,17 @@ function ChatHistorySidebar({
                               e.stopPropagation();
                               handleEditStart(chat);
                             }}
-                            className="p-1 rounded hover:bg-gray-200 transition-colors"
+                            className="p-1 rounded hover:bg-[#202020] transition-colors"
                             title="Edit chat title"
                           >
-                            <Pencil className="h-3 w-3 text-gray-500" />
+                            <Pencil className="h-3 w-3 text-gray-400" />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeletingChatId(chat.id);
                             }}
-                            className="p-1 rounded hover:bg-red-100 transition-colors"
+                            className="p-1 rounded hover:bg-red-900/30 transition-colors"
                             title="Delete chat"
                           >
                             <Trash2 className="h-3 w-3 text-red-500" />
@@ -248,9 +248,9 @@ function ChatHistorySidebar({
       {/* Delete Confirmation Modal */}
       {deletingChatId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Chat?</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="bg-[#151515] border border-[#2a2a2a] rounded-lg p-6 max-w-sm mx-4">
+            <h3 className="text-lg font-semibold text-gray-100 mb-2">Delete Chat?</h3>
+            <p className="text-sm text-gray-300 mb-4">
               Are you sure you want to delete this chat? This cannot be undone.
             </p>
             <div className="flex space-x-3">
@@ -1077,8 +1077,8 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
 
   if (isInitializing) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center text-gray-500">
+      <div className="flex items-center justify-center h-full bg-black">
+        <div className="text-center text-gray-300">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Loading chat...</p>
         </div>
@@ -1087,11 +1087,11 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
   }
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full bg-black text-gray-100">
       {/* Auth Warning */}
       {authWarning && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-4">
-          <p className="text-sm text-yellow-700">
+        <div className="bg-amber-900/25 border-l-4 border-amber-700 p-4 mx-4 mt-4">
+          <p className="text-sm text-amber-200">
             Please log in to save and view your chat history.
           </p>
         </div>
@@ -1102,7 +1102,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
         {/* Chat Window */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Mode Selector */}
-          <div className="border-b border-gray-200 bg-white px-4 py-4">
+          <div className="border-b border-[#2a2a2a] bg-black px-4 py-4">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
               <div className="flex items-center gap-3 flex-wrap">
                 <button
@@ -1112,14 +1112,14 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                 >
                   <History className="h-5 w-5" />
                 </button>
-                <span className="text-sm font-semibold text-gray-700">Assistant Mode:</span>
+                <span className="text-sm font-semibold text-gray-200">Assistant Mode:</span>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={() => handleModeSwitch('gemini')}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       chatMode === 'gemini'
                         ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-[#151515] text-gray-300 hover:bg-[#1d1d1d]'
                     }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -1132,7 +1132,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       chatMode === 'tourism'
                         ? 'bg-green-600 text-white shadow-lg transform scale-105'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-[#151515] text-gray-300 hover:bg-[#1d1d1d]'
                     }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -1144,12 +1144,12 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
               </div>
               <div className="flex items-center space-x-2">
                 {chatMode === 'gemini' ? (
-                  <div className="flex items-center space-x-2 text-xs text-gray-500">
+                  <div className="flex items-center space-x-2 text-xs text-gray-400">
                     <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                     <span>General AI Assistant</span>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 text-xs text-gray-500">
+                  <div className="flex items-center space-x-2 text-xs text-gray-400">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span>Statistical Reports (2010-2025)</span>
                   </div>
@@ -1157,8 +1157,8 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
               </div>
             </div>
             {chatMode === 'tourism' && (
-              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700">
+              <div className="mt-3 p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                <p className="text-xs text-green-300">
                   📊 <strong>Tourism Data Assistant</strong>: Uses tourism statistical reports for data-driven insights. Ask about visitor numbers, trends, and historical data.
                 </p>
               </div>
@@ -1166,16 +1166,16 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           </div>
           {/* Messages Area */}
           <div
-            className="flex-1 overflow-y-auto py-2 px-4"
+            className="flex-1 overflow-y-auto py-2 px-4 bg-black"
             data-messages-container
           >
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500">
+                <div className="text-center text-gray-400">
                   {chatMode === 'tourism' ? (
-                    <Database className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <Database className="h-16 w-16 mx-auto mb-4 text-gray-600" />
                   ) : (
-                    <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-600" />
                   )}
                   <p className="text-lg">
                     {chatMode === 'tourism' 
@@ -1199,7 +1199,7 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                     <div
                       className={`px-3 py-2 rounded-lg break-words ${message.sender === 'user'
                         ? 'bg-blue-600 text-white max-w-[75%] md:max-w-[75%] lg:max-w-[75%]'
-                        : 'bg-white text-gray-800 border border-gray-200 shadow-sm max-w-[90%] md:max-w-[75%] lg:max-w-[75%]'
+                        : 'bg-[#151515] text-gray-100 border border-[#2a2a2a] shadow-sm max-w-[90%] md:max-w-[75%] lg:max-w-[75%]'
                         }`}
                     >
                       {message.sender === 'user' ? (
@@ -1210,21 +1210,21 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                             remarkPlugins={[remarkGfm]}
                             rehypePlugins={[rehypeRaw]}
                             components={{
-                              strong: ({ node, ...props }) => <strong className="font-bold text-gray-900" {...props} />,
-                              em: ({ node, ...props }) => <em className="italic text-gray-700" {...props} />,
-                              p: ({ node, ...props }) => <p className="mb-3 leading-relaxed text-sm" {...props} />,
+                              strong: ({ node, ...props }) => <strong className="font-bold text-gray-100" {...props} />,
+                              em: ({ node, ...props }) => <em className="italic text-gray-200" {...props} />,
+                              p: ({ node, ...props }) => <p className="mb-3 leading-relaxed text-sm text-gray-100" {...props} />,
                               ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3 space-y-1" {...props} />,
                               ol: ({ node, ...props }) => <ol className="list-decimal ml-6 mb-3 space-y-1" {...props} />,
-                              li: ({ node, ...props }) => <li className="mb-1 text-sm" {...props} />,
-                              h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2 text-gray-900" {...props} />,
-                              h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2 text-gray-900" {...props} />,
-                              h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1 text-gray-900" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-1 text-sm text-gray-100" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2 text-gray-100" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2 text-gray-100" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1 text-gray-100" {...props} />,
                               code: ({ node, inline, ...props }) => (
                                 inline
-                                  ? <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono" {...props} />
-                                  : <pre className="bg-gray-100 p-3 rounded text-xs font-mono overflow-x-auto mt-2" {...props} />
+                                  ? <code className="bg-[#202020] text-gray-100 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                                  : <pre className="bg-[#101010] text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto mt-2" {...props} />
                               ),
-                              blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-2" {...props} />,
+                              blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-[#2a2a2a] pl-4 italic text-gray-300 my-2" {...props} />,
                             }}
                           >
                             {message.text}
@@ -1244,11 +1244,11 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-lg">
+                    <div className="bg-[#151515] text-gray-200 border border-[#2a2a2a] px-4 py-3 rounded-lg">
                       <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                     </div>
                   </div>
@@ -1258,14 +1258,15 @@ Use this data to provide specific, data-driven insights. If specific data isn't 
           </div>
 
           {/* Input Bar */}
-          <div className="flex space-x-2 pt-2 pb-2 border-t border-gray-200 px-4 bg-white">
+          <div className="flex space-x-2 pt-2 pb-2 border-t border-[#2a2a2a] px-4 bg-black">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Type your message..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="chatbot-input-dark flex-1 px-3 py-2 bg-[#151515] text-gray-100 placeholder:text-gray-400 rounded-lg focus:outline-none text-sm"
+              style={{ backgroundColor: '#151515', color: '#FFFFFF' }}
               disabled={isLoading || !currentUser}
             />
             <Button

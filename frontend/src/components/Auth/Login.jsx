@@ -12,17 +12,32 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
     async function handleSubmit(e) {
         e.preventDefault();
+        const email = emailRef.current.value.trim().toLowerCase();
+        const password = passwordRef.current.value;
+
+        if (!isValidEmail(email)) {
+            setError("Please enter a valid email address.");
+            return;
+        }
 
         try {
             setError("");
             setLoading(true);
-            await login(emailRef.current.value, passwordRef.current.value);
+            await login(email, password);
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
-            setError("Failed to log in: " + err.message);
+            if (err?.code === "auth/invalid-email" || /invalid email/i.test(err?.message || "")) {
+                setError("Invalid email address. Please check the format and try again.");
+            } else {
+                setError("Failed to log in: " + err.message);
+            }
         }
 
         setLoading(false);

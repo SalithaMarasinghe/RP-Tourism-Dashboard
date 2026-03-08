@@ -34,22 +34,22 @@ const formatTick = (yyyyMm) => {
     return parsed.month === 1 ? String(parsed.year) : '';
 };
 
-function TimelineTooltip({ active, payload, label }) {
+function TimelineTooltip({ active, payload, label, darkMode = false }) {
     if (!active || !payload || payload.length === 0) return null;
     const row = payload[0]?.payload;
     if (!row) return null;
 
     return (
-        <div className="rounded-md border border-gray-200 bg-white px-3 py-2 shadow-md">
-            <p className="text-xs text-gray-500">{formatMonthLabel(label)}</p>
-            <p className="text-sm font-semibold text-gray-900">
+        <div className={`rounded-md px-3 py-2 shadow-md ${darkMode ? 'border border-[#2a2a2a] bg-[#151515]' : 'border border-gray-200 bg-white'}`}>
+            <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>{formatMonthLabel(label)}</p>
+            <p className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 Arrivals: {numberFormatter.format(row.arrivals)}
             </p>
         </div>
     );
 }
 
-export default function OverviewArrivalsTimelineChart({ data, isLoading, error }) {
+export default function OverviewArrivalsTimelineChart({ data, isLoading, error, darkMode = false }) {
     const chartData = useMemo(() => {
         if (!Array.isArray(data)) return [];
 
@@ -76,7 +76,7 @@ export default function OverviewArrivalsTimelineChart({ data, isLoading, error }
 
     if (isLoading) {
         return (
-            <div className="h-[280px] w-full rounded-lg bg-gray-50 flex items-center justify-center text-sm text-gray-500">
+            <div className={`h-[280px] w-full rounded-lg flex items-center justify-center text-sm ${darkMode ? 'bg-[#151515] border border-[#2a2a2a] text-gray-300' : 'bg-gray-50 text-gray-500'}`}>
                 Loading arrivals timeline...
             </div>
         );
@@ -84,7 +84,7 @@ export default function OverviewArrivalsTimelineChart({ data, isLoading, error }
 
     if (error) {
         return (
-            <div className="h-[280px] w-full rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-sm text-red-700 px-4 text-center">
+            <div className={`h-[280px] w-full rounded-lg flex items-center justify-center text-sm px-4 text-center ${darkMode ? 'bg-red-950/30 border border-red-900 text-red-300' : 'bg-red-50 border border-red-200 text-red-700'}`}>
                 {error}
             </div>
         );
@@ -92,7 +92,7 @@ export default function OverviewArrivalsTimelineChart({ data, isLoading, error }
 
     if (chartData.length === 0) {
         return (
-            <div className="h-[280px] w-full rounded-lg bg-gray-50 flex items-center justify-center text-sm text-gray-500">
+            <div className={`h-[280px] w-full rounded-lg flex items-center justify-center text-sm ${darkMode ? 'bg-[#151515] border border-[#2a2a2a] text-gray-300' : 'bg-gray-50 text-gray-500'}`}>
                 No arrivals timeline data available.
             </div>
         );
@@ -102,28 +102,28 @@ export default function OverviewArrivalsTimelineChart({ data, isLoading, error }
         <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 8, right: 24, left: 8, bottom: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#334155' : '#e5e7eb'} />
                     <XAxis
                         dataKey="date"
                         tickFormatter={formatTick}
                         minTickGap={24}
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        tick={{ fontSize: 12, fill: darkMode ? '#cbd5e1' : '#6b7280' }}
                     />
                     <YAxis
                         tickFormatter={(value) => `${Math.round(value / 1000)}K`}
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        tick={{ fontSize: 12, fill: darkMode ? '#cbd5e1' : '#6b7280' }}
                     />
-                    <Tooltip content={<TimelineTooltip />} />
+                    <Tooltip content={<TimelineTooltip darkMode={darkMode} />} />
                     <Legend
                         verticalAlign="top"
                         align="right"
-                        wrapperStyle={{ fontSize: '12px' }}
+                        wrapperStyle={{ fontSize: '12px', color: darkMode ? '#e2e8f0' : '#374151' }}
                     />
                     <Line
                         type="monotone"
                         dataKey="arrivals"
                         name="Arrivals (2010-2025)"
-                        stroke="#2563eb"
+                        stroke={darkMode ? '#60a5fa' : '#2563eb'}
                         strokeWidth={2.5}
                         dot={false}
                         connectNulls
@@ -134,3 +134,4 @@ export default function OverviewArrivalsTimelineChart({ data, isLoading, error }
         </div>
     );
 }
+

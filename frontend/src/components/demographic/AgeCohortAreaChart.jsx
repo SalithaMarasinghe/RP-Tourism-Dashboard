@@ -106,8 +106,8 @@ const CustomTooltip = ({ active, payload, label }) => {
     const sorted = [...payload].sort((a, b) => (b?.value || 0) - (a?.value || 0));
 
     return (
-        <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-xl p-3 rounded-lg text-xs min-w-[170px]">
-            <p className="font-semibold text-gray-800 mb-2">Year: {label}</p>
+        <div className="bg-[#151515] border border-[#2a2a2a] shadow-xl p-3 rounded-lg text-xs min-w-[170px]">
+            <p className="font-semibold text-white mb-2">Year: {label}</p>
             <div className="space-y-1">
                 {sorted.map((entry) => (
                     <div key={entry.dataKey} className="flex items-center justify-between gap-3">
@@ -116,9 +116,9 @@ const CustomTooltip = ({ active, payload, label }) => {
                                 className="inline-block h-2.5 w-2.5 rounded-full"
                                 style={{ backgroundColor: entry.color }}
                             />
-                            <span className="text-gray-600">{AGE_LABELS[entry.dataKey] || entry.dataKey}</span>
+                            <span className="text-gray-300">{AGE_LABELS[entry.dataKey] || entry.dataKey}</span>
                         </div>
-                        <span className="font-medium text-gray-900">{formatPct(entry.value)}</span>
+                        <span className="font-medium text-white">{formatPct(entry.value)}</span>
                     </div>
                 ))}
             </div>
@@ -133,7 +133,7 @@ const AgeCohortAreaChart = ({ data, loading }) => {
 
     if (loading) {
         return (
-            <Card className="shadow-sm border-gray-100 h-[420px]">
+            <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] h-[420px]">
                 <CardHeader className="pb-2">
                     <Skeleton className="h-6 w-48" />
                 </CardHeader>
@@ -145,41 +145,41 @@ const AgeCohortAreaChart = ({ data, loading }) => {
     }
 
     return (
-        <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-300">
+        <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-bold text-gray-800">
+                <CardTitle className="text-lg font-bold text-white">
                     Age Cohort Evolution (15 Years)
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="h-[340px] w-full">
                     {!hasData ? (
-                        <div className="h-full w-full rounded-lg bg-gray-50 flex items-center justify-center text-sm text-gray-500">
+                        <div className="h-full w-full rounded-lg bg-[#1b1b1b] border border-[#2a2a2a] flex items-center justify-center text-sm text-gray-400">
                             No age cohort data available.
                         </div>
                     ) : (
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData} margin={{ top: 12, right: 16, left: 4, bottom: 8 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
                                 <XAxis
                                     dataKey="report_year"
-                                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
                                     tickLine={false}
                                     axisLine={false}
                                 />
                                 <YAxis
                                     domain={[0, 100]}
                                     tickFormatter={(v) => `${v}%`}
-                                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
                                     tickLine={false}
                                     axisLine={false}
                                 />
-                                <Tooltip content={<CustomTooltip />} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1b1b1b' }} />
                                 <Legend
                                     verticalAlign="top"
                                     align="right"
                                     iconType="circle"
-                                    wrapperStyle={{ fontSize: '11px', paddingBottom: '8px' }}
+                                    wrapperStyle={{ fontSize: '11px', paddingBottom: '8px', color: '#cbd5e1' }}
                                     formatter={(value) => AGE_LABELS[value] || value}
                                 />
 
@@ -207,4 +207,3 @@ const AgeCohortAreaChart = ({ data, loading }) => {
 };
 
 export default AgeCohortAreaChart;
-

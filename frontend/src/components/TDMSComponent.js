@@ -1140,7 +1140,7 @@ export default function TDMSComponent() {
     console.log('TDMSComponent: Showing loading state');
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg text-gray-600">Loading TDMS data...</div>
+        <div className="text-lg text-gray-300">Loading TDMS data...</div>
       </div>
     );
   }
@@ -1179,7 +1179,7 @@ export default function TDMSComponent() {
             </div>
             <button
               onClick={hideNotification}
-              className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-300 transition-colors"
             >
               <span className="sr-only">Close</span>
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -1193,23 +1193,24 @@ export default function TDMSComponent() {
       {/* Header with Export Button */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Tourist Flow <span className="text-blue-600">Distribution</span>
           </h1>
-          <p className="text-sm text-gray-500 font-medium">
+          <p className="text-sm text-gray-300 font-medium">
             Executive monitoring of site capacity, visitor load, and redistribution strategy.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4 bg-[#151515] p-3 rounded-xl border border-[#2a2a2a] shadow-sm">
           <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Select Date:</label>
+            <label className="text-sm font-medium text-gray-300">Select Date:</label>
             <select
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ colorScheme: 'dark' }}
             >
               {availableDates.map(date => (
-                <option key={date} value={date}>{date}</option>
+                <option key={date} value={date} style={{ backgroundColor: '#1b1b1b', color: '#f1f5f9' }}>{date}</option>
               ))}
             </select>
           </div>
@@ -1222,24 +1223,24 @@ export default function TDMSComponent() {
 
       {/* View Tabs */}
       <Tabs value={activeView} onValueChange={setActiveView}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="predictions">Predictions & Analytics</TabsTrigger>
-          <TabsTrigger value="vli">VLI & Infrastructure</TabsTrigger>
-          <TabsTrigger value="emergency">Emergency & Redistribution</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-[#151515] border border-[#2a2a2a]">
+          <TabsTrigger value="predictions" className="text-gray-300 data-[state=active]:bg-[#1b1b1b] data-[state=active]:text-white">Predictions & Analytics</TabsTrigger>
+          <TabsTrigger value="vli" className="text-gray-300 data-[state=active]:bg-[#1b1b1b] data-[state=active]:text-white">VLI & Infrastructure</TabsTrigger>
+          <TabsTrigger value="emergency" className="text-gray-300 data-[state=active]:bg-[#1b1b1b] data-[state=active]:text-white">Emergency & Redistribution</TabsTrigger>
         </TabsList>
 
         {/* View 1: Predictions & Analytics */}
         <TabsContent value="predictions" className="space-y-6">
           {/* Real-time Capacity Alerts */}
-          <Card>
+          <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <span className="flex items-center">
                   <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
                   Real-time Capacity Alerts
                 </span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-300">
                 Sites exceeding VLI threshold - {capacityAlerts.length} sites affected
               </CardDescription>
             </CardHeader>
@@ -1247,14 +1248,14 @@ export default function TDMSComponent() {
               {capacityAlerts.length > 0 ? (
                 <div className="space-y-3">
                   {capacityAlerts.map((alert, index) => (
-                    <div key={index} className={`p-4 rounded-lg border-l-4 ${alert.severity === 'critical' ? 'bg-red-50 border-red-600' :
-                        alert.severity === 'high' ? 'bg-orange-50 border-orange-600' :
-                          'bg-yellow-50 border-yellow-600'
+                    <div key={index} className={`p-4 rounded-lg border-l-4 ${alert.severity === 'critical' ? 'bg-[#2a1515] border-red-700' :
+                        alert.severity === 'high' ? 'bg-[#2a2115] border-orange-700' :
+                          'bg-[#2a2815] border-yellow-700'
                       }`}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-semibold text-gray-800">{alert.site}</h4>
-                          <p className="text-sm text-gray-600">
+                          <h4 className="font-semibold text-gray-100">{alert.site}</h4>
+                          <p className="text-sm text-gray-300">
                             VLI: {alert.vli_score.toFixed(1)}% |
                             Visitors: {alert.visitors.toLocaleString()} |
                             Utilization: {alert.capacity_utilization}%
@@ -1272,8 +1273,8 @@ export default function TDMSComponent() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <div className="text-green-600 text-lg mb-2">✓ All Sites Operating Normally</div>
+                <div className="text-center py-8 text-gray-300">
+                  <div className="text-green-400 text-lg mb-2">All Sites Operating Normally</div>
                   <p>No sites exceeding {alertThreshold}% VLI threshold</p>
                 </div>
               )}
@@ -1281,19 +1282,19 @@ export default function TDMSComponent() {
           </Card>
 
           {/* Monthly Aggregation Chart */}
-          <Card>
+          <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
             <CardHeader>
-              <CardTitle>Monthly Aggregation Chart</CardTitle>
-              <CardDescription>Total predicted visitors per month</CardDescription>
+              <CardTitle className="text-white">Monthly Aggregation Chart</CardTitle>
+              <CardDescription className="text-gray-300">Total predicted visitors per month</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Site:</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Select Site:</label>
                   <select
                     value={selectedSite}
                     onChange={(e) => setSelectedSite(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select a site...</option>
                     {availableSites.map(site => (
@@ -1302,11 +1303,11 @@ export default function TDMSComponent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Year:</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Select Year:</label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="2026">2026</option>
                     <option value="2027">2027</option>
@@ -1330,20 +1331,20 @@ export default function TDMSComponent() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="flex items-center justify-center h-full text-gray-400">
                     Select a site and year to view monthly data
                   </div>
                 )}
               </div>
               
               {/* Month Selection - Moved below chart for better UX */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mt-6 p-4 bg-[#1b1b1b] rounded-lg">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Daily View Options</h4>
+                  <h4 className="text-lg font-semibold text-gray-100">Daily View Options</h4>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Month:</label>
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Select Month:</label>
                     <select
                       value={selectedMonth}
                       onChange={(e) => {
@@ -1352,7 +1353,7 @@ export default function TDMSComponent() {
                           fetchDailyData(selectedSite, selectedYear, e.target.value);
                         }
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Select month for daily view...</option>
                       <option value="01">January</option>
@@ -1371,7 +1372,7 @@ export default function TDMSComponent() {
                   </div>
                   <div className="flex items-end">
                     {selectedMonth && (
-                      <div className="text-sm text-gray-500 italic">
+                      <div className="text-sm text-gray-400 italic">
                         Daily chart showing below
                       </div>
                     )}
@@ -1382,7 +1383,7 @@ export default function TDMSComponent() {
               {selectedMonth && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-800">
+                    <h4 className="text-lg font-semibold text-gray-100">
                       Daily Aggregation - {selectedSite} - {new Date(selectedYear + '-' + selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                     </h4>
                   </div>
@@ -1400,7 +1401,7 @@ export default function TDMSComponent() {
                           </LineChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500">
+                        <div className="flex items-center justify-center h-full text-gray-400">
                           Loading daily data...
                         </div>
                       )}
@@ -1415,15 +1416,15 @@ export default function TDMSComponent() {
         <TabsContent value="vli" className="space-y-6">
           {/* View Toggle */}
           <div className="mb-6">
-            <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200">
-              <label className="text-sm font-medium text-gray-700">View Mode:</label>
+            <div className="flex items-center space-x-4 p-4 bg-[#151515] rounded-lg border border-[#2a2a2a]">
+              <label className="text-sm font-medium text-gray-200">View Mode:</label>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setVliView('heatmap')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     vliView === 'heatmap'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-[#1b1b1b] text-gray-200 hover:bg-[#222222]'
                   }`}
                 >
                   National Grid Heatmap
@@ -1433,7 +1434,7 @@ export default function TDMSComponent() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     vliView === 'loadbalancing'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-[#1b1b1b] text-gray-200 hover:bg-[#222222]'
                   }`}
                 >
                   Infrastructure Load Balancing
@@ -1444,10 +1445,10 @@ export default function TDMSComponent() {
 
           {vliView === 'heatmap' ? (
             /* National Grid Heatmap */
-            <Card>
+            <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
               <CardHeader>
-                <CardTitle>National Grid Heatmap</CardTitle>
-                <CardDescription>15-tile grid representing all sites in network - {selectedDate}</CardDescription>
+                <CardTitle className="text-white">National Grid Heatmap</CardTitle>
+                <CardDescription className="text-gray-300">15-tile grid representing all sites in network - {selectedDate}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -1468,26 +1469,26 @@ export default function TDMSComponent() {
           ) : (
             /* Infrastructure Load Balancing */
             infrastructureLoad.total_sites && (
-              <Card>
+              <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
+                  <CardTitle className="flex items-center justify-between text-white">
                     <span className="flex items-center">
                       <BarChart3 className="h-5 w-5 mr-2 text-purple-600" />
                       Infrastructure Load Balancing
                     </span>
                     <div className="flex items-center space-x-2">
-                      <label className="text-sm font-medium">View:</label>
+                      <label className="text-sm font-medium text-gray-200">View:</label>
                       <select
                         value={infrastructureView}
                         onChange={(e) => setInfrastructureView(e.target.value)}
-                        className="px-2 py-1 border rounded text-sm"
+                        className="px-2 py-1 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded text-sm"
                       >
                         <option value="cards">Cards</option>
                         <option value="grid">Grid</option>
                       </select>
                     </div>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-300">
                     System-wide capacity utilization and recommended actions - {infrastructureLoad.analysis_date}
                   </CardDescription>
                 </CardHeader>
@@ -1495,19 +1496,19 @@ export default function TDMSComponent() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <div className="text-2xl font-bold text-green-600">{infrastructureLoad.optimal_sites}</div>
-                      <div className="text-sm text-gray-600">Optimal Sites</div>
+                      <div className="text-sm text-gray-300">Optimal Sites</div>
                     </div>
                     <div className="text-center p-4 bg-yellow-50 rounded-lg">
                       <div className="text-2xl font-bold text-yellow-600">{infrastructureLoad.high_load_sites}</div>
-                      <div className="text-sm text-gray-600">High Load Sites</div>
+                      <div className="text-sm text-gray-300">High Load Sites</div>
                     </div>
                     <div className="text-center p-4 bg-orange-50 rounded-lg">
                       <div className="text-2xl font-bold text-orange-600">{infrastructureLoad.overloaded_sites}</div>
-                      <div className="text-sm text-gray-600">Overloaded Sites</div>
+                      <div className="text-sm text-gray-300">Overloaded Sites</div>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">{infrastructureLoad.total_sites}</div>
-                      <div className="text-sm text-gray-600">Total Sites</div>
+                      <div className="text-sm text-gray-300">Total Sites</div>
                     </div>
                   </div>
 
@@ -1517,8 +1518,8 @@ export default function TDMSComponent() {
                         <div key={index} className={`p-4 rounded-lg border ${site.load_category === 'overloaded' ? 'bg-red-50 border-red-200' : site.load_category === 'high_load' ? 'bg-orange-50 border-orange-200' : site.load_category === 'moderate_load' ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="font-semibold text-gray-800">{site.site}</h4>
-                              <div className="text-sm text-gray-600">
+                              <h4 className="font-semibold text-gray-100">{site.site}</h4>
+                              <div className="text-sm text-gray-300">
                                 VLI: {site.vli_score.toFixed(1)}% |
                                 Utilization: {site.utilization_rate}% |
                                 Visitors: {site.visitors.toLocaleString()}
@@ -1532,7 +1533,7 @@ export default function TDMSComponent() {
                                 }`}>
                                 {site.load_category.replace('_', ' ').toUpperCase()}
                               </Badge>
-                              <div className="text-xs text-gray-600 mt-1 max-w-xs">
+                              <div className="text-xs text-gray-300 mt-1 max-w-xs">
                                 {site.recommended_action}
                               </div>
                             </div>
@@ -1542,34 +1543,34 @@ export default function TDMSComponent() {
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border border-gray-200">
+                      <table className="w-full border-collapse border border-[#2a2a2a]">
                         <thead>
-                          <tr className="bg-gray-50">
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-700">Site</th>
-                            <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">VLI Score</th>
-                            <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Utilization</th>
-                            <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Visitors</th>
-                            <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Load Category</th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-700">Recommended Action</th>
+                          <tr className="bg-[#1b1b1b]">
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-left text-sm font-medium text-gray-200">Site</th>
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">VLI Score</th>
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Utilization</th>
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Visitors</th>
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Load Category</th>
+                            <th className="border border-[#2a2a2a] px-4 py-2 text-left text-sm font-medium text-gray-200">Recommended Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {infrastructureLoad.site_analysis?.map((site, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
-                              <td className="border border-gray-200 px-4 py-2 font-medium text-gray-800">{site.site}</td>
-                              <td className="border border-gray-200 px-4 py-2 text-center">
+                            <tr key={index} className="hover:bg-[#1b1b1b]">
+                              <td className="border border-[#2a2a2a] px-4 py-2 font-medium text-gray-100">{site.site}</td>
+                              <td className="border border-[#2a2a2a] px-4 py-2 text-center">
                                 <span className={`font-semibold ${site.vli_score > 120 ? 'text-red-600' : site.vli_score > 100 ? 'text-orange-600' : site.vli_score > 80 ? 'text-yellow-600' : 'text-green-600'}`}>
                                   {site.vli_score.toFixed(1)}%
                                 </span>
                               </td>
-                              <td className="border border-gray-200 px-4 py-2 text-center">{site.utilization_rate}%</td>
-                              <td className="border border-gray-200 px-4 py-2 text-center">{site.visitors.toLocaleString()}</td>
-                              <td className="border border-gray-200 px-4 py-2 text-center">
+                              <td className="border border-[#2a2a2a] px-4 py-2 text-center">{site.utilization_rate}%</td>
+                              <td className="border border-[#2a2a2a] px-4 py-2 text-center">{site.visitors.toLocaleString()}</td>
+                              <td className="border border-[#2a2a2a] px-4 py-2 text-center">
                               <Badge className={`text-xs ${site.load_category === 'overloaded' ? 'bg-red-600' : site.load_category === 'high_load' ? 'bg-orange-600' : site.load_category === 'moderate_load' ? 'bg-yellow-600' : 'bg-green-600'}`}>
                                   {site.load_category.replace('_', ' ').toUpperCase()}
                                 </Badge>
                               </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-600">{site.recommended_action}</td>
+                              <td className="border border-[#2a2a2a] px-4 py-2 text-sm text-gray-300">{site.recommended_action}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -1582,24 +1583,24 @@ export default function TDMSComponent() {
           )}
 
           {/* Seasonal Capacity Planning */}
-          <Card>
+          <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <Calendar className="h-5 w-5 mr-2 text-blue-600" />
                 Seasonal Capacity Planning
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-300">
                 Strategic resource allocation and capacity management
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Site:</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">Select Site:</label>
                   <select
                     value={selectedSeasonalSite}
                     onChange={(e) => setSelectedSeasonalSite(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select a site...</option>
                     {availableSites.map(site => (
@@ -1608,11 +1609,11 @@ export default function TDMSComponent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Year:</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">Select Year:</label>
                   <select
                     value={selectedSeasonalYear}
                     onChange={(e) => setSelectedSeasonalYear(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="2026">2026</option>
                     <option value="2027">2027</option>
@@ -1628,31 +1629,31 @@ export default function TDMSComponent() {
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <h4 className="font-semibold text-blue-800 mb-3">Analysis for {seasonalAnalysis.site} - {seasonalAnalysis.year}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="text-center p-4 bg-white rounded-lg border border-blue-200">
+                      <div className="text-center p-4 bg-[#151515] rounded-lg border border-blue-200">
                         <div className="text-2xl font-bold text-blue-600">
                           {seasonalAnalysis.monthly_average.toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Monthly Average</div>
+                        <div className="text-sm text-gray-300">Monthly Average</div>
                       </div>
-                      <div className="text-center p-4 bg-white rounded-lg border border-green-200">
+                      <div className="text-center p-4 bg-[#151515] rounded-lg border border-green-200">
                         <div className="text-lg font-semibold text-green-800">{seasonalAnalysis.peak_month}</div>
                         <div className="text-2xl font-bold text-green-600">
                           {seasonalAnalysis.peak_visitors.toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Peak Month</div>
+                        <div className="text-sm text-gray-300">Peak Month</div>
                       </div>
-                      <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
+                      <div className="text-center p-4 bg-[#151515] rounded-lg border border-orange-200">
                         <div className="text-lg font-semibold text-orange-800">{seasonalAnalysis.off_peak_month}</div>
                         <div className="text-2xl font-bold text-orange-600">
                           {seasonalAnalysis.off_peak_visitors.toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Off-Peak Month</div>
+                        <div className="text-sm text-gray-300">Off-Peak Month</div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <div className="text-sm text-gray-700">
+                  <div className="p-4 bg-[#1b1b1b] rounded-lg">
+                    <div className="text-sm text-gray-200">
                       <strong>Recommended Strategy:</strong> Maintain stable capacity levels with seasonal staffing adjustments
                     </div>
                   </div>
@@ -1666,26 +1667,26 @@ export default function TDMSComponent() {
         <TabsContent value="infrastructure" className="space-y-6">
           {/* Infrastructure Load Balancing */}
           {infrastructureLoad.total_sites && (
-            <Card>
+            <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex items-center justify-between text-white">
                   <span className="flex items-center">
                     <BarChart3 className="h-5 w-5 mr-2 text-purple-600" />
                     Infrastructure Load Balancing
                   </span>
                   <div className="flex items-center space-x-2">
-                    <label className="text-sm font-medium">View:</label>
+                    <label className="text-sm font-medium text-gray-200">View:</label>
                     <select
                       value={infrastructureView}
                       onChange={(e) => setInfrastructureView(e.target.value)}
-                      className="px-2 py-1 border rounded text-sm"
+                      className="px-2 py-1 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded text-sm"
                     >
                       <option value="cards">Cards</option>
                       <option value="grid">Grid</option>
                     </select>
                   </div>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-300">
                   System-wide capacity utilization and recommended actions - {infrastructureLoad.analysis_date}
                 </CardDescription>
               </CardHeader>
@@ -1693,19 +1694,19 @@ export default function TDMSComponent() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div className="text-center p-4 bg-green-50 rounded-lg">
                     <div className="text-2xl font-bold text-green-600">{infrastructureLoad.optimal_sites}</div>
-                    <div className="text-sm text-gray-600">Optimal Sites</div>
+                    <div className="text-sm text-gray-300">Optimal Sites</div>
                   </div>
                   <div className="text-center p-4 bg-yellow-50 rounded-lg">
                     <div className="text-2xl font-bold text-yellow-600">{infrastructureLoad.high_load_sites}</div>
-                    <div className="text-sm text-gray-600">High Load Sites</div>
+                    <div className="text-sm text-gray-300">High Load Sites</div>
                   </div>
                   <div className="text-center p-4 bg-orange-50 rounded-lg">
                     <div className="text-2xl font-bold text-orange-600">{infrastructureLoad.overloaded_sites}</div>
-                    <div className="text-sm text-gray-600">Overloaded Sites</div>
+                    <div className="text-sm text-gray-300">Overloaded Sites</div>
                   </div>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{infrastructureLoad.total_sites}</div>
-                    <div className="text-sm text-gray-600">Total Sites</div>
+                    <div className="text-sm text-gray-300">Total Sites</div>
                   </div>
                 </div>
 
@@ -1719,8 +1720,8 @@ export default function TDMSComponent() {
                         }`}>
                         <div className="flex items-center justify-between">
                           <div>
-                            <h4 className="font-semibold text-gray-800">{site.site}</h4>
-                            <div className="text-sm text-gray-600">
+                            <h4 className="font-semibold text-gray-100">{site.site}</h4>
+                            <div className="text-sm text-gray-300">
                               VLI: {site.vli_score.toFixed(1)}% |
                               Utilization: {site.utilization_rate}% |
                               Visitors: {site.visitors.toLocaleString()}
@@ -1734,7 +1735,7 @@ export default function TDMSComponent() {
                               }`}>
                               {site.load_category.replace('_', ' ').toUpperCase()}
                             </Badge>
-                            <div className="text-xs text-gray-600 mt-1 max-w-xs">
+                            <div className="text-xs text-gray-300 mt-1 max-w-xs">
                               {site.recommended_action}
                             </div>
                           </div>
@@ -1744,22 +1745,22 @@ export default function TDMSComponent() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-200">
+                    <table className="w-full border-collapse border border-[#2a2a2a]">
                       <thead>
-                        <tr className="bg-gray-50">
-                          <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-700">Site</th>
-                          <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">VLI Score</th>
-                          <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Utilization</th>
-                          <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Visitors</th>
-                          <th className="border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Load Category</th>
-                          <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-700">Recommended Action</th>
+                        <tr className="bg-[#1b1b1b]">
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-left text-sm font-medium text-gray-200">Site</th>
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">VLI Score</th>
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Utilization</th>
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Visitors</th>
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-center text-sm font-medium text-gray-200">Load Category</th>
+                          <th className="border border-[#2a2a2a] px-4 py-2 text-left text-sm font-medium text-gray-200">Recommended Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         {infrastructureLoad.site_analysis?.map((site, index) => (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="border border-gray-200 px-4 py-2 font-medium text-gray-800">{site.site}</td>
-                            <td className="border border-gray-200 px-4 py-2 text-center">
+                          <tr key={index} className="hover:bg-[#1b1b1b]">
+                            <td className="border border-[#2a2a2a] px-4 py-2 font-medium text-gray-100">{site.site}</td>
+                            <td className="border border-[#2a2a2a] px-4 py-2 text-center">
                               <span className={`font-semibold ${
                                 site.vli_score > 120 ? 'text-red-600' :
                                 site.vli_score > 100 ? 'text-orange-600' :
@@ -1769,9 +1770,9 @@ export default function TDMSComponent() {
                                 {site.vli_score.toFixed(1)}%
                               </span>
                             </td>
-                            <td className="border border-gray-200 px-4 py-2 text-center">{site.utilization_rate}%</td>
-                            <td className="border border-gray-200 px-4 py-2 text-center">{site.visitors.toLocaleString()}</td>
-                            <td className="border border-gray-200 px-4 py-2 text-center">
+                            <td className="border border-[#2a2a2a] px-4 py-2 text-center">{site.utilization_rate}%</td>
+                            <td className="border border-[#2a2a2a] px-4 py-2 text-center">{site.visitors.toLocaleString()}</td>
+                            <td className="border border-[#2a2a2a] px-4 py-2 text-center">
                               <Badge className={`text-xs ${
                                 site.load_category === 'overloaded' ? 'bg-red-600' :
                                 site.load_category === 'high_load' ? 'bg-orange-600' :
@@ -1781,7 +1782,7 @@ export default function TDMSComponent() {
                                 {site.load_category.replace('_', ' ').toUpperCase()}
                               </Badge>
                             </td>
-                            <td className="border border-gray-200 px-4 py-2 text-sm text-gray-600">{site.recommended_action}</td>
+                            <td className="border border-[#2a2a2a] px-4 py-2 text-sm text-gray-300">{site.recommended_action}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1796,22 +1797,22 @@ export default function TDMSComponent() {
         <TabsContent value="emergency" className="space-y-6">
           {/* Emergency Response Planning */}
           {dashboardData && (
-            <Card>
+            <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
                   Emergency Response Planning
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-300">
                   Overcrowding mitigation scenarios and response strategies
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-red-50 rounded-lg">
-                      <h4 className="font-semibold text-red-800 mb-2">Critical Overcrowding</h4>
-                      <div className="text-sm text-gray-700 space-y-1">
+                    <div className="p-4 bg-[#2a1515] rounded-lg">
+                      <h4 className="font-semibold text-red-300 mb-2">Critical Overcrowding</h4>
+                      <div className="text-sm text-gray-200 space-y-1">
                         <p><strong>Trigger:</strong> VLI {'>'} 120% for 2+ hours</p>
                         <p><strong>Immediate Actions:</strong></p>
                         <ul className="list-disc list-inside ml-4 space-y-1">
@@ -1823,9 +1824,9 @@ export default function TDMSComponent() {
                       </div>
                     </div>
 
-                    <div className="p-4 bg-orange-50 rounded-lg">
-                      <h4 className="font-semibold text-orange-800 mb-2">High Capacity Strain</h4>
-                      <div className="text-sm text-gray-700 space-y-1">
+                    <div className="p-4 bg-[#2a2115] rounded-lg">
+                      <h4 className="font-semibold text-orange-300 mb-2">High Capacity Strain</h4>
+                      <div className="text-sm text-gray-200 space-y-1">
                         <p><strong>Trigger:</strong> VLI {'>'} 100-120% for 4+ hours</p>
                         <p><strong>Response Actions:</strong></p>
                         <ul className="list-disc list-inside ml-4 space-y-1">
@@ -1839,23 +1840,23 @@ export default function TDMSComponent() {
                   </div>
 
                   {/* Automatic Visitor Capping - Daily Assessment */}
-                  <div className="p-4 bg-red-50 rounded-lg">
-                    <h4 className="font-semibold text-red-800 mb-4">Automatic Visitor Capping - Daily Assessment</h4>
-                    <div className="text-sm text-gray-700 mb-4">
+                  <div className="p-4 bg-[#2a1515] rounded-lg">
+                    <h4 className="font-semibold text-red-300 mb-4">Automatic Visitor Capping - Daily Assessment</h4>
+                    <div className="text-sm text-gray-200 mb-4">
                       <p>The following sites exceed 80% VLI threshold and require visitor capping:</p>
                     
                     {autoCappedSites.length > 0 ? (
                       <div className="space-y-3">
                         {autoCappedSites.map((site, index) => (
-                          <div key={index} className={`p-4 rounded-lg border ${
-                            site.severity === 'critical' ? 'bg-red-100 border-red-300' :
-                            site.severity === 'high' ? 'bg-orange-100 border-orange-300' :
-                            'bg-yellow-100 border-yellow-300'
+                          <div key={index} className={`p-4 rounded-lg ${
+                            site.severity === 'critical' ? 'bg-[#3a1818]' :
+                            site.severity === 'high' ? 'bg-[#3a2818]' :
+                            'bg-[#3a3418]'
                           }`}>
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
-                                <h5 className="font-semibold text-gray-800 mb-2">{site.site}</h5>
-                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                <h5 className="font-semibold text-white mb-2">{site.site}</h5>
+                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
                                   <div>
                                     <span className="font-medium">Current Visitors:</span> {site.current_visitors.toLocaleString()}
                                   </div>
@@ -1921,8 +1922,8 @@ export default function TDMSComponent() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-6 text-gray-500">
-                        <div className="text-green-600 text-lg mb-2">✓ No Sites Require Capping</div>
+                      <div className="text-center py-6 text-gray-400">
+                        <div className="text-green-400 text-lg mb-2">✓ No Sites Require Capping</div>
                         <p>All sites are operating within acceptable VLI thresholds</p>
                       </div>
                     )}
@@ -1935,10 +1936,10 @@ export default function TDMSComponent() {
 
           {/* Redistribution Simulator */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
               <CardHeader>
-                <CardTitle>Redistribution Controls</CardTitle>
-                <CardDescription>Configure visitor redistribution between sites</CardDescription>
+                <CardTitle className="text-white">Redistribution Controls</CardTitle>
+                <CardDescription className="text-gray-300">Configure visitor redistribution between sites</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -1946,16 +1947,16 @@ export default function TDMSComponent() {
                   {sourceSite && targetSite && distributionPercentage > 0 && (() => {
                     const strategy = findOptimalRedistributionStrategy(sourceSite);
                     return strategy && strategy.targetSite === targetSite ? (
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <h5 className="font-semibold text-green-800 mb-3">Optimal Strategy To Apply</h5>
+                      <div className="p-4 bg-[#152418] rounded-lg border border-green-700">
+                        <h5 className="font-semibold text-green-300 mb-3">Optimal Strategy To Apply</h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
                           <div>
-                            <p className="text-gray-600"><strong>Strategy:</strong></p>
-                            <p className="font-medium text-gray-800">{strategy.strategy}</p>
+                            <p className="text-gray-300"><strong>Strategy:</strong></p>
+                            <p className="font-medium text-gray-100">{strategy.strategy}</p>
                           </div>
                           <div>
-                            <p className="text-gray-600"><strong>Expected Outcomes:</strong></p>
-                            <ul className="text-gray-800 space-y-1">
+                            <p className="text-gray-300"><strong>Expected Outcomes:</strong></p>
+                            <ul className="text-gray-100 space-y-1">
                               <li>• Source VLI reduction: {strategy.vliReduction.toFixed(1)}%</li>
                               <li>• Target VLI increase: {strategy.vliIncrease.toFixed(1)}%</li>
                               <li>• Source projected VLI: {strategy.projectedSourceVLI.toFixed(1)}%</li>
@@ -1969,11 +1970,11 @@ export default function TDMSComponent() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Source Node</label>
+                      <label className="block text-sm font-medium text-gray-200 mb-1">Source Node</label>
                       <select
                         value={sourceSite}
                         onChange={(e) => setSourceSite(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select source...</option>
                         {dashboardData?.vli_scores?.map((site) => (
@@ -1983,11 +1984,11 @@ export default function TDMSComponent() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Target Node</label>
+                      <label className="block text-sm font-medium text-gray-200 mb-1">Target Node</label>
                       <select
                         value={targetSite}
                         onChange={(e) => setTargetSite(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select target...</option>
                         {dashboardData?.vli_scores?.map((site) => (
@@ -1998,7 +1999,7 @@ export default function TDMSComponent() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-200 mb-1">
                       Distribution Percentage: {distributionPercentage}%
                     </label>
                     <input
@@ -2009,7 +2010,7 @@ export default function TDMSComponent() {
                       onChange={(e) => setDistributionPercentage(Number(e.target.value))}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                    <div className="flex justify-between text-xs text-gray-300 mt-1">
                       <span>0%</span>
                       <span>25%</span>
                       <span>50%</span>
@@ -2017,9 +2018,9 @@ export default function TDMSComponent() {
                   </div>
                   
                   {sourceSite && targetSite && distributionPercentage > 0 && dashboardData?.vli_scores ? (
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <h5 className="font-medium text-gray-800 mb-2">Redistribution Summary</h5>
-                      <div className="text-sm text-gray-600 space-y-1">
+                    <div className="p-3 bg-[#1b1b1b] rounded-lg">
+                      <h5 className="font-medium text-gray-100 mb-2">Redistribution Summary</h5>
+                      <div className="text-sm text-gray-300 space-y-1">
                         <p><strong>From:</strong> {sourceSite}</p>
                         <p><strong>To:</strong> {targetSite}</p>
                         <p><strong>Visitors to Move:</strong> {distributionPercentage}%</p>
@@ -2052,21 +2053,21 @@ export default function TDMSComponent() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Please select source and target sites, and set a distribution percentage to create a strategy.</p>
+                    <div className="p-3 bg-[#1b1b1b] rounded-lg">
+                      <p className="text-sm text-gray-300">Please select source and target sites, and set a distribution percentage to create a strategy.</p>
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
                   VLI Impact Analysis
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-300">
                   Before and after redistribution comparison with VLI threshold indicators
                 </CardDescription>
               </CardHeader>
@@ -2085,21 +2086,25 @@ export default function TDMSComponent() {
                         })()}
                         margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                       >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
                         <XAxis 
                           dataKey="site" 
-                          tick={{ fill: '#374151' }}
+                          tick={{ fill: '#e5e7eb' }}
                         />
                         <YAxis 
-                          tick={{ fill: '#374151' }}
-                          label={{ value: 'VLI Score (%)', angle: -90, position: 'insideLeft', fill: '#374151' }}
+                          tick={{ fill: '#e5e7eb' }}
+                          label={{ value: 'VLI Score (%)', angle: -90, position: 'insideLeft', fill: '#cbd5e1' }}
                         />
                         <Tooltip 
                           contentStyle={{ 
-                            backgroundColor: '#ffffff',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '8px'
+                            backgroundColor: '#151515',
+                            border: '1px solid #2a2a2a',
+                            borderRadius: '8px',
+                            color: '#f3f4f6'
                           }}
+                          labelStyle={{ color: '#f9fafb', fontWeight: 600 }}
+                          itemStyle={{ color: '#e5e7eb' }}
+                          cursor={{ fill: 'rgba(148, 163, 184, 0.08)' }}
                           formatter={(value, name) => [
                             `${Number(value).toFixed(1)}%`, 
                             name === 'original_vli' ? 'Original VLI' : 'Simulated VLI'
@@ -2142,7 +2147,7 @@ export default function TDMSComponent() {
                             dataKey="original_vli" 
                             position="top" 
                             formatter={(value) => `${Number(value).toFixed(1)}%`}
-                            style={{ fill: '#374151', fontSize: '12px' }}
+                            style={{ fill: '#e5e7eb', fontSize: '12px' }}
                           />
                         </Bar>
                         
@@ -2155,13 +2160,13 @@ export default function TDMSComponent() {
                             dataKey="simulated_vli" 
                             position="top" 
                             formatter={(value) => `${Number(value).toFixed(1)}%`}
-                            style={{ fill: '#374151', fontSize: '12px' }}
+                            style={{ fill: '#e5e7eb', fontSize: '12px' }}
                           />
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
                       <BarChart3 className="h-12 w-12 mb-4 text-gray-300" />
                       <div className="text-center">
                         <p className="text-lg font-medium mb-2">Select sites to view VLI impact</p>
@@ -2175,28 +2180,28 @@ export default function TDMSComponent() {
                   <div className="mt-6 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Source Site Analysis */}
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <h5 className="font-semibold text-blue-800 mb-3">Source: {sourceSite}</h5>
+                      <div className="p-4 bg-[#1b1b1b] rounded-lg border border-[#2a2a2a]">
+                        <h5 className="font-semibold text-blue-300 mb-3">Source: {sourceSite}</h5>
                         {(() => {
                           const sourceData = simulatedData.find(s => s.site === sourceSite);
                           const vliReduction = sourceData ? sourceData.original_vli - sourceData.simulated_vli : 0;
                           return (
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Original VLI:</span>
-                                <span className="font-medium">{sourceData?.original_vli.toFixed(1)}%</span>
+                                <span className="text-gray-300">Original VLI:</span>
+                                <span className="font-medium text-gray-100">{sourceData?.original_vli.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Simulated VLI:</span>
-                                <span className="font-medium text-green-600">{sourceData?.simulated_vli.toFixed(1)}%</span>
+                                <span className="text-gray-300">Simulated VLI:</span>
+                                <span className="font-medium text-green-400">{sourceData?.simulated_vli.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">VLI Reduction:</span>
-                                <span className="font-medium text-blue-600">{vliReduction.toFixed(1)}%</span>
+                                <span className="text-gray-300">VLI Reduction:</span>
+                                <span className="font-medium text-blue-300">{vliReduction.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Visitors Moved:</span>
-                                <span className="font-medium">{(sourceData?.original_visitors * (distributionPercentage/100)).toLocaleString()}</span>
+                                <span className="text-gray-300">Visitors Moved:</span>
+                                <span className="font-medium text-gray-100">{(sourceData?.original_visitors * (distributionPercentage/100)).toLocaleString()}</span>
                               </div>
                             </div>
                           );
@@ -2204,8 +2209,8 @@ export default function TDMSComponent() {
                       </div>
                       
                       {/* Target Site Analysis */}
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <h5 className="font-semibold text-green-800 mb-3">Target: {targetSite}</h5>
+                      <div className="p-4 bg-[#1b1b1b] rounded-lg border border-[#2a2a2a]">
+                        <h5 className="font-semibold text-green-300 mb-3">Target: {targetSite}</h5>
                         {(() => {
                           const targetData = simulatedData.find(s => s.site === targetSite);
                           const sourceData = simulatedData.find(s => s.site === sourceSite);
@@ -2214,20 +2219,20 @@ export default function TDMSComponent() {
                           return (
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Original VLI:</span>
-                                <span className="font-medium">{targetData?.original_vli.toFixed(1)}%</span>
+                                <span className="text-gray-300">Original VLI:</span>
+                                <span className="font-medium text-gray-100">{targetData?.original_vli.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Simulated VLI:</span>
-                                <span className="font-medium text-orange-600">{targetData?.simulated_vli.toFixed(1)}%</span>
+                                <span className="text-gray-300">Simulated VLI:</span>
+                                <span className="font-medium text-orange-400">{targetData?.simulated_vli.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">VLI Increase:</span>
-                                <span className="font-medium text-green-600">{vliIncrease.toFixed(1)}%</span>
+                                <span className="text-gray-300">VLI Increase:</span>
+                                <span className="font-medium text-green-400">{vliIncrease.toFixed(1)}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">Visitors Added:</span>
-                                <span className="font-medium">{visitorsAdded.toLocaleString()}</span>
+                                <span className="text-gray-300">Visitors Added:</span>
+                                <span className="font-medium text-gray-100">{visitorsAdded.toLocaleString()}</span>
                               </div>
                             </div>
                           );
@@ -2241,20 +2246,20 @@ export default function TDMSComponent() {
           </div>
 
           {/* Applied Strategies Section */}
-          <Card>
+          <Card className="!bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <AlertTriangle className="h-5 w-5 mr-2 text-blue-600" />
                 Applied Strategies - Daily Assessments
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-300">
                 Track and manage redistribution strategies that have been implemented
               </CardDescription>
             </CardHeader>
             <CardContent>
               {appliedStrategies.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="text-sm text-gray-700 mb-4">
+                  <div className="text-sm text-gray-200 mb-4">
                     <strong>Active Strategies ({appliedStrategies.length}):</strong>
                   </div>
                   {appliedStrategies.map((strategy, index) => (
@@ -2262,7 +2267,7 @@ export default function TDMSComponent() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-green-800">{strategy.type} - {strategy.site}</h4>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-300">
                             <p><strong>Action:</strong> {strategy.action}</p>
                             <p><strong>Visitors to Redistribute:</strong> {strategy.visitorsToRedistribute.toLocaleString()}</p>
                             <p><strong>Target Site:</strong> {strategy.targetSite}</p>
@@ -2284,8 +2289,8 @@ export default function TDMSComponent() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <div className="text-gray-600">No strategies applied yet</div>
+                <div className="text-center py-8 text-gray-300">
+                  <div className="text-gray-300">No strategies applied yet</div>
                   <p>Redistribution strategies will appear here once added from daily assessments</p>
                 </div>
               )}
@@ -2296,3 +2301,4 @@ export default function TDMSComponent() {
     </div>
   );
 }
+

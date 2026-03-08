@@ -5,6 +5,7 @@ All Firebase Auth + Firestore logic for the auth module.
 No FastAPI / HTTP concerns live here.
 """
 import logging
+import os
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -12,6 +13,7 @@ from fastapi import HTTPException
 from firebase_admin import auth as firebase_auth, firestore
 
 logger = logging.getLogger(__name__)
+FIREBASE_CLOCK_SKEW_SECONDS = int(os.getenv("FIREBASE_CLOCK_SKEW_SECONDS", "60"))
 
 
 # ── Utilities ────────────────────────────────────────────────────────────────
@@ -76,7 +78,10 @@ def verify_google_token(id_token: str) -> Dict[str, Any]:
     Called after signInWithPopup() on the frontend.
     """
     try:
-        decoded = firebase_auth.verify_id_token(id_token)
+        decoded = firebase_auth.verify_id_token(
+            id_token,
+            clock_skew_seconds=FIREBASE_CLOCK_SKEW_SECONDS,
+        )
     except Exception as exc:
         raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(exc)}")
 

@@ -13,11 +13,11 @@ const ALERT_LEVEL_ORDER = {
 };
 
 const LEVEL_BADGE_CLASSES = {
-    HIGH: 'bg-red-100 text-red-700 border-red-200',
-    MEDIUM: 'bg-amber-100 text-amber-700 border-amber-200',
-    WARN: 'bg-amber-100 text-amber-700 border-amber-200',
-    WARNING: 'bg-amber-100 text-amber-700 border-amber-200',
-    INFO: 'bg-blue-100 text-blue-700 border-blue-200'
+    HIGH: 'bg-red-500/20 text-red-300 border-red-700',
+    MEDIUM: 'bg-amber-500/20 text-amber-300 border-amber-700',
+    WARN: 'bg-amber-500/20 text-amber-300 border-amber-700',
+    WARNING: 'bg-amber-500/20 text-amber-300 border-amber-700',
+    INFO: 'bg-blue-500/20 text-blue-300 border-blue-700'
 };
 
 const toNumber = (value) => {
@@ -76,13 +76,13 @@ const RisingSegmentAlerts = ({ alerts, loading }) => {
 
     if (loading) {
         return (
-            <Card className="shadow-sm border-gray-100">
+            <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a]">
                 <CardHeader className="pb-2">
                     <Skeleton className="h-6 w-56" />
                 </CardHeader>
                 <CardContent className="space-y-3">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="rounded-lg border border-gray-100 p-3">
+                        <div key={i} className="rounded-lg border border-[#2a2a2a] bg-[#1b1b1b] p-3">
                             <div className="flex items-center justify-between mb-2">
                                 <Skeleton className="h-4 w-40" />
                                 <Skeleton className="h-5 w-16" />
@@ -97,21 +97,21 @@ const RisingSegmentAlerts = ({ alerts, loading }) => {
     }
 
     return (
-        <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-300">
+        <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-rose-600" />
                     Rising Segment Alerts
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {rows.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center">
-                        <div className="mx-auto mb-2 h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center">
-                            <AlertTriangle className="h-4 w-4 text-gray-500" />
+                    <div className="rounded-lg border border-dashed border-[#2a2a2a] bg-[#1b1b1b] px-4 py-8 text-center">
+                        <div className="mx-auto mb-2 h-9 w-9 rounded-full bg-[#151515] border border-[#2a2a2a] flex items-center justify-center">
+                            <AlertTriangle className="h-4 w-4 text-gray-400" />
                         </div>
-                        <p className="text-sm font-medium text-gray-700">No rising alerts detected</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-sm font-medium text-gray-200">No rising alerts detected</p>
+                        <p className="text-xs text-gray-400 mt-1">
                             Segment movements are currently within expected levels.
                         </p>
                     </div>
@@ -120,16 +120,16 @@ const RisingSegmentAlerts = ({ alerts, loading }) => {
                         {rows.map((row, index) => (
                             <div
                                 key={`${row.segmentType}-${row.segmentName}-${row.reportYear}-${index}`}
-                                className="rounded-lg border border-gray-100 bg-white px-4 py-3"
+                                className="rounded-lg border border-[#2a2a2a] bg-[#1b1b1b] px-4 py-3"
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                     <div className="min-w-0">
-                                        <p className="text-sm font-semibold text-gray-800 truncate">
+                                        <p className="text-sm font-semibold text-gray-100 truncate">
                                             {formatSegmentName(row.segmentName)}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-gray-400">
                                             {formatSegmentType(row.segmentType)}
-                                            {row.reportYear ? ` • ${row.reportYear}` : ''}
+                                            {row.reportYear ? ` - ${row.reportYear}` : ''}
                                         </p>
                                     </div>
 
@@ -139,13 +139,13 @@ const RisingSegmentAlerts = ({ alerts, loading }) => {
                                         >
                                             {row.alertLevel}
                                         </Badge>
-                                        <span className="text-sm font-semibold text-gray-900">
+                                        <span className="text-sm font-semibold text-white">
                                             {formatChangeValue(row.changeValue)}
                                         </span>
                                     </div>
                                 </div>
 
-                                <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                                <p className="mt-2 text-xs text-gray-300 leading-relaxed">
                                     {row.rationale}
                                 </p>
                             </div>
@@ -158,4 +158,3 @@ const RisingSegmentAlerts = ({ alerts, loading }) => {
 };
 
 export default RisingSegmentAlerts;
-

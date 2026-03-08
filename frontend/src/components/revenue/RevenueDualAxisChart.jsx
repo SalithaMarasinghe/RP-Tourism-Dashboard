@@ -26,13 +26,13 @@ const CustomTooltip = ({ active, payload, label }) => {
         const isForecast = data.is_forecast;
 
         return (
-            <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-xl p-4 rounded-lg text-xs min-w-[200px] z-50">
-                <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-2">
-                    <span className="font-bold text-gray-800">{new Date(data.ds).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+            <div className="bg-[#151515] border border-[#2a2a2a] shadow-xl p-4 rounded-lg text-xs min-w-[200px] z-50 text-gray-200">
+                <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-2 mb-2">
+                    <span className="font-bold text-white">{new Date(data.ds).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                     {isForecast ? (
-                        <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter">Forecast</span>
+                        <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter">Forecast</span>
                     ) : (
-                        <span className="bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter">Historical</span>
+                        <span className="bg-[#1b1b1b] text-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter border border-[#2a2a2a]">Historical</span>
                     )}
                 </div>
 
@@ -40,15 +40,15 @@ const CustomTooltip = ({ active, payload, label }) => {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
                             <div className="w-2 h-2 rounded-full bg-[#10b981] mr-2" />
-                            <span className="text-gray-500">Arrivals:</span>
+                            <span className="text-gray-300">Arrivals:</span>
                         </div>
-                        <span className="font-semibold text-gray-900">{new Intl.NumberFormat().format(data.arrivals)}</span>
+                        <span className="font-semibold text-white">{new Intl.NumberFormat().format(data.arrivals)}</span>
                     </div>
 
                     <div className="flex justify-between items-center text-blue-600 font-medium">
                         <div className="flex items-center">
                             <div className="w-2 h-2 rounded-full bg-[#2563eb] mr-2" />
-                            <span className="text-gray-500">Revenue:</span>
+                            <span className="text-gray-300">Revenue:</span>
                         </div>
                         <span>${data.revenue_usd_mn?.toFixed(1) || 0}M</span>
                     </div>
@@ -56,28 +56,28 @@ const CustomTooltip = ({ active, payload, label }) => {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
                             <div className="w-2 h-2 rounded-full bg-[#f59e0b] mr-2" />
-                            <span className="text-gray-500">Avg Spend:</span>
+                            <span className="text-gray-300">Avg Spend:</span>
                         </div>
-                        <span className="font-semibold text-gray-900">${data.avg_rpt_usd?.toFixed(0) || 0}</span>
+                        <span className="font-semibold text-white">${data.avg_rpt_usd?.toFixed(0) || 0}</span>
                     </div>
 
-                    <div className="flex justify-between items-center pt-1 mt-1 border-t border-gray-50">
-                        <span className="text-gray-500 ml-4">Spend/Day:</span>
-                        <span className="font-semibold text-gray-900">${data.avg_rptd_usd?.toFixed(2) || 0}</span>
+                    <div className="flex justify-between items-center pt-1 mt-1 border-t border-[#2a2a2a]">
+                        <span className="text-gray-300 ml-4">Spend/Day:</span>
+                        <span className="font-semibold text-white">${data.avg_rptd_usd?.toFixed(2) || 0}</span>
                     </div>
 
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
                             <div className="w-2 h-2 rounded-full bg-[#8b5cf6] mr-2" />
-                            <span className="text-gray-500">Length of Stay:</span>
+                            <span className="text-gray-300">Length of Stay:</span>
                         </div>
-                        <span className="font-semibold text-gray-900">{data.avg_los?.toFixed(1) || 0} Days</span>
+                        <span className="font-semibold text-white">{data.avg_los?.toFixed(1) || 0} Days</span>
                     </div>
                 </div>
 
                 {data.hasAnomaly && (
-                    <div className="mt-2 pt-2 border-t border-red-50 text-red-600 italic text-[10px] flex items-start">
-                        <span className="mr-1">⚠️</span>
+                    <div className="mt-2 pt-2 border-t border-red-900 text-red-400 italic text-[10px] flex items-start">
+                        <span className="mr-1">!</span>
                         <span>{data.anomalyInfo?.anomaly_reason || data.anomalyInfo?.label}</span>
                     </div>
                 )}
@@ -130,9 +130,43 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
         });
     }, [monthlyData, anomalies, events]);
 
+    // Consolidate noisy event-series into discrete markers so the chart remains readable.
+    const eventMarkers = useMemo(() => {
+        if (!events?.length) return [];
+
+        const byLabel = new Map();
+
+        events.forEach((event) => {
+            if (!event?.ds) return;
+
+            const label = (event.label || 'Event').trim();
+            const eventDate = new Date(event.ds);
+            if (Number.isNaN(eventDate.getTime())) return;
+
+            const existing = byLabel.get(label);
+            if (!existing || eventDate < existing.eventDate) {
+                byLabel.set(label, { ...event, label, eventDate });
+            }
+        });
+
+        const markers = Array.from(byLabel.values()).sort((a, b) => a.eventDate - b.eventDate);
+
+        // Hard cap marker count to avoid dense stripe artifacts on long timelines.
+        const maxMarkers = 8;
+        if (markers.length <= maxMarkers) return markers;
+
+        const stride = Math.ceil(markers.length / maxMarkers);
+        return markers.filter((_, index) => index % stride === 0).slice(0, maxMarkers);
+    }, [events]);
+
+    const formatEventLabel = (label) => {
+        if (!label) return 'Event';
+        return label.length > 24 ? `${label.slice(0, 24)}...` : label;
+    };
+
     if (loading) {
         return (
-            <Card className="shadow-sm border-gray-100 h-[480px]">
+            <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] h-[480px]">
                 <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
                 <CardContent className="flex items-center justify-center h-full">
                     <Skeleton className="h-[350px] w-full" />
@@ -142,18 +176,18 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
     }
 
     return (
-        <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-300">
+        <Card className="shadow-sm !bg-[#151515] !border-[#2a2a2a] hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg font-bold text-gray-800">
+                    <CardTitle className="text-lg font-bold text-white">
                         Revenue & Volume Performance
                     </CardTitle>
                     <div className="flex items-center space-x-3 text-[10px] uppercase font-bold tracking-widest text-gray-400">
-                        <div className="flex items-center space-x-1 border border-gray-100 px-1.5 py-0.5 rounded">
+                        <div className="flex items-center space-x-1 border border-[#2a2a2a] px-1.5 py-0.5 rounded bg-[#1b1b1b]">
                             <span className="w-2 h-0.5 bg-gray-400"></span>
                             <span>Hist</span>
                         </div>
-                        <div className="flex items-center space-x-1 border border-gray-100 px-1.5 py-0.5 rounded">
+                        <div className="flex items-center space-x-1 border border-[#2a2a2a] px-1.5 py-0.5 rounded bg-[#1b1b1b]">
                             <span className="w-2 h-0.5 border-t border-dashed border-gray-400"></span>
                             <span>Forecast</span>
                         </div>
@@ -165,7 +199,7 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
                 <div className="h-[400px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={processedData} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2a2a2a" />
 
                             <XAxis
                                 dataKey="ds"
@@ -199,7 +233,7 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
                                 tickFormatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(0)}K` : val}
                             />
 
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1b1b1b' }} />
 
                             <Legend
                                 verticalAlign="top"
@@ -210,9 +244,25 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
                             />
 
                             {/* Event Annotations */}
-                            {events?.map((e, i) => (
-                                <ReferenceLine key={i} x={e.ds} yAxisId="left" stroke="#e2e8f0" strokeDasharray="4 4">
-                                    <Label value={e.label} position="top" fill="#cbd5e1" fontSize={8} fontWeight={700} offset={10} />
+                            {eventMarkers.map((event, index) => (
+                                <ReferenceLine
+                                    key={`evt-${event.label}-${event.ds}-${index}`}
+                                    x={event.ds}
+                                    yAxisId="left"
+                                    stroke="#475569"
+                                    strokeOpacity={0.65}
+                                    strokeDasharray="4 4"
+                                >
+                                    {eventMarkers.length <= 5 && (
+                                        <Label
+                                            value={formatEventLabel(event.label)}
+                                            position="top"
+                                            fill="#94a3b8"
+                                            fontSize={8}
+                                            fontWeight={600}
+                                            offset={8}
+                                        />
+                                    )}
                                 </ReferenceLine>
                             ))}
 
@@ -247,3 +297,4 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
 };
 
 export default RevenueDualAxisChart;
+
