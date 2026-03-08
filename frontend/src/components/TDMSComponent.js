@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, Users, MapPin, AlertTriangle, Download, RefreshCw, 
-  Calendar, BarChart3, CheckCircle, Activity, Info, LayoutDashboard, ArrowRight, Zap, ShieldCheck
+  Calendar, BarChart3, CheckCircle, Activity, Info, LayoutDashboard, ArrowRight, Zap, ShieldCheck, Cpu, Network, Target
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -34,11 +34,10 @@ export default function TDMSComponent() {
   const [isExporting, setIsExporting] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
 
-  // --- RESTORED STATES ---
   const [selectedMonth, setSelectedMonth] = useState('');
   const [dailyData, setDailyData] = useState([]);
   const [seasonalAnalysis, setSeasonalAnalysis] = useState({});
-  const [visitorCaps, setVisitorCaps] = useState([]); // Restored just in case it's used elsewhere
+  const [visitorCaps, setVisitorCaps] = useState([]); 
 
   // Advanced Capacity Management State
   const [capacityAlerts, setCapacityAlerts] = useState([]);
@@ -46,12 +45,12 @@ export default function TDMSComponent() {
   const [alertThreshold] = useState(80);
   const [autoCappedSites, setAutoCappedSites] = useState([]);
   const [infrastructureView, setInfrastructureView] = useState('cards');
-  const [vliView, setVliView] = useState('heatmap');
+  const [vliView, setVliView] = useState('heatmap'); 
   const [appliedStrategies, setAppliedStrategies] = useState([]);
   const [notification, setNotification] = useState(null);
   const [kpis, setKpis] = useState({ totalVisitors: 0, avgVli: 0 });
 
-  // Initial Data Fetch
+  // 1. Initial Data Fetch
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -81,7 +80,7 @@ export default function TDMSComponent() {
     fetchInitialData();
   }, []);
 
-  // Fetch Dashboard Data based on Date
+  // 2. Fetch Dashboard Data
   useEffect(() => {
     if (selectedDate) {
       const fetchDashboardData = async () => {
@@ -96,7 +95,7 @@ export default function TDMSComponent() {
     }
   }, [selectedDate]);
 
-  // Process Dashboard Data
+  // 3. Process Dashboard Data
   useEffect(() => {
     if (dashboardData?.vli_scores) {
       const scores = dashboardData.vli_scores;
@@ -122,6 +121,7 @@ export default function TDMSComponent() {
           infrastructure_stress: util > 100 ? 'critical' : util > 80 ? 'high' : 'normal'
         };
       });
+      
       setInfrastructureLoad({
         analysis_date: selectedDate, total_sites: loadAnalysis.length,
         overloaded_sites: loadAnalysis.filter(s => s.load_category === 'overloaded').length,
@@ -140,11 +140,11 @@ export default function TDMSComponent() {
         };
       });
       setAutoCappedSites(cappedSites);
-      setVisitorCaps(cappedSites); // Keeping sync for completeness
+      setVisitorCaps(cappedSites);
     }
   }, [dashboardData, alertThreshold]);
 
-  // Fetch Deep Analytics
+  // 4. Fetch Deep Analytics
   useEffect(() => {
     if (selectedSite && selectedYear) {
       axios.get(`${API_BASE}/api/tdms/monthly/${selectedSite}/${selectedYear}`)
@@ -156,12 +156,15 @@ export default function TDMSComponent() {
   useEffect(() => {
     if (selectedSite) {
       axios.get(`${API_BASE}/api/tdms/weekly-trend/${encodeURIComponent(selectedSite)}`)
-        .then(res => setTrendData(res.data.trend_data || []))
+        .then(res => {
+          const data = res.data.trend_data || res.data.data || [];
+          setTrendData(data);
+        })
         .catch(() => setTrendData([]));
     }
   }, [selectedSite]);
 
-  // --- RESTORED: Seasonal Capacity Planning Analysis ---
+  // 5. Seasonal Capacity Planning Analysis
   useEffect(() => {
     if (selectedSite && selectedYear && monthlyData.length > 0) {
       const monthlyAvg = monthlyData.reduce((sum, month) => sum + month.total_visitors, 0) / monthlyData.length;
@@ -179,10 +182,9 @@ export default function TDMSComponent() {
     }
   }, [selectedSite, selectedYear, monthlyData]);
 
-  // --- RESTORED: Fetch Daily Data ---
+  // 6. Fetch Mock Daily Data
   const fetchDailyData = async (site, year, month) => {
     try {
-      // Mock daily generator logic (from original code)
       const daysInMonth = new Date(year, month, 0).getDate();
       const dailyArray = [];
       for (let day = 1; day <= daysInMonth; day++) {
@@ -198,7 +200,7 @@ export default function TDMSComponent() {
     }
   }, [selectedMonth, selectedSite, selectedYear]);
 
-  // Optimal Strategy Engine
+  // 7. Optimal Strategy Engine
   const findOptimalRedistributionStrategy = (overcrowdedSite) => {
     if (!dashboardData?.vli_scores?.length) return null;
     const src = dashboardData.vli_scores.find(s => s.site === overcrowdedSite);
@@ -235,7 +237,7 @@ export default function TDMSComponent() {
     }
   };
 
-  // Simulation Engine Effect
+  // 8. Simulation Engine Effect
   useEffect(() => {
     if (sourceSite && targetSite && distributionPercentage > 0 && dashboardData) {
       const simulated = dashboardData.vli_scores.map(site => {
@@ -255,12 +257,14 @@ export default function TDMSComponent() {
     }
   }, [sourceSite, targetSite, distributionPercentage, dashboardData]);
 
+  // Notifications
   const showNotification = (message, type = 'success') => {
     setNotification({ id: Date.now(), message, type, timestamp: new Date() });
     setTimeout(() => setNotification(prev => prev?.id === notification?.id ? null : prev), 5000);
   };
   const hideNotification = () => setNotification(null);
 
+  // Strategy Management
   const addStrategyToAssessments = () => {
     const srcData = dashboardData.vli_scores.find(s => s.site === sourceSite);
     const val = srcData ? Math.floor(srcData.visitors * (distributionPercentage / 100)) : 0;
@@ -286,16 +290,160 @@ export default function TDMSComponent() {
     return 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]';
   };
 
+  // 9. COMPLETE PDF EXPORT LOGIC RESTORED
+  const handleExportTDMSReport = () => {
+    if (!dashboardData || loading) {
+      showNotification('⚠️ Please load TDMS data first before exporting', 'warning');
+      return;
+    }
+    
+    setIsExporting(true);
+    
+    // Use timeout to allow UI to show loading state before blocking thread
+    setTimeout(() => {
+      try {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        
+        // Premium Dark/Professional Colors for PDF
+        const headerColor = [30, 41, 59]; // Slate 800
+        const accentColor = [99, 102, 241]; // Indigo 500
+        const successColor = [16, 185, 129]; // Emerald
+        const warningColor = [245, 158, 11]; // Amber
+        const dangerColor = [225, 29, 72]; // Rose
+
+        const addPageNumbers = () => {
+          const pageCount = doc.internal.getNumberOfPages();
+          for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Page ${i} of ${pageCount}`, pageWidth - 30, pageHeight - 10);
+          }
+        };
+
+        const addColoredHeader = (text, color, yPosition) => {
+          doc.setFillColor(...color);
+          doc.rect(20, yPosition - 5, pageWidth - 40, 10, 'F');
+          doc.setFontSize(12);
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(255, 255, 255);
+          doc.text(text, pageWidth / 2, yPosition, { align: 'center' });
+          doc.setTextColor(0);
+          return yPosition + 15;
+        };
+
+        // Cover Page
+        doc.setFillColor(...headerColor);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        
+        doc.setFontSize(24);
+        doc.setTextColor(255, 255, 255);
+        doc.text('Tourist Distribution', pageWidth / 2, 80, { align: 'center' });
+        doc.text('Management System', pageWidth / 2, 95, { align: 'center' });
+        
+        doc.setFillColor(...accentColor);
+        doc.rect(pageWidth / 2 - 50, 105, 100, 3, 'F');
+        
+        doc.setFontSize(16);
+        doc.text('Comprehensive Analytics Report', pageWidth / 2, 125, { align: 'center' });
+        
+        doc.setFontSize(12);
+        doc.text(`Analysis Date: ${selectedDate}`, pageWidth / 2, 160, { align: 'center' });
+        doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 175, { align: 'center' });
+        
+        // Page 2: Executive Summary
+        doc.addPage();
+        let yPosition = 20;
+        
+        yPosition = addColoredHeader('Executive Summary', headerColor, yPosition);
+        
+        const totalSites = dashboardData.vli_scores?.length || 0;
+        const criticalSites = dashboardData.vli_scores?.filter(site => site.vli_score > 120).length || 0;
+        const highLoadSites = dashboardData.vli_scores?.filter(site => site.vli_score > 100).length || 0;
+        const optimalSites = dashboardData.vli_scores?.filter(site => site.vli_score <= 80).length || 0;
+        const totalVisitors = dashboardData.vli_scores?.reduce((sum, site) => sum + site.visitors, 0) || 0;
+        const avgVLI = dashboardData.vli_scores?.reduce((sum, site) => sum + site.vli_score, 0) / totalSites || 0;
+
+        const summaryData = [
+          ['System Status', criticalSites > 0 ? 'Critical Attention Required' : highLoadSites > 0 ? 'Monitor Closely' : 'Operating Normally'],
+          ['Total Visitors', totalVisitors.toLocaleString()],
+          ['Average VLI', `${avgVLI.toFixed(1)}%`],
+          ['Sites Requiring Action', String(`${criticalSites + highLoadSites} of ${totalSites}`)],
+          ['Optimal Performance', `${((optimalSites / totalSites) * 100).toFixed(1)}%`],
+          ['Active Strategies', appliedStrategies.length.toString()]
+        ];
+
+        autoTable(doc, {
+          head: [['Metric', 'Status/Value']],
+          body: summaryData,
+          startY: yPosition,
+          margin: { left: 20, right: 20 },
+          styles: { fontSize: 10, cellPadding: 3, textColor: [60, 60, 60] },
+          headStyles: { fillColor: headerColor, textColor: [255, 255, 255], fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 245, 245] }
+        });
+
+        // Page 3: Site Performance
+        doc.addPage();
+        yPosition = 20;
+        yPosition = addColoredHeader('Site Performance Analysis', headerColor, yPosition);
+
+        if (dashboardData.vli_scores && dashboardData.vli_scores.length > 0) {
+          const sortedSites = [...dashboardData.vli_scores].sort((a, b) => b.vli_score - a.vli_score);
+          
+          const vliTableData = sortedSites.map(site => {
+            const status = site.vli_score > 120 ? 'CRITICAL' : site.vli_score > 100 ? 'HIGH' : site.vli_score > 80 ? 'MODERATE' : 'OPTIMAL';
+            return [
+              site.site,
+              site.visitors.toLocaleString(),
+              `${site.vli_score.toFixed(1)}%`,
+              status,
+              site.vli_score > 80 ? 'Action Required' : 'Normal'
+            ];
+          });
+
+          autoTable(doc, {
+            head: [['Site', 'Visitors', 'VLI Score', 'Status', 'Action Required']],
+            body: vliTableData,
+            startY: yPosition,
+            margin: { left: 20, right: 20 },
+            styles: { fontSize: 9, cellPadding: 2, textColor: [60, 60, 60] },
+            headStyles: { fillColor: headerColor, textColor: [255, 255, 255], fontStyle: 'bold' },
+            didParseCell: (data) => {
+              if (data.column.index === 3 && data.cell.section === 'body') {
+                if (data.cell.raw === 'CRITICAL') { data.cell.styles.fillColor = dangerColor; data.cell.styles.textColor = [255, 255, 255]; }
+                else if (data.cell.raw === 'HIGH') { data.cell.styles.fillColor = warningColor; data.cell.styles.textColor = [255, 255, 255]; }
+                else if (data.cell.raw === 'MODERATE') { data.cell.styles.fillColor = [253, 224, 71]; data.cell.styles.textColor = [0, 0, 0]; }
+                else { data.cell.styles.fillColor = successColor; data.cell.styles.textColor = [255, 255, 255]; }
+              }
+            }
+          });
+        }
+
+        addPageNumbers();
+        doc.save(`TDMS_Comprehensive_Report_${selectedDate.replace(/-/g, '_')}.pdf`);
+        showNotification('📄 Comprehensive TDMS report exported successfully!', 'success');
+      } catch(err) {
+        console.error("PDF Export Error:", err);
+        showNotification('❌ Failed to export report', 'error');
+      } finally {
+        setIsExporting(false);
+      }
+    }, 500); // Short delay allows React to render the loading spinner
+  };
+
   // Derived State Filtering
   const activeAlerts = capacityAlerts.filter(alert => !appliedStrategies.some(strat => strat.site === alert.site));
   const activeInterventions = autoCappedSites.filter(site => !appliedStrategies.some(strat => strat.site === site.site));
   const unmitigatedCriticalCount = activeAlerts.filter(a => a.severity === 'critical').length;
   const mitigatedCount = appliedStrategies.length;
 
-  const handleExportTDMSReport = () => { /* Export logic intact */ };
-
-  const inputStyle = "w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer hover:border-slate-600 shadow-sm";
+  // Reusable Styling Constants
+  const inputStyle = "w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer hover:border-slate-600 shadow-sm";
   const selectBgIcon = `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`;
+  const optionStyle = "bg-slate-900 text-slate-200";
 
   if (loading && !dashboardData) {
     return (
@@ -344,10 +492,10 @@ export default function TDMSComponent() {
                 <select
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="px-4 py-2 bg-slate-800 border border-slate-700 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer pr-10 hover:bg-slate-700 transition-colors"
+                  className="px-4 py-2 bg-slate-900 border border-slate-700 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer pr-10 hover:bg-slate-800 transition-colors"
                   style={{ backgroundImage: selectBgIcon, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em' }}
                 >
-                  {availableDates.map(date => <option key={date} value={date}>{date}</option>)}
+                  {availableDates.map(date => <option key={date} value={date} className={optionStyle}>{date}</option>)}
                 </select>
                 <Button onClick={handleExportTDMSReport} disabled={isExporting || !dashboardData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-indigo-500/25 border border-indigo-500">
                   {isExporting ? <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <><Download className="h-4 w-4 mr-2" /> Export</>}
@@ -365,7 +513,7 @@ export default function TDMSComponent() {
             }`}>
               <div className="flex justify-between items-start gap-4">
                 <p className="text-sm font-medium pt-0.5">{notification.message}</p>
-                <button onClick={hideNotification} className="opacity-60 hover:opacity-100 transition-opacity">×</button>
+                <button onClick={hideNotification} className="opacity-60 hover:opacity-100 transition-opacity"><AlertTriangle className="h-4 w-4 hidden" />×</button>
               </div>
             </div>
           )}
@@ -375,7 +523,7 @@ export default function TDMSComponent() {
               <TabsList className="bg-slate-900/60 border border-slate-800 p-1.5 rounded-xl shadow-inner min-w-max">
                 <TabsTrigger value="dashboard" className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-400 data-[state=active]:bg-indigo-600/10 data-[state=active]:text-indigo-400 data-[state=active]:border-indigo-500/30 border border-transparent transition-all flex items-center gap-2"><LayoutDashboard className="w-4 h-4"/> Overview</TabsTrigger>
                 <TabsTrigger value="analytics" className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-400 data-[state=active]:bg-indigo-600/10 data-[state=active]:text-indigo-400 data-[state=active]:border-indigo-500/30 border border-transparent transition-all flex items-center gap-2"><TrendingUp className="w-4 h-4"/> Deep Analytics</TabsTrigger>
-                <TabsTrigger value="network" className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-400 data-[state=active]:bg-indigo-600/10 data-[state=active]:text-indigo-400 data-[state=active]:border-indigo-500/30 border border-transparent transition-all flex items-center gap-2"><MapPin className="w-4 h-4"/> Grid Map</TabsTrigger>
+                <TabsTrigger value="network" className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-400 data-[state=active]:bg-indigo-600/10 data-[state=active]:text-indigo-400 data-[state=active]:border-indigo-500/30 border border-transparent transition-all flex items-center gap-2"><MapPin className="w-4 h-4"/> Network Map</TabsTrigger>
                 <TabsTrigger value="simulator" className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-400 data-[state=active]:bg-indigo-600/10 data-[state=active]:text-indigo-400 data-[state=active]:border-indigo-500/30 border border-transparent transition-all flex items-center gap-2"><RefreshCw className="w-4 h-4"/> Action Simulator {mitigatedCount > 0 && <Badge className="ml-1 bg-indigo-500 text-white border-none h-5 w-5 p-0 flex items-center justify-center rounded-full">{mitigatedCount}</Badge>}</TabsTrigger>
               </TabsList>
             </div>
@@ -490,14 +638,62 @@ export default function TDMSComponent() {
 
             {/* VIEW 2: DEEP ANALYTICS */}
             <TabsContent value="analytics" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              
+              {/* RESEARCH METHODOLOGY PANEL */}
+              <Card className="bg-slate-900/60 border-slate-800 shadow-xl rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-slate-800/60 pb-4 bg-slate-900/30">
+                  <CardTitle className="text-lg font-bold text-white flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Cpu className="w-5 h-5 mr-2 text-indigo-400" />
+                      Forecasting Engine Diagnostics
+                    </div>
+                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]">System Optimal</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/50 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 p-2 opacity-10"><Network className="w-8 h-8" /></div>
+                       <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Architecture</p>
+                       <p className="text-lg font-bold text-white mt-1">Panel Ridge</p>
+                       <p className="text-xs text-indigo-400 mt-1 font-mono">Global Matrix Model</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/50 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 p-2 opacity-10"><Target className="w-8 h-8" /></div>
+                       <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Accuracy Rate</p>
+                       <p className="text-lg font-bold text-emerald-400 mt-1">89.26%</p>
+                       <p className="text-xs text-slate-500 mt-1 font-mono">MAPE: 10.74%</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/50 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 p-2 opacity-10"><Activity className="w-8 h-8" /></div>
+                       <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Predictive Skill</p>
+                       <p className="text-lg font-bold text-blue-400 mt-1">0.246 MASE</p>
+                       <p className="text-xs text-slate-500 mt-1 font-mono">4x Baseline Edge</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/50 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 p-2 opacity-10"><RefreshCw className="w-8 h-8" /></div>
+                       <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">R-Squared</p>
+                       <p className="text-lg font-bold text-amber-400 mt-1">0.946</p>
+                       <p className="text-xs text-slate-500 mt-1 font-mono">Variance Explained</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 p-4 rounded-xl bg-indigo-900/10 border border-indigo-900/30">
+                      <h4 className="text-sm font-semibold text-indigo-300 flex items-center mb-2"><Info className="w-4 h-4 mr-1.5"/> Empirical Selection Methodology</h4>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                          The predictive engine is powered by a <strong>Global Panel Ridge Regression</strong> framework, selected via a rigorous 10-model tournament. By applying explicit site-specific autoregressive lags (T-1, T-7, T-30), the algorithm effectively linearized complex seasonal demand curves. It outperformed heavy Deep Learning architectures (LSTM/GRU), which failed due to data scarcity (~800 data points per panel view), ensuring superior stability and avoiding overfitting across the 5-year forecast horizon.
+                      </p>
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/40 p-4 rounded-2xl border border-slate-800">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider pl-1">Target Location</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                     <select value={selectedSite} onChange={(e) => setSelectedSite(e.target.value)} className={inputStyle} style={{ backgroundImage: selectBgIcon, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em' }}>
-                      <option value="" className="bg-slate-800">Select a site...</option>
-                      {availableSites.map(s => <option key={s} value={s} className="bg-slate-800">{s}</option>)}
+                      <option value="" className={optionStyle}>Select a site...</option>
+                      {availableSites.map(s => <option key={s} value={s} className={optionStyle}>{s}</option>)}
                     </select>
                   </div>
                 </div>
@@ -506,13 +702,12 @@ export default function TDMSComponent() {
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                     <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className={inputStyle} style={{ backgroundImage: selectBgIcon, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em' }}>
-                      {['2026','2027','2028','2029','2030'].map(y => <option key={y} value={y} className="bg-slate-800">{y}</option>)}
+                      {['2026','2027','2028','2029','2030'].map(y => <option key={y} value={y} className={optionStyle}>{y}</option>)}
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* RESTORED: Seasonal Capacity Planning Summaries */}
               {seasonalAnalysis.site && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="bg-blue-900/10 border border-blue-900/50 p-4 rounded-xl text-center">
@@ -548,7 +743,14 @@ export default function TDMSComponent() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                          <XAxis dataKey="date" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} tickFormatter={(str) => str.substring(0,4)} />
+                          <XAxis 
+                            dataKey="date" 
+                            stroke="#64748b" 
+                            tick={{ fill: '#94a3b8', fontSize: 11 }} 
+                            tickLine={false} 
+                            minTickGap={40}
+                            tickFormatter={(val) => val && typeof val === 'string' ? val.split('-')[0] : ''} 
+                          />
                           <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} itemStyle={{ color: '#a78bfa' }} />
                           <Area type="monotone" dataKey="predicted_total_visitors" name="Expected Traffic" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorTrend)" />
@@ -578,25 +780,24 @@ export default function TDMSComponent() {
                 </Card>
               </div>
 
-              {/* RESTORED: Daily Drilldown Chart */}
               {selectedSite && selectedYear && (
                 <Card className="bg-slate-900/60 border-slate-800 shadow-xl rounded-2xl overflow-hidden mt-6">
                   <CardHeader className="border-b border-slate-800/60 bg-slate-900/30 flex flex-row items-center justify-between pb-4">
                     <CardTitle className="text-lg text-white">Daily Traffic Drilldown</CardTitle>
-                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                      <option value="">Select Month</option>
-                      <option value="01">January</option>
-                      <option value="02">February</option>
-                      <option value="03">March</option>
-                      <option value="04">April</option>
-                      <option value="05">May</option>
-                      <option value="06">June</option>
-                      <option value="07">July</option>
-                      <option value="08">August</option>
-                      <option value="09">September</option>
-                      <option value="10">October</option>
-                      <option value="11">November</option>
-                      <option value="12">December</option>
+                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                      <option value="" className={optionStyle}>Select Month</option>
+                      <option value="01" className={optionStyle}>January</option>
+                      <option value="02" className={optionStyle}>February</option>
+                      <option value="03" className={optionStyle}>March</option>
+                      <option value="04" className={optionStyle}>April</option>
+                      <option value="05" className={optionStyle}>May</option>
+                      <option value="06" className={optionStyle}>June</option>
+                      <option value="07" className={optionStyle}>July</option>
+                      <option value="08" className={optionStyle}>August</option>
+                      <option value="09" className={optionStyle}>September</option>
+                      <option value="10" className={optionStyle}>October</option>
+                      <option value="11" className={optionStyle}>November</option>
+                      <option value="12" className={optionStyle}>December</option>
                     </select>
                   </CardHeader>
                   <CardContent className="p-4 h-[300px]">
@@ -618,33 +819,123 @@ export default function TDMSComponent() {
 
             {/* VIEW 3: NETWORK MAP */}
             <TabsContent value="network" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-800 shadow-xl rounded-2xl overflow-hidden">
-                <CardHeader className="border-b border-slate-800/60 bg-slate-900/30 flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg text-white">Live Status Grid</CardTitle>
-                    <CardDescription className="text-slate-400 mt-1">Real-time capacity rendering across all monitored nodes.</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {dashboardData?.vli_scores?.map((site) => {
-                      const isMitigated = appliedStrategies.some(strat => strat.site === site.site);
-                      return (
-                        <div key={site.site} className={`border ${isMitigated ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : getVLICardStyle(site.vli_score)} p-5 rounded-xl text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 relative overflow-hidden`}>
-                          {isMitigated && (
-                            <div className="absolute top-0 right-0 bg-indigo-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md">Managed</div>
-                          )}
-                          <h3 className="font-semibold text-sm mb-3 text-slate-200 truncate px-1" title={site.site}>{site.site}</h3>
-                          <div className="text-3xl font-black mb-1 tracking-tight">{Math.round(site.vli_score)}<span className="text-lg opacity-70">%</span></div>
-                          <div className="text-xs font-medium opacity-80 mt-2 bg-black/20 rounded-full py-1 px-2 inline-block">
-                            {site.visitors.toLocaleString()} Pax
+              
+              <div className="flex flex-col sm:flex-row items-center gap-4 p-2 bg-slate-900/60 backdrop-blur-xl rounded-xl border border-slate-800 w-fit">
+                <button onClick={() => setVliView('heatmap')} className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${vliView === 'heatmap' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>Grid Heatmap</button>
+                <button onClick={() => setVliView('loadbalancing')} className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${vliView === 'loadbalancing' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>Network Load Analysis</button>
+              </div>
+
+              {vliView === 'heatmap' ? (
+                <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-800 shadow-xl rounded-2xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-800/60 bg-slate-900/30 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg text-white">Live Status Grid</CardTitle>
+                      <CardDescription className="text-slate-400 mt-1">Real-time capacity rendering across all monitored nodes.</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                      {dashboardData?.vli_scores?.map((site) => {
+                        const isMitigated = appliedStrategies.some(strat => strat.site === site.site);
+                        return (
+                          <div key={site.site} className={`border ${isMitigated ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : getVLICardStyle(site.vli_score)} p-5 rounded-xl text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 relative overflow-hidden`}>
+                            {isMitigated && (
+                              <div className="absolute top-0 right-0 bg-indigo-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md">Managed</div>
+                            )}
+                            <h3 className="font-semibold text-sm mb-3 text-slate-200 truncate px-1" title={site.site}>{site.site}</h3>
+                            <div className="text-3xl font-black mb-1 tracking-tight">{Math.round(site.vli_score)}<span className="text-lg opacity-70">%</span></div>
+                            <div className="text-xs font-medium opacity-80 mt-2 bg-black/20 rounded-full py-1 px-2 inline-block">
+                              {site.visitors.toLocaleString()} Pax
+                            </div>
                           </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-800 shadow-xl rounded-2xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-800/60 bg-slate-900/30 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white">Load Balancing Audit</CardTitle>
+                      <CardDescription className="text-slate-400 mt-1">Infrastructure utilization breakdown</CardDescription>
+                    </div>
+                    <select value={infrastructureView} onChange={(e) => setInfrastructureView(e.target.value)} className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-1.5 focus:outline-none">
+                      <option value="cards" className={optionStyle}>Card View</option>
+                      <option value="grid" className={optionStyle}>Table View</option>
+                    </select>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                      <div className="bg-emerald-950/30 border border-emerald-900/50 p-4 rounded-xl text-center">
+                        <div className="text-3xl font-bold text-emerald-400">{infrastructureLoad.optimal_sites}</div>
+                        <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">Optimal</div>
+                      </div>
+                      <div className="bg-amber-950/30 border border-amber-900/50 p-4 rounded-xl text-center">
+                        <div className="text-3xl font-bold text-amber-400">{infrastructureLoad.high_load_sites}</div>
+                        <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">High Load</div>
+                      </div>
+                      <div className="bg-rose-950/30 border border-rose-900/50 p-4 rounded-xl text-center">
+                        <div className="text-3xl font-bold text-rose-400">{infrastructureLoad.overloaded_sites}</div>
+                        <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">Overloaded</div>
+                      </div>
+                      <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-xl text-center">
+                        <div className="text-3xl font-bold text-slate-300">{infrastructureLoad.total_sites}</div>
+                        <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">Total Monitored</div>
+                      </div>
+                    </div>
+
+                    {infrastructureView === 'cards' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {infrastructureLoad.site_analysis?.map((site, idx) => (
+                          <div key={idx} className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-xl flex justify-between items-center hover:bg-slate-800/60 transition-colors">
+                            <div>
+                              <h4 className="font-bold text-slate-200">{site.site}</h4>
+                              <p className="text-xs text-slate-400 mt-1 font-mono">VLI: {site.vli_score.toFixed(1)}% • UTIL: {site.utilization_rate}%</p>
+                              <p className="text-xs text-indigo-400 mt-2">{site.recommended_action}</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="outline" className={`border ${site.load_category === 'overloaded' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : site.load_category === 'high_load' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' : site.load_category === 'moderate_load' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}>
+                                {site.load_category.replace('_', ' ').toUpperCase()}
+                              </Badge>
+                              <p className="text-lg font-bold text-slate-300 mt-2">{site.visitors.toLocaleString()} pax</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="overflow-hidden rounded-xl border border-slate-800">
+                        <table className="w-full text-left text-sm">
+                          <thead className="bg-slate-800/50 text-slate-400 uppercase tracking-wider text-[10px]">
+                            <tr>
+                              <th className="px-4 py-3 font-medium">Destination</th>
+                              <th className="px-4 py-3 font-medium">Status</th>
+                              <th className="px-4 py-3 font-medium text-right">VLI</th>
+                              <th className="px-4 py-3 font-medium text-right">Visitors</th>
+                              <th className="px-4 py-3 font-medium">System Recommendation</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/50">
+                            {infrastructureLoad.site_analysis?.map((site, idx) => (
+                              <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-4 py-3 text-slate-200 font-medium">{site.site}</td>
+                                <td className="px-4 py-3">
+                                  <Badge variant="outline" className={`text-[10px] border ${site.load_category === 'overloaded' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : site.load_category === 'high_load' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' : site.load_category === 'moderate_load' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}>
+                                    {site.load_category.replace('_', ' ').toUpperCase()}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-3 text-right font-mono text-slate-300">{site.vli_score.toFixed(1)}%</td>
+                                <td className="px-4 py-3 text-right font-mono text-slate-300">{site.visitors.toLocaleString()}</td>
+                                <td className="px-4 py-3 text-slate-400 text-xs">{site.recommended_action}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             {/* VIEW 4: SIMULATOR */}
@@ -664,8 +955,8 @@ export default function TDMSComponent() {
                       <div className="w-full lg:w-1/3 bg-slate-900 border border-rose-500/30 p-4 rounded-xl shadow-[0_0_20px_rgba(225,29,72,0.05)] relative">
                         <div className="absolute -top-3 left-4 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">Source (Overloaded)</div>
                         <select value={sourceSite} onChange={(e) => setSourceSite(e.target.value)} className={`${inputStyle} mt-2 bg-slate-950`} style={{ backgroundImage: selectBgIcon, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em' }}>
-                          <option value="">Select source...</option>
-                          {dashboardData?.vli_scores?.map(s => <option key={s.site} value={s.site}>{s.site}</option>)}
+                          <option value="" className={optionStyle}>Select source...</option>
+                          {dashboardData?.vli_scores?.map(s => <option key={s.site} value={s.site} className={optionStyle}>{s.site}</option>)}
                         </select>
                         {sourceStats && (
                           <div className="mt-3 flex justify-between text-sm px-1">
@@ -692,8 +983,8 @@ export default function TDMSComponent() {
                       <div className="w-full lg:w-1/3 bg-slate-900 border border-emerald-500/30 p-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.05)] relative">
                         <div className="absolute -top-3 left-4 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">Target (Absorbing)</div>
                         <select value={targetSite} onChange={(e) => setTargetSite(e.target.value)} className={`${inputStyle} mt-2 bg-slate-950`} style={{ backgroundImage: selectBgIcon, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em' }}>
-                          <option value="">Select target...</option>
-                          {dashboardData?.vli_scores?.filter(s=>s.site !== sourceSite).map(s => <option key={s.site} value={s.site}>{s.site}</option>)}
+                          <option value="" className={optionStyle}>Select target...</option>
+                          {dashboardData?.vli_scores?.filter(s=>s.site !== sourceSite).map(s => <option key={s.site} value={s.site} className={optionStyle}>{s.site}</option>)}
                         </select>
                         {targetStats && (
                           <div className="mt-3 flex justify-between text-sm px-1">

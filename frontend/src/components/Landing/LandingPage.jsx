@@ -69,6 +69,7 @@ const LandingPage = () => {
           <nav className="tb-nav" aria-label="Main navigation">
             <a href="#features">Features</a>
             <a href="#analytics">Analytics</a>
+            <a href="#platform-capabilities">Capabilities</a>
             <a href="#audience">Who It's For</a>
             <a href="#ai-assistant">AI Assistant</a>
             <a href="#how-it-works">How It Works</a>
@@ -425,7 +426,7 @@ const LandingPage = () => {
                         <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
                       </svg>
                       <h3 className="magic-bento-card__title">Monthly Forecasting</h3>
-                      <p className="magic-bento-card__description">SVR and ensemble predictions 2026–2030 with baseline, optimistic, and pessimistic scenarios.</p>
+                      <p className="magic-bento-card__description">Ridge Regression with 89.26% accuracy and ensemble predictions 2026–2030 with baseline, optimistic, and pessimistic scenarios.</p>
                       <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(59, 91, 219, 0.2)', color: '#3b5bdb', padding: '0.3em 0.6em', borderRadius: '4px'}}>5-Year Horizon</span>
                     </div>
                   </>
@@ -524,7 +525,7 @@ const LandingPage = () => {
                         <line x1="12" y1="15" x2="12" y2="3"/>
                       </svg>
                       <h3 className="magic-bento-card__title">Revenue Analytics</h3>
-                      <p className="magic-bento-card__description">Comprehensive revenue tracking with geopolitical adjustments and anomaly detection.</p>
+                      <p className="magic-bento-card__description">Comprehensive revenue tracking with geopolitical adjustments, anomaly detection, and RAG-powered insights from SLTDA official reports.</p>
                       <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(220, 38, 38, 0.2)', color: '#dc2626', padding: '0.3em 0.6em', borderRadius: '4px'}}>Financial Insights</span>
                     </div>
                   </>
@@ -631,8 +632,8 @@ const LandingPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="ai-ft">Sri Lanka Tourism Knowledge Base</div>
-                    <div className="ai-fd">Contextual insights trained on SLTDA data, seasonal patterns, and site-level analytics.</div>
+                    <div className="ai-ft">SLTDA RAG Knowledge Base</div>
+                    <div className="ai-fd">Contextual insights powered by SLTDA official reports, seasonal patterns, and site-level analytics using Retrieval-Augmented Generation.</div>
                   </div>
                 </div>
                 <div className="ai-feat">
@@ -644,6 +645,18 @@ const LandingPage = () => {
                   <div>
                     <div className="ai-ft">Persistent Chat History</div>
                     <div className="ai-fd">Your conversations are saved per organisation — resume analysis anytime, from any device.</div>
+                  </div>
+                </div>
+                <div className="ai-feat">
+                  <div className="ai-fic" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#a78bfa" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="ai-ft">Document Intelligence</div>
+                    <div className="ai-fd">Processes and analyzes SLTDA PDF reports, policy documents, and tourism statistics for instant insights.</div>
                   </div>
                 </div>
               </div>
@@ -796,6 +809,165 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* PLATFORM CAPABILITIES */}
+      <section className="sec" id="platform-capabilities" style={{background: 'var(--white)'}} aria-labelledby="capabilities-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
+        <div className="pw">
+          <div className="capabilities-inner">
+            <div data-reveal>
+              <div className="capabilities-label">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 1l1.8 5.5L15 8l-5.2 1.5L8 15l-1.8-5.5L1 8l5.2-1.5z" fill="#3b5bdb"/>
+                </svg>
+                Complete Platform Overview
+              </div>
+              <h2 className="sec-h2" id="capabilities-h2">Every tool you need for<br/><span className="ac">tourism intelligence</span></h2>
+              <p className="sec-lead">From arrival forecasting to revenue optimization, our platform delivers comprehensive insights powered by advanced ML models and SLTDA official data.</p>
+              
+              <div className="capabilities-grid">
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(59, 91, 219, 0.1)', color: '#3b5bdb'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                      </svg>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Monthly forecasting with Ridge Regression (89.26% accuracy)</li>
+                    <li>Daily site predictions with 7-day horizon</li>
+                    <li>Scenario modeling (baseline, optimistic, pessimistic)</li>
+                    <li>Seasonal trend analysis</li>
+                  </ul>
+                </div>
+
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(245, 159, 0, 0.1)', color: '#f59f00'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M3 12a9 9 0 1 0 18 0"/>
+                      </svg>
+                    </div>
+                    <h3>Real-Time Monitoring</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Visitor Load Index for 15 sites</li>
+                    <li>Capacity alerts at 120% threshold</li>
+                    <li>Live dashboard updates</li>
+                    <li>Automated notification system</li>
+                  </ul>
+                </div>
+
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(220, 38, 38, 0.1)', color: '#dc2626'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                    </div>
+                    <h3>Financial Intelligence</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Revenue tracking with geopolitical adjustments</li>
+                    <li>Anomaly detection in financial patterns</li>
+                    <li>RAG-powered insights from SLTDA reports</li>
+                    <li>Market segment analysis</li>
+                  </ul>
+                </div>
+
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(18, 184, 134, 0.1)', color: '#12b886'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                    </div>
+                    <h3>Visitor Analytics</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Age cohort demographic tracking</li>
+                    <li>Population pyramid analysis</li>
+                    <li>Rising segment alerts</li>
+                    <li>Behavioral pattern recognition</li>
+                  </ul>
+                </div>
+
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/>
+                        <line x1="8" y1="2" x2="8" y2="18"/>
+                        <line x1="16" y1="6" x2="16" y2="22"/>
+                      </svg>
+                    </div>
+                    <h3>Geographic Intelligence</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Geopolitical impact analysis</li>
+                    <li>Regional tourism patterns</li>
+                    <li>Source market intelligence</li>
+                    <li>Choropleth mapping</li>
+                  </ul>
+                </div>
+
+                <div className="capability-category">
+                  <div className="capability-header">
+                    <div className="capability-icon" style={{background: 'rgba(121, 80, 242, 0.1)', color: '#7950f2'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                        <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+                      </svg>
+                    </div>
+                    <h3>Planning Tools</h3>
+                  </div>
+                  <ul className="capability-list">
+                    <li>Tourist redistribution simulator</li>
+                    <li>Before/after impact modeling</li>
+                    <li>Capacity optimization</li>
+                    <li>Strategic planning scenarios</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="capabilities-cta">
+                <div className="capabilities-badge">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M8 1l1.8 5.5L15 8l-5.2 1.5L8 15l-1.8-5.5L1 8l5.2-1.5z" fill="#3b5bdb"/>
+                  </svg>
+                  9 Integrated Modules
+                </div>
+                <Link to="/signup" className="btn-blue-lg">Explore All Features</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="sec proc-sec" id="how-it-works" aria-labelledby="proc-h2">
         <div className="section-antigravity" aria-hidden="true">
@@ -918,6 +1090,7 @@ const LandingPage = () => {
               <a href="#features">Daily Predictions</a>
               <a href="#features">Visitor Load Index</a>
               <a href="#analytics">Advanced Analytics</a>
+              <a href="#platform-capabilities">All Capabilities</a>
               <a href="#ai-assistant">AI Assistant</a>
             </div>
             <div className="foot-col">
