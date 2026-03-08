@@ -170,7 +170,7 @@ function DailyPredictionsComponent() {
       return (
         <div className="bg-[#151515] border border-[#2a2a2a] p-4 shadow-lg rounded-lg text-slate-200" style={{ minWidth: '280px', maxWidth: '320px' }}>
           <div className="font-semibold text-white mb-2">{label}</div>
-          <div className="font-medium text-purple-300 mb-3">
+          <div className="font-medium text-blue-300 mb-3">
             Predicted Arrivals: {data.arrivals.toLocaleString()}
           </div>
           <div className="space-y-1 text-sm">
@@ -234,7 +234,7 @@ function DailyPredictionsComponent() {
 
     // Set colors (matching monthly export)
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
-    const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
+    const accentColor = [37, 99, 235]; // Blue accent (#2563eb)
 
     // Helper function to add page numbers
     const addPageNumbers = () => {
@@ -489,16 +489,16 @@ function DailyPredictionsComponent() {
                 <Area
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#a78bfa"
-                  fill="#1e1b4b"
+                  stroke="#60a5fa"
+                  fill="#1e3a8a"
                   fillOpacity={0.6}
                 />
                 <Line
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#a78bfa"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#a78bfa', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -511,7 +511,7 @@ function DailyPredictionsComponent() {
       <Card className="power-bi-card !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center text-white">
-            <Calendar className="h-5 w-5 mr-2 text-purple-300" />
+            <Calendar className="h-5 w-5 mr-2 text-blue-300" />
             {forecastDays}-Day Tourist Arrival Predictions
           </CardTitle>
         </CardHeader>
@@ -521,7 +521,7 @@ function DailyPredictionsComponent() {
               <div key={index} className="flex items-center justify-between p-4 bg-[#1b1b1b]/70 border border-[#2a2a2a] rounded-lg">
                 <div className="flex items-center space-x-4">
                   <div className="font-semibold text-slate-100">{item.day}</div>
-                  <div className="text-2xl font-bold text-purple-300">
+                  <div className="text-2xl font-bold text-blue-300">
                     {item.prediction.toLocaleString()}
                   </div>
                 </div>

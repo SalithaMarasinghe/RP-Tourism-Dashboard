@@ -247,6 +247,7 @@ export default function Profile() {
                                                 onChange={(e) => setEditFirstName(e.target.value)}
                                                 ref={firstNameRef}
                                                 className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                                                style={{ backgroundColor: "#151515", color: "#FFFFFF", borderColor: "#2a2a2a" }}
                                                 placeholder="Enter your first name"
                                                 required
                                             />
@@ -261,6 +262,7 @@ export default function Profile() {
                                                 onChange={(e) => setEditLastName(e.target.value)}
                                                 ref={lastNameRef}
                                                 className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                                                style={{ backgroundColor: "#151515", color: "#FFFFFF", borderColor: "#2a2a2a" }}
                                                 placeholder="Enter your last name"
                                                 required
                                             />
@@ -302,6 +304,7 @@ export default function Profile() {
                                             value={securityData.currentPassword}
                                             onChange={(e) => setSecurityData({...securityData, currentPassword: e.target.value})}
                                             className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            style={{ backgroundColor: "#151515", color: "#FFFFFF", borderColor: "#2a2a2a" }}
                                             required
                                         />
                                     </div>
@@ -315,6 +318,7 @@ export default function Profile() {
                                             value={securityData.newPassword}
                                             onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
                                             className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            style={{ backgroundColor: "#151515", color: "#FFFFFF", borderColor: "#2a2a2a" }}
                                             required
                                         />
                                         {securityData.newPassword && (
@@ -341,6 +345,7 @@ export default function Profile() {
                                             value={securityData.confirmPassword}
                                             onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
                                             className="profile-input-dark w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            style={{ backgroundColor: "#151515", color: "#FFFFFF", borderColor: "#2a2a2a" }}
                                             required
                                         />
                                     </div>

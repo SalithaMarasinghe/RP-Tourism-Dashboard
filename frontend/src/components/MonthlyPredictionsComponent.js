@@ -184,7 +184,7 @@ function MonthlyPredictionsComponent() {
           style={{ minWidth: '280px', maxWidth: '320px' }}
         >
           <div className="font-semibold text-white mb-2">{label}</div>
-          <div className="font-medium text-purple-300 mb-3">
+          <div className="font-medium text-blue-300 mb-3">
             Predicted Arrivals: {data.arrivals.toLocaleString()}
           </div>
           <div className="space-y-1 text-sm">
@@ -228,7 +228,7 @@ function MonthlyPredictionsComponent() {
 
     // Set colors
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
-    const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
+    const accentColor = [37, 99, 235]; // Blue accent (#2563eb)
 
     // Helper function to add page numbers
     const addPageNumbers = () => {
@@ -462,16 +462,16 @@ function MonthlyPredictionsComponent() {
                 <Area
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#a78bfa"
-                  fill="#1e1b4b"
+                  stroke="#60a5fa"
+                  fill="#1e3a8a"
                   fillOpacity={0.6}
                 />
                 <Line
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#a78bfa"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#a78bfa', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -495,7 +495,7 @@ function MonthlyPredictionsComponent() {
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center space-x-4">
                     <div className="font-semibold text-slate-100">{item.month}</div>
-                    <div className="text-2xl font-bold text-purple-300">
+                    <div className="text-2xl font-bold text-blue-300">
                       {item.prediction !== '-' ? item.prediction.toLocaleString() : '-'}
                     </div>
                   </div>
