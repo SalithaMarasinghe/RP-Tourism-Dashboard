@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import asyncio
 import firebase_admin
 from firebase_admin import credentials, auth
 from fastapi import HTTPException, Security, Request
@@ -12,6 +13,9 @@ from dotenv import load_dotenv
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+# Allow small client/server clock drift to avoid false "Token used too early" failures.
+FIREBASE_CLOCK_SKEW_SECONDS = int(os.getenv("FIREBASE_CLOCK_SKEW_SECONDS", "60"))
 
 # Initialize Firebase Admin
 # Supports three methods (in priority order):
@@ -42,15 +46,35 @@ else:
 
 security = HTTPBearer()
 
+
+def _verify_id_token_compat(token: str):
+    """
+    Verify Firebase ID token across firebase-admin versions.
+    Older versions do not support `clock_skew_seconds`.
+    """
+    try:
+        return auth.verify_id_token(
+            token,
+            clock_skew_seconds=FIREBASE_CLOCK_SKEW_SECONDS,
+        )
+    except TypeError:
+        # Backward compatibility for older firebase-admin versions.
+        return auth.verify_id_token(token)
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)):
     """
     Verifies the Firebase token and returns the user's decoded token data.
     """
     token = credentials.credentials
     try:
-        # Add clock skew tolerance to handle "Token used too early" errors
-        decoded_token = auth.verify_id_token(token)
-        return decoded_token
+        try:
+            return _verify_id_token_compat(token)
+        except Exception as first_error:
+            # If token is marginally early due to clock drift, retry once after 1s.
+            if "Token used too early" in str(first_error):
+                await asyncio.sleep(1)
+                return _verify_id_token_compat(token)
+            raise
     except Exception as e:
         raise HTTPException(
             status_code=401,
@@ -65,8 +89,14 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
     Verifies the Firebase ID token and returns the decoded payload.
     """
     try:
-        # Add clock skew tolerance to handle "Token used too early" errors
-        return auth.verify_id_token(credentials.credentials)
+        token = credentials.credentials
+        try:
+            return _verify_id_token_compat(token)
+        except Exception as first_error:
+            if "Token used too early" in str(first_error):
+                await asyncio.sleep(1)
+                return _verify_id_token_compat(token)
+            raise
     except Exception as e:
         raise HTTPException(
             status_code=401,

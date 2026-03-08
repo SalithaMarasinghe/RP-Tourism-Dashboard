@@ -5,6 +5,8 @@ All Firebase Auth + Firestore logic for the auth module.
 No FastAPI / HTTP concerns live here.
 """
 import logging
+import os
+import time
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -12,6 +14,9 @@ from fastapi import HTTPException
 from firebase_admin import auth as firebase_auth, firestore
 
 logger = logging.getLogger(__name__)
+FIREBASE_CLOCK_SKEW_SECONDS = int(os.getenv("FIREBASE_CLOCK_SKEW_SECONDS", "60"))
+EARLY_TOKEN_RETRY_SECONDS = float(os.getenv("FIREBASE_EARLY_TOKEN_RETRY_SECONDS", "1"))
+EARLY_TOKEN_MAX_RETRIES = int(os.getenv("FIREBASE_EARLY_TOKEN_MAX_RETRIES", "2"))
 
 
 # ── Utilities ────────────────────────────────────────────────────────────────
@@ -75,8 +80,26 @@ def verify_google_token(id_token: str) -> Dict[str, Any]:
     Verify a Google OAuth idToken and ensure a Firestore profile exists.
     Called after signInWithPopup() on the frontend.
     """
+    def _verify_google_token_compat(token: str):
+        """Verify token across firebase-admin versions."""
+        try:
+            return firebase_auth.verify_id_token(
+                token,
+                clock_skew_seconds=FIREBASE_CLOCK_SKEW_SECONDS,
+            )
+        except TypeError:
+            return firebase_auth.verify_id_token(token)
+
     try:
-        decoded = firebase_auth.verify_id_token(id_token)
+        for attempt in range(EARLY_TOKEN_MAX_RETRIES + 1):
+            try:
+                decoded = _verify_google_token_compat(id_token)
+                break
+            except Exception as exc:
+                if "Token used too early" in str(exc) and attempt < EARLY_TOKEN_MAX_RETRIES:
+                    time.sleep(EARLY_TOKEN_RETRY_SECONDS)
+                    continue
+                raise
     except Exception as exc:
         raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(exc)}")
 

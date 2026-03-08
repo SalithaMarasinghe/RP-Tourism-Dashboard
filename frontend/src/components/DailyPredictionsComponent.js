@@ -20,6 +20,17 @@ function DailyPredictionsComponent() {
   const [isLoading, setIsLoading] = useState(true);
   const [forecastData, setForecastData] = useState([]);
 
+  const darkSelectStyle = {
+    backgroundColor: '#151515',
+    color: '#f1f5f9',
+    colorScheme: 'dark',
+  };
+
+  const darkOptionStyle = {
+    backgroundColor: '#1b1b1b',
+    color: '#f1f5f9',
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -137,7 +148,7 @@ function DailyPredictionsComponent() {
 
   const formatFactor = (percentage) => {
     const value = parseFloat(percentage);
-    const color = value >= 0 ? 'text-green-600' : 'text-red-600';
+    const color = value >= 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
     return <span className={color}>{percentage}</span>;
   };
 
@@ -157,13 +168,13 @@ function DailyPredictionsComponent() {
       }
 
       return (
-        <div className="bg-white p-4 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
-          <div className="font-semibold text-gray-900 mb-2">{label}</div>
-          <div className="font-medium text-purple-600 mb-3">
+        <div className="bg-[#151515] border border-[#2a2a2a] p-4 shadow-lg rounded-lg text-slate-200" style={{ minWidth: '280px', maxWidth: '320px' }}>
+          <div className="font-semibold text-white mb-2">{label}</div>
+          <div className="font-medium text-blue-300 mb-3">
             Predicted Arrivals: {data.arrivals.toLocaleString()}
           </div>
           <div className="space-y-1 text-sm">
-            <div className="font-medium text-gray-700 mb-1">External Factor Contributions:</div>
+            <div className="font-medium text-gray-200 mb-1">External Factor Contributions:</div>
             <div>• Economic Indicators: {formatFactor(factorsMap.economic_indicators || '0%')}</div>
             <div>• Exchange Rates: {formatFactor(factorsMap.exchange_rates || '0%')}</div>
             <div>• Weather: {formatFactor(factorsMap.weather || '0%')}</div>
@@ -223,7 +234,7 @@ function DailyPredictionsComponent() {
 
     // Set colors (matching monthly export)
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
-    const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
+    const accentColor = [37, 99, 235]; // Blue accent (#2563eb)
 
     // Helper function to add page numbers
     const addPageNumbers = () => {
@@ -340,25 +351,38 @@ function DailyPredictionsComponent() {
   };
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading daily predictions...</div>;
+    return <div className="p-4 text-center text-gray-200">Loading daily predictions...</div>;
   }
 
   return (
     <div className="space-y-6">
-      <Card className="power-bi-card">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            Daily <span className="text-blue-600">Predictions</span>
+          </h1>
+          <p className="text-sm text-gray-300 font-medium">
+            Executive monitoring of short-horizon tourism arrival forecasts.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 bg-black p-3 rounded-xl border border-gray-800 shadow-sm">
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportDailyPredictions}>
+            <Download className="h-4 w-4 mr-1" />
+            Export Predictions
+          </Button>
+        </div>
+      </div>
+
+      <Card className="power-bi-card !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Daily Forecast Filters</CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportDailyPredictions}>
-              <Download className="h-4 w-4 mr-1" />
-              Export Predictions
-            </Button>
+            <CardTitle className="text-lg font-semibold text-white">Daily Forecast Filters</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Scenario</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Scenario</label>
               <div className="flex space-x-2">
                 {['baseline', 'optimistic', 'pessimistic'].map((scenario) => (
                   <button
@@ -366,7 +390,7 @@ function DailyPredictionsComponent() {
                     onClick={() => handleScenarioChange(scenario)}
                     className={`px-3 py-1 text-sm rounded-md ${currentScenario === scenario
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-[#1b1b1b] text-gray-100 hover:bg-[#222222]'
                       }`}
                   >
                     {scenario.charAt(0).toUpperCase() + scenario.slice(1)}
@@ -376,15 +400,16 @@ function DailyPredictionsComponent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Start Date</label>
               <div className="grid grid-cols-3 gap-2">
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  style={darkSelectStyle}
                 >
                   {years.map((year) => (
-                    <option key={year} value={year}>
+                    <option key={year} value={year} style={darkOptionStyle}>
                       {year}
                     </option>
                   ))}
@@ -392,10 +417,11 @@ function DailyPredictionsComponent() {
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  style={darkSelectStyle}
                 >
                   {months.map((month) => (
-                    <option key={month.value} value={month.value}>
+                    <option key={month.value} value={month.value} style={darkOptionStyle}>
                       {month.name}
                     </option>
                   ))}
@@ -403,10 +429,11 @@ function DailyPredictionsComponent() {
                 <select
                   value={selectedDay}
                   onChange={(e) => setSelectedDay(parseInt(e.target.value))}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  style={darkSelectStyle}
                 >
                   {days.map((day) => (
-                    <option key={day} value={day}>
+                    <option key={day} value={day} style={darkOptionStyle}>
                       {day}
                     </option>
                   ))}
@@ -415,22 +442,23 @@ function DailyPredictionsComponent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Forecast Duration</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Forecast Duration</label>
               <select
                 value={forecastDays}
                 onChange={(e) => setForecastDays(parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                style={darkSelectStyle}
               >
-                <option value={7}>7 Days</option>
-                <option value={14}>14 Days</option>
-                <option value={30}>30 Days</option>
+                <option value={7} style={darkOptionStyle}>7 Days</option>
+                <option value={14} style={darkOptionStyle}>14 Days</option>
+                <option value={30} style={darkOptionStyle}>30 Days</option>
               </select>
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <p className="text-sm text-blue-700">
-              Showing <strong>{currentScenario}</strong> forecast starting from {selectedDay} {months[selectedMonth - 1].name} {selectedYear} for the next {forecastDays} days
+          <div className="mt-4 p-3 bg-[#1b1b1b]/80 border border-[#2a2a2a] rounded-md">
+            <p className="text-sm text-gray-200">
+              Showing <strong className="text-blue-300">{currentScenario}</strong> forecast starting from {selectedDay} {months[selectedMonth - 1].name} {selectedYear} for the next {forecastDays} days
             </p>
           </div>
         </CardContent>
@@ -438,39 +466,39 @@ function DailyPredictionsComponent() {
 
       {/* Daily Tourist Arrival Forecast Chart - MOVED UP */}
       {forecastData.length > 0 && (
-        <Card className="power-bi-card mt-6 mb-8">
+        <Card className="power-bi-card mt-6 mb-8 !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Daily Tourist Arrival Forecast Chart</CardTitle>
+            <CardTitle className="text-lg font-semibold text-white">Daily Tourist Arrival Forecast Chart</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={dailyChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis
                   dataKey="date"
                   angle={-45}
                   height={80}
                   tickFormatter={truncateDate}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#cbd5e1' }}
                 />
                 <YAxis
                   tickFormatter={formatNumberWithCommas}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#cbd5e1' }}
                 />
                 <Tooltip content={<DailyCustomTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#9333ea"
-                  fill="#f3e8ff"
+                  stroke="#60a5fa"
+                  fill="#1e3a8a"
                   fillOpacity={0.6}
                 />
                 <Line
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#9333ea"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -480,27 +508,27 @@ function DailyPredictionsComponent() {
       )}
 
       {/* Daily Predictions Table - MOVED DOWN */}
-      <Card className="power-bi-card">
+      <Card className="power-bi-card !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center">
-            <Calendar className="h-5 w-5 mr-2 text-purple-600" />
+          <CardTitle className="text-lg font-semibold flex items-center text-white">
+            <Calendar className="h-5 w-5 mr-2 text-blue-300" />
             {forecastDays}-Day Tourist Arrival Predictions
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {forecastData.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-4 bg-[#1b1b1b]/70 border border-[#2a2a2a] rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <div className="font-semibold text-gray-800">{item.day}</div>
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="font-semibold text-slate-100">{item.day}</div>
+                  <div className="text-2xl font-bold text-blue-300">
                     {item.prediction.toLocaleString()}
                   </div>
                 </div>
               </div>
             ))}
             {forecastData.length === 0 && !isLoading && (
-              <div className="p-4 text-center text-gray-500">No data available for the selected period.</div>
+              <div className="p-4 text-center text-slate-400">No data available for the selected period.</div>
             )}
           </div>
         </CardContent>
@@ -510,3 +538,4 @@ function DailyPredictionsComponent() {
 }
 
 export default DailyPredictionsComponent;
+

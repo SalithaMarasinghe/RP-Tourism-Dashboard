@@ -92,14 +92,14 @@ function buildChoropleth(apiData, activeFrameIdx) {
         geo: {
             showframe: false,
             showcoastlines: true,
-            coastlinecolor: 'rgba(148,163,184,0.4)',
+            coastlinecolor: 'rgba(148,163,184,0.55)',
             showland: true,
-            landcolor: '#e2e8f0',
+            landcolor: '#111827',
             showocean: true,
-            oceancolor: '#f0f9ff',
+            oceancolor: '#0b1020',
             showlakes: false,
             showcountries: true,
-            countrycolor: 'rgba(148,163,184,0.3)',
+            countrycolor: 'rgba(148,163,184,0.45)',
             projection: { type: 'natural earth' },
             bgcolor: 'transparent',
         },
@@ -217,8 +217,8 @@ export default function ChoroplethMap() {
 
     if (error) {
         return (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-5 text-center">
-                <p className="text-red-700 font-medium text-sm">⚠️ {error}</p>
+            <div className="rounded-lg bg-red-500/10 border border-red-800 p-5 text-center">
+                <p className="text-red-300 font-medium text-sm">⚠️ {error}</p>
             </div>
         );
     }
@@ -230,18 +230,18 @@ export default function ChoroplethMap() {
     const banner = BANNER_COLORS[activeFrame.year];
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+        <div className="bg-[#151515] rounded-xl shadow-sm border border-[#2a2a2a] overflow-hidden flex flex-col">
             {/* Card header */}
-            <div className="px-6 pt-5 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="px-6 pt-5 pb-4 border-b border-[#2a2a2a] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Geographic Source Distribution</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">
+                    <h3 className="text-lg font-semibold text-gray-100">Geographic Source Distribution</h3>
+                    <p className="text-sm text-gray-400 mt-0.5">
                         Where Sri Lanka's tourists come from — by year
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 pt-1">
                     {SEGMENTS.map((seg) => (
-                        <span key={seg.label} className="flex items-center gap-1.5 text-xs text-gray-600">
+                        <span key={seg.label} className="flex items-center gap-1.5 text-xs text-gray-300">
                             <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
                             {seg.label}
                         </span>
@@ -268,16 +268,16 @@ export default function ChoroplethMap() {
             </div>
 
             {/* KPI strip */}
-            <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-3">
+            <div className="px-5 py-3 bg-[#1b1b1b] border-t border-[#2a2a2a] flex flex-wrap gap-3">
                 {[
                     { icon: '🌍', label: 'Total Arrivals', value: fmt(activeFrame.total_arrivals) },
                     { icon: '🥇', label: 'Top Market', value: activeFrame.top_market },
                     { icon: '📊', label: 'Markets Tracked', value: activeFrame.markets_tracked },
                 ].map((kpi) => (
-                    <div key={kpi.label} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    <div key={kpi.label} className="flex items-center gap-2 bg-[#151515] border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm">
                         <span>{kpi.icon}</span>
-                        <span className="text-gray-500">{kpi.label}:</span>
-                        <span className="font-semibold text-gray-800">{kpi.value}</span>
+                        <span className="text-gray-400">{kpi.label}:</span>
+                        <span className="font-semibold text-gray-100">{kpi.value}</span>
                     </div>
                 ))}
             </div>
@@ -300,7 +300,7 @@ export default function ChoroplethMap() {
                     {years.map((y, i) => (
                         <span
                             key={y}
-                            className={`cursor-pointer transition-colors ${i === activeIdx ? 'text-blue-600 font-bold' : 'hover:text-gray-600'}`}
+                            className={`cursor-pointer transition-colors ${i === activeIdx ? 'text-blue-600 font-bold' : 'hover:text-gray-300'}`}
                             onClick={() => { setPlaying(false); setActiveIdx(i); }}
                         >
                             {y}
@@ -312,7 +312,7 @@ export default function ChoroplethMap() {
                 <div className="flex items-center gap-2 pt-1">
                     <button
                         onClick={() => setPlaying((p) => !p)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-colors text-gray-700"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium bg-[#222222] hover:bg-[#2a2a2a] border border-[#2a2a2a] transition-colors text-gray-200"
                     >
                         {playing ? '⏸  Pause' : '▶  Play'}
                     </button>

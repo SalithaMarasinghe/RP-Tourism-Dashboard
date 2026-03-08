@@ -16,6 +16,18 @@ export function useAuth() {
     return useContext(AuthContext);
 }
 
+function normalizeEmail(email) {
+    // Remove hidden whitespace characters and normalize casing.
+    return String(email || "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .trim()
+        .toLowerCase();
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // Helper: get Firebase ID token from current user
 async function getIdToken() {
     const user = auth.currentUser;
@@ -47,12 +59,16 @@ export function AuthProvider({ children }) {
     // ---------- Auth functions ----------
 
     async function signup(email, password, additionalData) {
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
         // 1. Backend creates the user + Firestore profile, returns custom token
         const res = await fetch(`${API_BASE}/api/auth/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                email,
+                email: normalizedEmail,
                 password,
                 firstName: additionalData.firstName,
                 lastName: additionalData.lastName
@@ -70,23 +86,65 @@ export function AuthProvider({ children }) {
         // credential validation; we keep this direct for simplicity since we are not
         // storing passwords on the backend.
         const { signInWithEmailAndPassword } = await import("firebase/auth");
-        const result = await signInWithEmailAndPassword(auth, email, password);
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
+        const result = await signInWithEmailAndPassword(auth, normalizedEmail, password);
         return result;
     }
 
     async function googleSignIn() {
-        // 1. Firebase client-side popup (no change needed here)
-        const result = await signInWithPopup(auth, googleProvider);
-        const idToken = await result.user.getIdToken();
+        try {
+            // 1. Firebase client-side popup with error handling
+            console.log("[Auth] Starting Google Sign-In popup...");
+            
+            let result;
+            try {
+                result = await signInWithPopup(auth, googleProvider);
+                console.log("[Auth] Popup successful, user:", result.user.email);
+            } catch (popupError) {
+                // Handle specific popup errors
+                if (popupError.code === 'auth/popup-closed-by-user') {
+                    console.warn("[Auth] User closed the popup");
+                    throw new Error("Sign-in cancelled. Please try again.");
+                } else if (popupError.code === 'auth/popup-blocked') {
+                    console.warn("[Auth] Popup was blocked by browser");
+                    throw new Error("Popup blocked. Please allow popups for this site.");
+                } else if (popupError.code === 'auth/cancelled-popup-request') {
+                    console.warn("[Auth] Popup request was cancelled");
+                    throw new Error("Sign-in cancelled. Please try again.");
+                } else {
+                    console.error("[Auth] Popup error:", popupError.code, popupError.message);
+                    throw popupError;
+                }
+            }
 
-        // 2. Backend ensures Firestore profile exists
-        await fetch(`${API_BASE}/api/auth/google`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idToken })
-        });
+            // 2. Get ID token
+            console.log("[Auth] Getting ID token...");
+            const idToken = await result.user.getIdToken();
 
-        return result;
+            // 3. Backend ensures Firestore profile exists
+            console.log("[Auth] Syncing user profile with backend...");
+            const response = await fetch(`${API_BASE}/api/auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("[Auth] Backend sync failed:", errorData);
+                throw new Error(errorData.detail || "Failed to sync user profile");
+            }
+
+            console.log("[Auth] Google Sign-In completed successfully");
+            return result;
+            
+        } catch (error) {
+            console.error("[Auth] Google Sign-In error:", error.message);
+            throw error;
+        }
     }
 
     function logout() {
@@ -95,7 +153,11 @@ export function AuthProvider({ children }) {
     }
 
     function resetPassword(email) {
-        return sendPasswordResetEmail(auth, email);
+        const normalizedEmail = normalizeEmail(email);
+        if (!isValidEmail(normalizedEmail)) {
+            throw new Error("Invalid email format");
+        }
+        return sendPasswordResetEmail(auth, normalizedEmail);
     }
 
     async function changePassword(currentPassword, newPassword) {
@@ -150,31 +212,38 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            setCurrentUser(user);
+            try {
+                if (user) {
+                    console.log("[Auth] User signed in:", user.email);
+                    setCurrentUser(user);
 
-            if (user) {
-                try {
-                    const token = await user.getIdToken();
-                    const res = await fetch(`${API_BASE}/api/auth/me`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    if (res.ok) {
-                        const profile = await res.json();
-                        // eslint-disable-next-line no-unused-vars
-                        const { uid, ...profileData } = profile;
-                        setUserData(profileData);
-                    } else {
+                    try {
+                        const token = await user.getIdToken();
+                        const res = await fetch(`${API_BASE}/api/auth/me`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            const profile = await res.json();
+                            console.log("[Auth] User profile loaded:", profile.email);
+                            // eslint-disable-next-line no-unused-vars
+                            const { uid, ...profileData } = profile;
+                            setUserData(profileData);
+                        } else {
+                            console.warn("[Auth] Failed to fetch profile, status:", res.status);
+                            setUserData(null);
+                        }
+                    } catch (err) {
+                        console.error("[Auth] Failed to fetch user profile:", err);
                         setUserData(null);
                     }
-                } catch (err) {
-                    console.error("Failed to fetch user profile:", err);
+                } else {
+                    console.log("[Auth] User signed out");
+                    setCurrentUser(null);
                     setUserData(null);
                 }
-            } else {
-                setUserData(null);
+            } finally {
+                setLoading(false);
             }
-
-            setLoading(false);
         });
 
         return unsubscribe;

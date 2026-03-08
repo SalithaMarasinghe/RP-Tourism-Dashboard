@@ -1,0 +1,32 @@
+{
+  "year": 2026,
+  "scenario": "Baseline",
+  "total_revenue_usd_mn": 0.0,
+  "drivers": [
+    {
+      "name": "Hotels",
+      "value_usd_mn": 2023.63,
+      "share_pct": 0.0
+    },
+    {
+      "name": "Travel Agencies",
+      "value_usd_mn": 371.5,
+      "share_pct": 0.0
+    },
+    {
+      "name": "Shops",
+      "value_usd_mn": 429.19,
+      "share_pct": 0.0
+    },
+    {
+      "name": "Banks",
+      "value_usd_mn": 509.82,
+      "share_pct": 0.0
+    },
+    {
+      "name": "Gem Corp",
+      "value_usd_mn": 140.75,
+      "share_pct": 0.0
+    }
+  ]
+}

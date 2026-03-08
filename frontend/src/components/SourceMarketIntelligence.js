@@ -28,6 +28,13 @@ const fmt = (n) => (n == null ? '' : n.toLocaleString());
 // ── Build Plotly bar-chart-race figure ────────────────────────────────────────
 function buildFigure(apiData) {
     const { years, countries, rankings } = apiData;
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const compactLayout = viewportWidth < 768;
+    const controlsBottomMargin = compactLayout ? 250 : 185;
+    const sliderX = compactLayout ? 0.08 : 0.34;
+    const sliderLen = compactLayout ? 0.90 : 0.62;
+    const sliderY = compactLayout ? -0.18 : -0.22;
+    const buttonsY = compactLayout ? -0.56 : -0.22;
     const colorOf = {};
     countries.forEach((c) => { colorOf[c.country] = c.color; });
 
@@ -55,7 +62,7 @@ function buildFigure(apiData) {
                 xanchor: 'right', yanchor: 'bottom',
                 text: `<b>${yr}</b>`,
                 showarrow: false,
-                font: { size: 72, color: 'rgba(30,30,60,0.10)', family: 'Inter, sans-serif' },
+                font: { size: 72, color: 'rgba(226,232,240,0.14)', family: 'Inter, sans-serif' },
             },
         ];
 
@@ -66,11 +73,11 @@ function buildFigure(apiData) {
                 xanchor: 'right', yanchor: 'top',
                 text: landmark,
                 showarrow: false,
-                bgcolor: 'rgba(255,251,230,0.95)',
-                bordercolor: '#f59e0b',
+                bgcolor: 'rgba(21,21,21,0.95)',
+                bordercolor: '#2a2a2a',
                 borderwidth: 1.5,
                 borderpad: 8,
-                font: { size: 12, color: '#92400e', family: 'Inter, sans-serif' },
+                font: { size: 12, color: '#e5e7eb', family: 'Inter, sans-serif' },
             });
         }
 
@@ -95,24 +102,25 @@ function buildFigure(apiData) {
     const layout = {
         autosize: true,
         height: 520,
-        margin: { l: 130, r: 110, t: 20, b: 100 },
+        margin: { l: 130, r: 110, t: 20, b: controlsBottomMargin },
         paper_bgcolor: 'transparent',
-        plot_bgcolor: 'rgba(248,250,252,0.6)',
-        font: { family: 'Inter, system-ui, sans-serif', size: 13, color: '#1e293b' },
+        plot_bgcolor: 'rgba(21,21,21,0.70)',
+        font: { family: 'Inter, system-ui, sans-serif', size: 13, color: '#cbd5e1' },
         xaxis: {
-            title: { text: 'Annual Arrivals', font: { size: 12, color: '#64748b' } },
+            title: { text: 'Annual Arrivals', font: { size: 12, color: '#94a3b8' } },
             tickformat: ',.0f',
-            gridcolor: 'rgba(203,213,225,0.5)',
+            gridcolor: 'rgba(71,85,105,0.5)',
             zeroline: false,
             fixedrange: true,
         },
-        yaxis: { tickfont: { size: 13, color: '#1e293b' }, fixedrange: true, automargin: true },
+        yaxis: { tickfont: { size: 13, color: '#cbd5e1' }, fixedrange: true, automargin: true },
         annotations: firstFrame.layout.annotations,
         updatemenus: [{
             type: 'buttons',
             showactive: false,
-            x: 0, y: -0.24,
+            x: 0, y: buttonsY,
             xanchor: 'left', yanchor: 'top',
+            direction: 'down',
             buttons: [
                 {
                     label: '▶  Play',
@@ -125,8 +133,8 @@ function buildFigure(apiData) {
                     args: [[null], { mode: 'immediate', frame: { duration: 0 }, transition: { duration: 0 } }],
                 },
             ],
-            bgcolor: '#f1f5f9', bordercolor: '#cbd5e1', borderwidth: 1,
-            font: { size: 13 }, pad: { l: 4, r: 4, t: 4, b: 4 },
+            bgcolor: '#151515', bordercolor: '#2a2a2a', borderwidth: 1,
+            font: { size: 13, color: '#e5e7eb' }, pad: { l: 4, r: 4, t: 4, b: 4 },
         }],
         sliders: [{
             active: 0,
@@ -135,12 +143,12 @@ function buildFigure(apiData) {
                 method: 'animate',
                 args: [[String(yr)], { mode: 'immediate', frame: { duration: 500, redraw: true }, transition: { duration: 300 } }],
             })),
-            x: 0.08, y: -0.16, len: 0.92,
+            x: sliderX, y: sliderY, len: sliderLen,
             xanchor: 'left', yanchor: 'top',
-            currentvalue: { prefix: 'Year: ', visible: true, xanchor: 'center', font: { size: 13, color: '#475569' } },
+            currentvalue: { prefix: 'Year: ', visible: true, xanchor: 'center', font: { size: 13, color: '#cbd5e1' } },
             pad: { t: 20 },
-            bgcolor: '#e2e8f0', bordercolor: '#94a3b8', tickcolor: '#64748b',
-            font: { color: '#475569', size: 11 },
+            bgcolor: '#1b1b1b', bordercolor: '#2a2a2a', tickcolor: '#94a3b8',
+            font: { color: '#cbd5e1', size: 11 },
         }],
     };
 
@@ -181,15 +189,15 @@ function BarChartRace({ apiData }) {
     }, []);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-            <div className="px-6 pt-5 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="bg-[#151515] rounded-xl shadow-sm border border-[#2a2a2a] overflow-hidden flex flex-col">
+            <div className="px-6 pt-5 pb-4 border-b border-[#2a2a2a] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Source Market Race (2010–2025)</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Top 10 tourist source countries ranked by annual arrivals</p>
+                    <h3 className="text-lg font-semibold text-gray-100">Source Market Race (2010–2025)</h3>
+                    <p className="text-sm text-gray-400 mt-0.5">Top 10 tourist source countries ranked by annual arrivals</p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 pt-1">
                     {SEGMENTS.map((seg) => (
-                        <span key={seg.label} className="flex items-center gap-1.5 text-xs text-gray-600">
+                        <span key={seg.label} className="flex items-center gap-1.5 text-xs text-gray-300">
                             <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }} />
                             {seg.label}
                         </span>
@@ -224,16 +232,16 @@ export default function SourceMarketIntelligence() {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-4">
                 <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-500">Loading source market data…</p>
+                <p className="text-sm text-gray-400">Loading source market data…</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-6 text-center">
-                <p className="text-red-700 font-medium">⚠️ {error}</p>
-                <p className="text-red-500 text-sm mt-1">Please check the backend server and try again.</p>
+            <div className="rounded-lg bg-red-500/10 border border-red-800 p-6 text-center">
+                <p className="text-red-300 font-medium">⚠️ {error}</p>
+                <p className="text-red-200 text-sm mt-1">Please check the backend server and try again.</p>
             </div>
         );
     }
@@ -241,9 +249,11 @@ export default function SourceMarketIntelligence() {
     return (
         <div className="space-y-6">
             {/* Section header */}
-            <div>
-                <h2 className="text-2xl font-bold text-gray-900">Source Market Intelligence</h2>
-                <p className="text-gray-500 mt-1 text-sm leading-relaxed">
+            <div className="space-y-1">
+                <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                    Source Market <span className="text-blue-600">Intelligence</span>
+                </h1>
+                <p className="text-sm text-gray-400 font-medium leading-relaxed">
                     15-year animated view of Sri Lanka's top tourist source markets —
                     tracking growth, decline, and emerging players.
                 </p>
@@ -263,3 +273,4 @@ export default function SourceMarketIntelligence() {
         </div>
     );
 }
+

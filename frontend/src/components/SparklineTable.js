@@ -90,10 +90,10 @@ function DominanceBar({ years_in_top3, total_years, color }) {
     const pct = total_years > 0 ? (years_in_top3 / total_years) * 100 : 0;
     return (
         <div>
-            <span className="text-sm font-medium text-gray-800">
+            <span className="text-sm font-medium text-gray-100">
                 {years_in_top3} / {total_years} yrs
             </span>
-            <div className="mt-1 h-1.5 rounded-full w-24" style={{ background: '#e2e8f0' }}>
+            <div className="mt-1 h-1.5 rounded-full w-24" style={{ background: '#2a2a2a' }}>
                 <div
                     className="h-1.5 rounded-full"
                     style={{ width: `${pct}%`, background: color }}
@@ -172,8 +172,8 @@ export default function SparklineTable() {
     }
     if (error) {
         return (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-5 text-center">
-                <p className="text-red-700 font-medium text-sm">⚠️ {error}</p>
+            <div className="rounded-lg bg-red-500/10 border border-red-800 p-5 text-center">
+                <p className="text-red-300 font-medium text-sm">⚠️ {error}</p>
             </div>
         );
     }
@@ -183,11 +183,11 @@ export default function SparklineTable() {
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-[#151515] rounded-xl shadow-sm border border-[#2a2a2a] overflow-hidden">
             {/* Card header */}
-            <div className="px-6 pt-5 pb-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800">Source Market Profiles</h3>
-                <p className="text-sm text-gray-500 mt-0.5">
+            <div className="px-6 pt-5 pb-4 border-b border-[#2a2a2a]">
+                <h3 className="text-lg font-semibold text-gray-100">Source Market Profiles</h3>
+                <p className="text-sm text-gray-400 mt-0.5">
                     ML-classified market segments with 15-year performance breakdown
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
@@ -196,23 +196,23 @@ export default function SparklineTable() {
             </div>
 
             {/* Summary chips */}
-            <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-2">
+            <div className="px-6 py-3 bg-[#1b1b1b] border-b border-[#2a2a2a] flex flex-wrap gap-2">
                 {[
                     { icon: '🌍', label: 'Countries', value: summary.total_countries },
                     { icon: '🔵', label: 'Mature', value: summary.mature_count },
                     { icon: '🟢', label: 'Emerging', value: summary.emerging_count },
                     { icon: '🔴', label: 'Declining', value: summary.declining_count },
                 ].map((chip) => (
-                    <div key={chip.label} className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm">
+                    <div key={chip.label} className="flex items-center gap-1.5 bg-[#151515] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-sm">
                         <span>{chip.icon}</span>
-                        <span className="text-gray-500">{chip.label}:</span>
-                        <span className="font-semibold text-gray-800">{chip.value}</span>
+                        <span className="text-gray-400">{chip.label}:</span>
+                        <span className="font-semibold text-gray-100">{chip.value}</span>
                     </div>
                 ))}
             </div>
 
             {/* Controls: segment filter + search */}
-            <div className="px-6 py-3 border-b border-gray-100 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+            <div className="px-6 py-3 border-b border-[#2a2a2a] flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 {/* Segment tabs */}
                 <div className="flex gap-1.5 flex-wrap">
                     {FILTERS.map((f) => {
@@ -228,7 +228,7 @@ export default function SparklineTable() {
                                         ? { background: sc?.bg, color: sc?.text, borderColor: sc?.bg }
                                         : active
                                             ? { background: '#1e293b', color: '#fff', borderColor: '#1e293b' }
-                                            : { background: '#f8fafc', color: '#475569', borderColor: '#e2e8f0' }
+                                            : { background: '#1b1b1b', color: '#cbd5e1', borderColor: '#2a2a2a' }
                                 }
                             >
                                 {f}
@@ -243,46 +243,47 @@ export default function SparklineTable() {
                     placeholder="Search country…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-indigo-300 w-48"
+                    className="w-48 rounded-lg px-3 py-1.5 text-sm outline-none border border-[#2a2a2a] ring-1 ring-[#2a2a2a] !bg-[#151515] text-gray-100 placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500"
+                    style={{ backgroundColor: '#151515', color: '#f3f4f6' }}
                 />
             </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+                    <thead className="bg-[#1b1b1b] border-b border-[#2a2a2a] sticky top-0 z-10">
                         <tr>
-                            <th className="px-4 py-3 text-left font-medium text-gray-500 min-w-[160px]">Country</th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-500">15-yr Trend</th>
+                            <th className="px-4 py-3 text-left font-medium text-gray-400 min-w-[160px]">Country</th>
+                            <th className="px-4 py-3 text-left font-medium text-gray-400">15-yr Trend</th>
                             <th
-                                className="px-4 py-3 text-right font-medium text-gray-500 cursor-pointer hover:text-gray-800 select-none"
+                                className="px-4 py-3 text-right font-medium text-gray-400 cursor-pointer hover:text-gray-100 select-none"
                                 onClick={() => toggleSort('latest_arrivals')}
                             >
                                 Latest Arrivals <SortArrow col="latest_arrivals" sort={sort} />
                             </th>
-                            <th className="px-4 py-3 text-right font-medium text-gray-500 hidden md:table-cell">Peak</th>
+                            <th className="px-4 py-3 text-right font-medium text-gray-400 hidden md:table-cell">Peak</th>
                             <th
-                                className="px-4 py-3 text-right font-medium text-gray-500 cursor-pointer hover:text-gray-800 select-none"
+                                className="px-4 py-3 text-right font-medium text-gray-400 cursor-pointer hover:text-gray-100 select-none"
                                 onClick={() => toggleSort('cagr_pct')}
                             >
                                 CAGR <SortArrow col="cagr_pct" sort={sort} />
                             </th>
                             <th
-                                className="px-4 py-3 text-right font-medium text-gray-500 cursor-pointer hover:text-gray-800 select-none hidden lg:table-cell"
+                                className="px-4 py-3 text-right font-medium text-gray-400 cursor-pointer hover:text-gray-100 select-none hidden lg:table-cell"
                                 onClick={() => toggleSort('best_yoy_pct')}
                             >
                                 Best Year <SortArrow col="best_yoy_pct" sort={sort} />
                             </th>
                             <th
-                                className="px-4 py-3 text-right font-medium text-gray-500 cursor-pointer hover:text-gray-800 select-none hidden lg:table-cell"
+                                className="px-4 py-3 text-right font-medium text-gray-400 cursor-pointer hover:text-gray-100 select-none hidden lg:table-cell"
                                 onClick={() => toggleSort('worst_yoy_pct')}
                             >
                                 Worst Year <SortArrow col="worst_yoy_pct" sort={sort} />
                             </th>
-                            <th className="px-4 py-3 text-right font-medium text-gray-500 hidden md:table-cell">Top 3 Dominance</th>
+                            <th className="px-4 py-3 text-right font-medium text-gray-400 hidden md:table-cell">Top 3 Dominance</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-[#2a2a2a]">
                         {rows.map((c, i) => {
                             const yoy = fmtYoy(c.kpis.yoy_pct);
                             const cc = cagrColor(c.kpis.cagr_pct);
@@ -292,12 +293,12 @@ export default function SparklineTable() {
                             return (
                                 <tr
                                     key={c.country}
-                                    className="hover:bg-indigo-50/30 transition-colors"
-                                    style={{ background: i % 2 === 0 ? '#fff' : '#fafafa' }}
+                                    className="hover:bg-[#222222] transition-colors"
+                                    style={{ background: i % 2 === 0 ? '#151515' : '#1b1b1b' }}
                                 >
                                     {/* Column 1 — Country */}
                                     <td className="px-4 py-3 min-w-[160px]">
-                                        <div className="font-semibold text-gray-900 flex items-center gap-1.5">
+                                        <div className="font-semibold text-white flex items-center gap-1.5">
                                             <span>{c.flag_emoji}</span>
                                             <span>{c.country}</span>
                                         </div>
@@ -323,13 +324,13 @@ export default function SparklineTable() {
 
                                     {/* Column 3 — Latest Arrivals */}
                                     <td className="px-4 py-3 text-right">
-                                        <div className="font-bold text-gray-900 text-base">{fmt(c.kpis.latest_arrivals)}</div>
+                                        <div className="font-bold text-white text-base">{fmt(c.kpis.latest_arrivals)}</div>
                                         <div className="text-xs mt-0.5 font-medium" style={{ color: yoy.color }}>{yoy.label}</div>
                                     </td>
 
                                     {/* Column 4 — Peak */}
                                     <td className="px-4 py-3 text-right hidden md:table-cell">
-                                        <div className="font-bold text-gray-800">{c.kpis.peak_year}</div>
+                                        <div className="font-bold text-gray-100">{c.kpis.peak_year}</div>
                                         <div className="text-xs text-gray-400">{fmt(c.kpis.peak_arrivals)}</div>
                                     </td>
 

@@ -498,3 +498,54 @@ body {
   border-color: var(--powerbi-blue);
   box-shadow: 0 0 0 3px rgba(17, 141, 255, 0.1);
 }
+
+/* AI Assistant input should remain dark regardless of global input styles */
+input[type="text"].chatbot-input-dark,
+input[type="text"].chatbot-input-dark:focus,
+input[type="text"].chatbot-input-dark:disabled {
+  background: #151515 !important;
+  color: #f3f4f6 !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.5rem 0.75rem !important;
+  height: auto !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  opacity: 1 !important;
+}
+
+input[type="text"].chatbot-input-dark::placeholder {
+  color: #9ca3af !important;
+}
+
+input[type="text"].chatbot-input-dark:-webkit-autofill,
+input[type="text"].chatbot-input-dark:-webkit-autofill:hover,
+input[type="text"].chatbot-input-dark:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #151515 inset !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+  caret-color: #f3f4f6 !important;
+}
+
+/* Profile page inputs should stay dark inside Edit Profile / Security sections */
+input[type="text"].profile-input-dark,
+input[type="password"].profile-input-dark,
+input[type="email"].profile-input-dark {
+  background: #151515 !important;
+  color: #f3f4f6 !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+input[type="text"].profile-input-dark:focus,
+input[type="password"].profile-input-dark:focus,
+input[type="email"].profile-input-dark:focus {
+  background: #151515 !important;
+  color: #f3f4f6 !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35) !important;
+}
+
+input[type="text"].profile-input-dark::placeholder,
+input[type="password"].profile-input-dark::placeholder,
+input[type="email"].profile-input-dark::placeholder {
+  color: #9ca3af !important;
+}

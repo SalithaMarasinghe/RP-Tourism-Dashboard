@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "D:\RP\backend\test_data_service.py", line 8, in <module>
+    print('Monthly Shape:', svc.get_monthly_data(scenario='baseline').shape)
+  File "D:\RP\backend\services\rev_data_service.py", line 94, in get_monthly_data
+    df = self._get_monthly_df()
+  File "D:\RP\backend\services\rev_data_service.py", line 67, in _get_monthly_df
+    self._build_caches()
+  File "D:\RP\backend\services\rev_data_service.py", line 44, in _build_caches
+    df_vol_rev_hist = load_volume_revenue_clean()
+  File "D:\RP\backend\services\rev_data_loader.py", line 132, in load_volume_revenue_clean
+    return load_and_validate_csv("prompt1_volume_revenue_clean-9.csv", required)
+  File "D:\RP\backend\services\rev_data_loader.py", line 62, in load_and_validate_csv
+    raise ValueError(
+ValueError: Failed to load 'prompt1_volume_revenue_clean-9.csv': Missing required columns: ['totalarrivals', 'revenueusdmn', 'revenuelkrmn']. Available columns are: ['year', 'total_arrivals', 'tourist_nights_000', 'avg_length_of_stay_nights', 'revenue_usd_mn', 'revenue_lkr_mn', 'revenue_per_tourist_usd', 'revenue_per_tourist_day_usd', 'is_partial_year', 'revenue_usd_missing', 'nights_missing']

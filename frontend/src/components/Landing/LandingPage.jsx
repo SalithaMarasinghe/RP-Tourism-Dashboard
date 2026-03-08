@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
+import Antigravity from './Antigravity';
+import MagicBento from '../MagicBento/MagicBento';
 
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,29 +39,50 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* TOP BAR */}
-      <header className={`topbar ${isScrolled ? 'shadow' : ''}`} role="banner">
-        <div className="tb-left">
-          <span className="brand-pill">Sri Lanka Tourism Analytics</span>
+      <div className="hero-shell">
+        <div className="hero-antigravity" aria-hidden="true">
+          <Antigravity
+            count={460}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={2}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
         </div>
 
-        <nav className="tb-nav" aria-label="Main navigation">
-          <a href="#features">Features</a>
-          <a href="#audience">Who It's For</a>
-          <a href="#ai-assistant">AI Assistant</a>
-          <a href="#how-it-works">How It Works</a>
-        </nav>
+        {/* TOP BAR */}
+        <header className={`topbar ${isScrolled ? 'shadow' : ''}`} role="banner">
+          <div className="tb-left">
+            <span className="brand-pill">Sri Lanka Tourism Analytics</span>
+          </div>
 
-        <div className="tb-right">
-          <Link to="/login" className="btn btn-ghost">Sign In</Link>
-          <Link to="/signup" className="btn btn-blue">Register Now</Link>
-        </div>
-      </header>
+          <nav className="tb-nav" aria-label="Main navigation">
+            <a href="#features">Features</a>
+            <a href="#audience">Who It's For</a>
+            <a href="#ai-assistant">AI Assistant</a>
+            <a href="#how-it-works">How It Works</a>
+          </nav>
+
+          <div className="tb-right">
+            <Link to="/login" className="btn btn-ghost">Sign In</Link>
+            <Link to="/signup" className="btn btn-blue">Register Now</Link>
+          </div>
+        </header>
 
       {/* MOBILE PANEL - REMOVED */}
 
-      {/* HERO */}
-      <section className="hero" aria-label="Platform overview">
+        {/* HERO */}
+        <section className="hero" aria-label="Platform overview">
         <div className="hero-bg" aria-hidden="true"></div>
         <div className="hg hg1" aria-hidden="true"></div>
         <div className="hg hg2" aria-hidden="true"></div>
@@ -238,117 +261,140 @@ const LandingPage = () => {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      </div>
 
       {/* AUDIENCE */}
       <section className="sec" id="audience" aria-labelledby="aud-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal>
             <span className="eyebrow">Who It's For</span>
             <h2 className="sec-h2" id="aud-h2">Built for every stakeholder<br/>in Sri Lanka's tourism chain</h2>
             <p className="sec-lead">Three role-specific dashboards — each surfacing the metrics, forecasts, and controls relevant to how you actually operate.</p>
           </div>
-          <div className="aud-grid">
-            <article className="aud-card aud-card--sl" data-reveal data-d1 aria-labelledby="aud-sl">
-              <div className="aud-ico" aria-hidden="true">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="1.9">
-                  <rect x="3" y="3" width="18" height="18" rx="3"/>
-                  <path d="M9 9h6M9 12h6M9 15h4"/>
-                </svg>
-              </div>
-              <div className="aud-role">Tourism Board & Government</div>
-              <h3 id="aud-sl">SLTDA Officers</h3>
-              <p>Evidence-based policy tools for sustainable tourism development and regulatory oversight.</p>
-              <ul className="aud-bens" role="list">
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  5-year arrival forecasts for infrastructure planning
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Congestion alerts and redistribution controls
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#3b5bdb" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Policy-grade PDF reports and data exports
-                </li>
-              </ul>
-            </article>
-            <article className="aud-card aud-card--ht" data-reveal data-d2 aria-labelledby="aud-ht">
-              <div className="aud-ico" aria-hidden="true">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="1.9">
-                  <path d="M3 21V8l9-5 9 5v13"/>
-                  <rect x="9" y="13" width="6" height="8"/>
-                </svg>
-              </div>
-              <div className="aud-role">Hospitality</div>
-              <h3 id="aud-ht">Hotels & Resorts</h3>
-              <p>Demand visibility that drives smarter pricing, staffing, and partnership decisions ahead of season.</p>
-              <ul className="aud-bens" role="list">
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#12b886" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Occupancy predictions up to 30 days ahead
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#12b886" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Origin-market breakdown for campaign targeting
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#12b886" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Peak/off-peak alerts for dynamic pricing
-                </li>
-              </ul>
-            </article>
-            <article className="aud-card aud-card--op" data-reveal data-d3 aria-labelledby="aud-op">
-              <div className="aud-ico" aria-hidden="true">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f59f00" strokeWidth="1.9">
-                  <circle cx="12" cy="12" r="3"/>
-                  <circle cx="12" cy="12" r="9"/>
-                  <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
-                </svg>
-              </div>
-              <div className="aud-role">Operations</div>
-              <h3 id="aud-op">Tour & Transport Providers</h3>
-              <p>Real-time tourist flow data to optimise routes, fleets, and seasonal capacity planning.</p>
-              <ul className="aud-bens" role="list">
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#f59f00" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Site-specific visitor load for route planning
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#f59f00" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  7-day forecasts for fleet and crew allocation
-                </li>
-                <li>
-                  <svg className="chk" viewBox="0 0 16 16" fill="none" stroke="#f59f00" strokeWidth="2.2" aria-hidden="true">
-                    <polyline points="2,8 6,12 14,4"/>
-                  </svg>
-                  Redistribution scenarios to avoid bottlenecks
-                </li>
-              </ul>
-            </article>
-          </div>
+          <MagicBento
+            cards={[
+              {
+                backgroundColor: 'rgba(59, 91, 219, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__header">
+                      <div className="magic-bento-card__label">Tourism Board & Government</div>
+                    </div>
+                    <div className="magic-bento-card__content">
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="1.9" style={{marginBottom: '0.5em'}}>
+                        <rect x="3" y="3" width="18" height="18" rx="3"/>
+                        <path d="M9 9h6M9 12h6M9 15h4"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">SLTDA Officers</h3>
+                      <p className="magic-bento-card__description">Evidence-based policy tools for sustainable tourism development and regulatory oversight.</p>
+                      <ul style={{listStyle: 'none', padding: '0.5em 0 0', margin: 0, fontSize: '13px', opacity: 0.85}}>
+                        <li style={{marginBottom: '0.4em'}}>✓ 5-year arrival forecasts</li>
+                        <li style={{marginBottom: '0.4em'}}>✓ Congestion alerts</li>
+                        <li>✓ PDF reports & exports</li>
+                      </ul>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(18, 184, 134, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__header">
+                      <div className="magic-bento-card__label">Hospitality</div>
+                    </div>
+                    <div className="magic-bento-card__content">
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="1.9" style={{marginBottom: '0.5em'}}>
+                        <path d="M3 21V8l9-5 9 5v13"/>
+                        <rect x="9" y="13" width="6" height="8"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Hotels & Resorts</h3>
+                      <p className="magic-bento-card__description">Demand visibility for smarter pricing, staffing, and planning.</p>
+                      <ul style={{listStyle: 'none', padding: '0.5em 0 0', margin: 0, fontSize: '13px', opacity: 0.85}}>
+                        <li style={{marginBottom: '0.4em'}}>✓ Occupancy predictions</li>
+                        <li style={{marginBottom: '0.4em'}}>✓ Market breakdown</li>
+                        <li>✓ Dynamic pricing alerts</li>
+                      </ul>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(245, 159, 0, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__header">
+                      <div className="magic-bento-card__label">Operations</div>
+                    </div>
+                    <div className="magic-bento-card__content">
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f59f00" strokeWidth="1.9" style={{marginBottom: '0.5em'}}>
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Tour & Transport</h3>
+                      <p className="magic-bento-card__description">Real-time flow data for route and fleet optimization.</p>
+                      <ul style={{listStyle: 'none', padding: '0.5em 0 0', margin: 0, fontSize: '13px', opacity: 0.85}}>
+                        <li style={{marginBottom: '0.4em'}}>✓ Visitor load tracking</li>
+                        <li style={{marginBottom: '0.4em'}}>✓ 7-day forecasts</li>
+                        <li>✓ Redistribution modeling</li>
+                      </ul>
+                    </div>
+                  </>
+                )
+              }
+            ]}
+            enableSpotlight={true}
+            enableStars={true}
+            enableBorderGlow={true}
+            enableMagnetism={false}
+            enableTilt={false}
+            glowColor="132, 0, 255"
+          />
         </div>
       </section>
 
       {/* FEATURES */}
       <section className="sec" id="features" style={{background: 'var(--white)'}} aria-labelledby="feat-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal style={{display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap'}}>
             <div>
@@ -359,80 +405,137 @@ const LandingPage = () => {
               Four core modules built on machine learning, real-time data feeds, and Sri Lanka's official arrivals dataset.
             </p>
           </div>
-          <div className="feat-grid">
-            <div className="feat-card" data-reveal data-d1>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2">
-                  <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                </svg>
-              </div>
-              <h3>Monthly Arrival Forecasting</h3>
-              <p>SVR and ensemble model predictions from 2026–2030 with baseline, optimistic, and pessimistic scenarios.</p>
-              <span className="feat-badge">5-Year Horizon</span>
-            </div>
-            <div className="feat-card" data-reveal data-d2>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/>
-                  <path d="M16 2v4M8 2v4M3 10h18"/>
-                </svg>
-              </div>
-              <h3>Daily Rolling Predictions</h3>
-              <p>7-day granular forecasts per tourist site with live data refresh. Exportable as PDF for operations teams.</p>
-              <span className="feat-badge" style={{background: 'var(--green-soft)', color: 'var(--green)'}}>Operational</span>
-            </div>
-            <div className="feat-card" data-reveal data-d3>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59f00" strokeWidth="2">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M3 12a9 9 0 1 0 18 0"/>
-                </svg>
-              </div>
-              <h3>Visitor Load Index</h3>
-              <p>Real-time VLI monitoring for 50+ sites. Automated congestion alerts when visitor load exceeds 120% capacity.</p>
-              <span className="feat-badge" style={{background: 'var(--amber-soft)', color: 'var(--amber)'}}>50+ Sites</span>
-            </div>
-            <div className="feat-card" data-reveal data-d1>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7950f2" strokeWidth="2">
-                  <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
-                </svg>
-              </div>
-              <h3>Redistribution Simulator</h3>
-              <p>Interactive tool to model tourist rerouting between locations with before/after impact visualisation.</p>
-              <span className="feat-badge" style={{background: 'rgba(121,80,242,.1)', color: '#7950f2'}}>Planning Tool</span>
-            </div>
-            <div className="feat-card" data-reveal data-d2>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14,2 14,8 20,8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                </svg>
-              </div>
-              <h3>Exportable Reports</h3>
-              <p>Policy-grade PDF exports and CSV data extracts. Scheduled delivery to ministry inboxes or teams.</p>
-              <span className="feat-badge" style={{background: 'var(--green-soft)', color: 'var(--green)'}}>PDF / CSV</span>
-            </div>
-            <div className="feat-card" data-reveal data-d3>
-              <div className="feat-ico" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2">
-                  <circle cx="9" cy="12" r="1"/>
-                  <circle cx="12" cy="12" r="1"/>
-                  <circle cx="15" cy="12" r="1"/>
-                  <rect x="2" y="4" width="20" height="16" rx="2"/>
-                </svg>
-              </div>
-              <h3>Top Source Markets</h3>
-              <p>Market share by origin country — India, Russia, UK, Germany, China — with trend tracking and alerts.</p>
-              <span className="feat-badge">Market Intel</span>
-            </div>
-          </div>
+          <MagicBento
+            cards={[
+              {
+                backgroundColor: 'rgba(59, 91, 219, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Monthly Forecasting</h3>
+                      <p className="magic-bento-card__description">SVR and ensemble predictions 2026–2030 with baseline, optimistic, and pessimistic scenarios.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(59, 91, 219, 0.2)', color: '#3b5bdb', padding: '0.3em 0.6em', borderRadius: '4px'}}>5-Year Horizon</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(18, 184, 134, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Daily Predictions</h3>
+                      <p className="magic-bento-card__description">7-day granular forecasts per site with live refresh and PDF exports.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(18, 184, 134, 0.2)', color: '#12b886', padding: '0.3em 0.6em', borderRadius: '4px'}}>Operational</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(245, 159, 0, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59f00" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M3 12a9 9 0 1 0 18 0"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Visitor Load Index</h3>
+                      <p className="magic-bento-card__description">Real-time VLI for 50+ sites. Alerts when load exceeds 120% capacity.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(245, 159, 0, 0.2)', color: '#f59f00', padding: '0.3em 0.6em', borderRadius: '4px'}}>50+ Sites</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(121, 80, 242, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7950f2" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Redistribution Simulator</h3>
+                      <p className="magic-bento-card__description">Model tourist rerouting with before/after impact visualization.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(121, 80, 242, 0.2)', color: '#7950f2', padding: '0.3em 0.6em', borderRadius: '4px'}}>Planning Tool</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(18, 184, 134, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Exportable Reports</h3>
+                      <p className="magic-bento-card__description">PDF exports & CSV data extracts with scheduled delivery.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(18, 184, 134, 0.2)', color: '#12b886', padding: '0.3em 0.6em', borderRadius: '4px'}}>PDF / CSV</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(59, 91, 219, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <circle cx="9" cy="12" r="1"/>
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="15" cy="12" r="1"/>
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Top Source Markets</h3>
+                      <p className="magic-bento-card__description">Market share by origin with trend tracking and alerts.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(59, 91, 219, 0.2)', color: '#3b5bdb', padding: '0.3em 0.6em', borderRadius: '4px'}}>Market Intel</span>
+                    </div>
+                  </>
+                )
+              }
+            ]}
+            enableSpotlight={true}
+            enableStars={true}
+            enableBorderGlow={true}
+            enableMagnetism={false}
+            enableTilt={false}
+            glowColor="132, 0, 255"
+          />
         </div>
       </section>
 
       {/* AI ASSISTANT */}
       <section className="ai-sec" id="ai-assistant" aria-labelledby="ai-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="ai-glow-1" aria-hidden="true"></div>
         <div className="ai-glow-2" aria-hidden="true"></div>
         <div className="pw">
@@ -542,6 +645,25 @@ const LandingPage = () => {
 
       {/* HOW IT WORKS */}
       <section className="sec proc-sec" id="how-it-works" aria-labelledby="proc-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div data-reveal style={{textAlign: 'center'}}>
             <span className="eyebrow">Getting Started</span>
@@ -571,6 +693,25 @@ const LandingPage = () => {
 
       {/* REGISTER CTA */}
       <section className="cta-sec" id="register" aria-labelledby="cta-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="cta-glow" aria-hidden="true"></div>
         <div className="pw">
           <div className="cta-inner" data-reveal>
@@ -593,6 +734,25 @@ const LandingPage = () => {
 
       {/* FOOTER */}
       <footer role="contentinfo">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={120}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.5}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
         <div className="pw">
           <div className="foot-grid">
             <div>

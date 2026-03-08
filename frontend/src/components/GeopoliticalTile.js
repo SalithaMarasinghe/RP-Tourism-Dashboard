@@ -106,20 +106,20 @@ function LoadingSkeleton() {
     return (
         <div
             id="geo-loading-skeleton"
-            className="animate-pulse rounded-xl border border-gray-200 bg-white shadow-sm p-6"
+            className="animate-pulse rounded-xl border border-[#2a2a2a] bg-[#151515] shadow-sm p-6"
             aria-label="Loading geopolitical tile"
         >
             <div className="flex items-center justify-between mb-4">
-                <div className="h-5 w-56 bg-gray-200 rounded" />
-                <div className="h-8 w-28 bg-gray-200 rounded-lg" />
+                <div className="h-5 w-56 bg-slate-700 rounded" />
+                <div className="h-8 w-28 bg-slate-700 rounded-lg" />
             </div>
             <div className="flex items-end gap-4 mb-4">
-                <div className="h-12 w-40 bg-gray-200 rounded" />
-                <div className="h-7 w-20 bg-gray-200 rounded" />
+                <div className="h-12 w-40 bg-slate-700 rounded" />
+                <div className="h-7 w-20 bg-slate-700 rounded" />
             </div>
-            <div className="h-4 w-3/4 bg-gray-200 rounded mb-2" />
-            <div className="h-4 w-1/2 bg-gray-200 rounded mb-4" />
-            <div className="h-3 w-1/3 bg-gray-200 rounded" />
+            <div className="h-4 w-3/4 bg-slate-700 rounded mb-2" />
+            <div className="h-4 w-1/2 bg-slate-700 rounded mb-4" />
+            <div className="h-3 w-1/3 bg-slate-700 rounded" />
         </div>
     );
 }
@@ -129,10 +129,10 @@ function FallbackTile({ message }) {
     return (
         <div
             id="geo-fallback-tile"
-            className="rounded-xl border border-gray-200 bg-white shadow-sm p-6"
+            className="rounded-xl border border-[#2a2a2a] bg-[#151515] shadow-sm p-6"
         >
-            <div className="flex items-center gap-3 text-gray-500">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <div className="flex items-center gap-3 text-gray-300">
+                <div className="w-10 h-10 rounded-full bg-[#1b1b1b] flex items-center justify-center">
                     <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -148,11 +148,11 @@ function FallbackTile({ message }) {
 function CollapsibleSection({ id, title, children, defaultOpen = false }) {
     const [open, setOpen] = useState(defaultOpen);
     return (
-        <div className="border-t border-gray-100 mt-4">
+        <div className="border-t border-[#2a2a2a] mt-4">
             <button
                 id={id}
                 onClick={() => setOpen(o => !o)}
-                className="w-full flex items-center justify-between py-3 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="w-full flex items-center justify-between py-3 text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 aria-expanded={open}
             >
                 {title}
@@ -266,7 +266,7 @@ function GeopoliticalTile() {
     return (
         <div
             id="geo-tile-wrapper"
-            className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-6"
+            className="rounded-xl border border-[#2a2a2a] bg-[#151515] shadow-lg shadow-black/20 overflow-hidden mb-6"
         >
             {/* ── Stale / error banners ────────────────────────────────────────── */}
             {staleWarning && (
@@ -310,7 +310,7 @@ function GeopoliticalTile() {
                                 {td.primary_label || 'Situation-Adjusted Forecast'}
                             </p>
                             {tileData?.forecast_month && (
-                                <span className="text-xs px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 font-medium border border-blue-100">
+                                <span className="text-xs px-2 py-0.5 rounded-md bg-blue-900/40 text-blue-200 font-medium border border-blue-700">
                                     {tileData.forecast_month}
                                 </span>
                             )}
@@ -324,7 +324,7 @@ function GeopoliticalTile() {
                             >
                                 <span
                                     id="geo-primary-value"
-                                    className="text-4xl font-extrabold text-gray-900 tracking-tight cursor-default select-none"
+                                    className="text-4xl font-extrabold text-white tracking-tight cursor-default select-none"
                                 >
                                     {td.primary_value || '—'}
                                 </span>
@@ -357,8 +357,8 @@ function GeopoliticalTile() {
                                 disabled={refreshing}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all
                   ${refreshing
-                                        ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                                        : 'border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 cursor-pointer'
+                                        ? 'border-[#2a2a2a] text-gray-400 cursor-not-allowed bg-[#1b1b1b]'
+                                        : 'border-blue-700 text-blue-300 hover:bg-blue-950/40 hover:border-blue-600 cursor-pointer'
                                     }`}
                                 aria-label="Refresh geopolitical analysis"
                             >
@@ -381,7 +381,7 @@ function GeopoliticalTile() {
                         id="geo-refresh-overlay"
                         className="flex items-center justify-center py-2 mb-3"
                     >
-                        <div className="flex items-center gap-2 text-sm text-blue-600">
+                        <div className="flex items-center gap-2 text-sm text-blue-300">
                             <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -395,17 +395,17 @@ function GeopoliticalTile() {
                 {ss.headline && (
                     <p
                         id="geo-headline"
-                        className="text-sm text-gray-600 mb-3 leading-relaxed"
+                        className="text-sm text-gray-300 mb-3 leading-relaxed"
                     >
                         {ss.headline}
                     </p>
                 )}
 
                 {/* Confidence range + freshness */}
-                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400">
                     {td.confidence_range_value && (
                         <span id="geo-confidence-range">
-                            <span className="font-medium text-gray-600">Estimated Range:</span>{' '}
+                            <span className="font-medium text-gray-200">Estimated Range:</span>{' '}
                             {td.confidence_range_value}
                         </span>
                     )}
@@ -427,11 +427,11 @@ function GeopoliticalTile() {
                     >
                         <ul
                             id="geo-recommendations-list"
-                            className="space-y-2 text-sm text-gray-700"
+                            className="space-y-2 text-sm text-gray-200"
                         >
                             {suggestions.map((s, i) => (
                                 <li key={i} className="flex items-start gap-2">
-                                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full bg-blue-900/50 text-blue-200 flex items-center justify-center text-xs font-bold">
                                         {i + 1}
                                     </span>
                                     <span>{s}</span>
@@ -447,13 +447,13 @@ function GeopoliticalTile() {
                         id="geo-data-sources-toggle"
                         title="Data Sources"
                     >
-                        <div className="text-xs text-gray-500 space-y-1">
-                            <p className="text-gray-400 mb-2">
+                        <div className="text-xs text-gray-400 space-y-1">
+                            <p className="text-gray-500 mb-2">
                                 Domains that returned no results in this analysis run:
                             </p>
                             <div className="flex flex-wrap gap-1.5">
                                 {dq.domains_with_no_results.map((d, i) => (
-                                    <span key={i} className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+                                    <span key={i} className="px-2 py-0.5 rounded-full bg-[#1b1b1b] text-gray-300 border border-[#2a2a2a]">
                                         {d}
                                     </span>
                                 ))}
@@ -467,3 +467,4 @@ function GeopoliticalTile() {
 }
 
 export default GeopoliticalTile;
+

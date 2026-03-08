@@ -18,6 +18,17 @@ function MonthlyPredictionsComponent() {
   const [currentScenario, setCurrentScenario] = useState('baseline');
   const [isLoading, setIsLoading] = useState(true);
 
+  const darkSelectStyle = {
+    backgroundColor: '#151515',
+    color: '#f1f5f9',
+    colorScheme: 'dark',
+  };
+
+  const darkOptionStyle = {
+    backgroundColor: '#1b1b1b',
+    color: '#f1f5f9',
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -151,44 +162,57 @@ function MonthlyPredictionsComponent() {
 
   const formatFactor = (percentage) => {
     const value = parseFloat(percentage);
-    const color = value >= 0 ? 'text-green-600' : 'text-red-600';
+    const color = value >= 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
     return <span className={color}>{percentage}</span>;
   };
-
   // Custom Tooltip Component with External Factors
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
 
-      // Convert external factors array to object for easier access
       const factorsMap = {};
       if (data.externalFactors && Array.isArray(data.externalFactors)) {
-        data.externalFactors.forEach(factor => {
-          // Convert factor names to match expected keys
+        data.externalFactors.forEach((factor) => {
           const key = factor.name.toLowerCase().replace(/\s+/g, '_');
           factorsMap[key] = factor.value;
         });
       }
 
       return (
-        <div className="bg-white p-4 shadow-lg rounded-lg" style={{ minWidth: '280px', maxWidth: '320px' }}>
-          <div className="font-semibold text-gray-900 mb-2">{label}</div>
-          <div className="font-medium text-purple-600 mb-3">
+        <div
+          className="bg-[#151515] border border-[#2a2a2a] p-4 shadow-lg rounded-lg text-slate-200"
+          style={{ minWidth: '280px', maxWidth: '320px' }}
+        >
+          <div className="font-semibold text-white mb-2">{label}</div>
+          <div className="font-medium text-blue-300 mb-3">
             Predicted Arrivals: {data.arrivals.toLocaleString()}
           </div>
           <div className="space-y-1 text-sm">
-            <div className="font-medium text-gray-700 mb-1">External Factor Contributions:</div>
-            <div>• Economic Indicators: {formatFactor(factorsMap.economic_indicators || '0%')}</div>
-            <div>• Exchange Rates: {formatFactor(factorsMap.exchange_rates || '0%')}</div>
-            <div>• Weather: {formatFactor(factorsMap.weather || '0%')}</div>
-            <div>• Google Trends: {formatFactor(factorsMap.google_trends || '0%')}</div>
+            <div className="font-medium text-gray-200 mb-1">External Factor Contributions:</div>
+            <ul className="list-disc pl-5 space-y-0.5 text-slate-200">
+              <li>
+                <span className="text-slate-200">Economic Indicators: </span>
+                {formatFactor(factorsMap.economic_indicators || '0%')}
+              </li>
+              <li>
+                <span className="text-slate-200">Exchange Rates: </span>
+                {formatFactor(factorsMap.exchange_rates || '0%')}
+              </li>
+              <li>
+                <span className="text-slate-200">Weather: </span>
+                {formatFactor(factorsMap.weather || '0%')}
+              </li>
+              <li>
+                <span className="text-slate-200">Google Trends: </span>
+                {formatFactor(factorsMap.google_trends || '0%')}
+              </li>
+            </ul>
           </div>
         </div>
       );
     }
     return null;
   };
-
   // PDF Export Handler
   const handleExportPredictions = () => {
     // Check if predictions are available
@@ -204,7 +228,7 @@ function MonthlyPredictionsComponent() {
 
     // Set colors
     const headerColor = [44, 62, 80]; // Dark header background (#2c3e50)
-    const accentColor = [147, 51, 234]; // Purple accent (#9333ea)
+    const accentColor = [37, 99, 235]; // Blue accent (#2563eb)
 
     // Helper function to add page numbers
     const addPageNumbers = () => {
@@ -325,10 +349,17 @@ function MonthlyPredictionsComponent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Machine Learning Predictions</h2>
-        {isLoading && <span className="text-sm text-gray-500 ml-4">Loading data...</span>}
-        <div className="flex space-x-2">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-1">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            Monthly <span className="text-blue-500">Predictions</span>
+          </h1>
+          <p className="text-sm text-gray-300 font-medium">
+            Executive monitoring of month-level forecasts and scenario signals.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 bg-black p-3 rounded-xl border border-gray-800 shadow-sm">
+          {isLoading && <span className="text-sm text-gray-300">Loading data...</span>}
           <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleExportPredictions}>
             <Download className="h-4 w-4 mr-1" />
             Export Predictions
@@ -340,63 +371,67 @@ function MonthlyPredictionsComponent() {
       <GeopoliticalTile />
 
       {/* Date and Scenario Selector */}
-      <Card className="power-bi-card">
+      <Card className="power-bi-card !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Forecast Configuration</CardTitle>
+          <CardTitle className="text-lg font-semibold text-white">Forecast Configuration</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Month</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Start Month</label>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={darkSelectStyle}
               >
                 {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
+                  <option key={i + 1} value={i + 1} style={darkOptionStyle}>
                     {new Date(0, i).toLocaleString('default', { month: 'long' })}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Year</label>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={darkSelectStyle}
               >
                 {Array.from({ length: 10 }, (_, i) => (
-                  <option key={2026 + i} value={2026 + i}>
+                  <option key={2026 + i} value={2026 + i} style={darkOptionStyle}>
                     {2026 + i}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Forecast Months</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Forecast Months</label>
               <select
                 value={forecastMonths}
                 onChange={(e) => setForecastMonths(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={darkSelectStyle}
               >
-                <option value={3}>3 Months</option>
-                <option value={6}>6 Months</option>
-                <option value={12}>12 Months</option>
-                <option value={24}>24 Months</option>
+                <option value={3} style={darkOptionStyle}>3 Months</option>
+                <option value={6} style={darkOptionStyle}>6 Months</option>
+                <option value={12} style={darkOptionStyle}>12 Months</option>
+                <option value={24} style={darkOptionStyle}>24 Months</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Scenario</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Scenario</label>
               <select
                 value={currentScenario}
                 onChange={(e) => setCurrentScenario(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#2a2a2a] bg-[#1b1b1b] text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={darkSelectStyle}
               >
-                <option value="baseline">Baseline</option>
-                <option value="optimistic">Optimistic</option>
-                <option value="pessimistic">Pessimistic</option>
+                <option value="baseline" style={darkOptionStyle}>Baseline</option>
+                <option value="optimistic" style={darkOptionStyle}>Optimistic</option>
+                <option value="pessimistic" style={darkOptionStyle}>Pessimistic</option>
               </select>
             </div>
           </div>
@@ -405,38 +440,38 @@ function MonthlyPredictionsComponent() {
 
       {/* Monthly Tourist Arrival Forecast Chart - MOVED UP */}
       {forecastData.length > 0 && (
-        <Card className="power-bi-card mt-6 mb-8">
+        <Card className="power-bi-card mt-6 mb-8 !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Monthly Tourist Arrival Forecast Chart</CardTitle>
+            <CardTitle className="text-lg font-semibold text-white">Monthly Tourist Arrival Forecast Chart</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis
                   dataKey="month"
                   angle={-45}
                   height={80}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#cbd5e1' }}
                 />
                 <YAxis
                   tickFormatter={formatNumberWithCommas}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#cbd5e1' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#9333ea"
-                  fill="#f3e8ff"
+                  stroke="#60a5fa"
+                  fill="#1e3a8a"
                   fillOpacity={0.6}
                 />
                 <Line
                   type="monotone"
                   dataKey="arrivals"
-                  stroke="#9333ea"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#9333ea', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -446,21 +481,21 @@ function MonthlyPredictionsComponent() {
       )}
 
       {/* Forecast Results - MOVED DOWN */}
-      <Card className="power-bi-card">
+      <Card className="power-bi-card !bg-[#151515] !border-[#2a2a2a] shadow-lg shadow-black/20">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Forecast Results</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg font-semibold text-white">Forecast Results</CardTitle>
+          <CardDescription className="text-slate-300">
             Predicted visitor numbers for the next {forecastMonths} months under {currentScenario} scenario
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {forecastData.map((item, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg overflow-hidden">
+              <div key={index} className="bg-[#1b1b1b]/70 border border-[#2a2a2a] rounded-lg overflow-hidden">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center space-x-4">
-                    <div className="font-semibold text-gray-800">{item.month}</div>
-                    <div className="text-2xl font-bold text-purple-600">
+                    <div className="font-semibold text-slate-100">{item.month}</div>
+                    <div className="text-2xl font-bold text-blue-300">
                       {item.prediction !== '-' ? item.prediction.toLocaleString() : '-'}
                     </div>
                   </div>
@@ -468,11 +503,11 @@ function MonthlyPredictionsComponent() {
 
                 {/* External Factors Section */}
                 {item.externalFactors && item.externalFactors.length > 0 && (
-                  <div className="px-4 pb-3 pt-1 bg-gray-100 border-t border-gray-200">
-                    <div className="text-xs font-medium text-gray-500 mb-1">External Factors:</div>
+                  <div className="px-4 pb-3 pt-1 bg-[#151515]/80 border-t border-[#2a2a2a]">
+                    <div className="text-xs font-medium text-slate-300 mb-1">External Factors:</div>
                     <div className="flex flex-wrap gap-2">
                       {item.externalFactors.map((factor, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs bg-white">
+                        <Badge key={idx} variant="outline" className="text-xs bg-[#151515] border-[#2a2a2a] text-slate-200">
                           {factor.name}: {factor.value}%
                         </Badge>
                       ))}
@@ -482,7 +517,7 @@ function MonthlyPredictionsComponent() {
               </div>
             ))}
             {forecastData.length === 0 && !isLoading && (
-              <div className="p-4 text-center text-gray-500">No data available for the selected period.</div>
+              <div className="p-4 text-center text-slate-400">No data available for the selected period.</div>
             )}
           </div>
         </CardContent>
@@ -496,3 +531,5 @@ function MonthlyPredictionsComponent() {
 }
 
 export default MonthlyPredictionsComponent;
+
+

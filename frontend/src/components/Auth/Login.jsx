@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import Antigravity from "../Landing/Antigravity";
 import "./AuthStyles.css";
 
 export default function Login() {
@@ -11,31 +12,49 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
     async function handleSubmit(e) {
         e.preventDefault();
+        const email = emailRef.current.value.trim().toLowerCase();
+        const password = passwordRef.current.value;
+
+        if (!isValidEmail(email)) {
+            setError("Please enter a valid email address.");
+            return;
+        }
 
         try {
             setError("");
             setLoading(true);
-            await login(emailRef.current.value, passwordRef.current.value);
+            await login(email, password);
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
-            setError("Failed to log in: " + err.message);
+            if (err?.code === "auth/invalid-email" || /invalid email/i.test(err?.message || "")) {
+                setError("Invalid email address. Please check the format and try again.");
+            } else {
+                setError("Failed to log in: " + err.message);
+            }
         }
 
         setLoading(false);
     }
 
     async function handleGoogleSignIn() {
+        setError("");
+        setLoading(true);
         try {
-            setError("");
-            setLoading(true);
             await googleSignIn();
             navigate("/dashboard");
         } catch (err) {
-            console.error(err);
-            setError("Failed to sign in with Google: " + err.message);
+            console.error("[Login] Google Sign-In error:", err);
+            // Display user-friendly error message
+            const message = err.message || "Failed to sign in with Google. Please try again.";
+            setError(message);
+        } finally {
             setLoading(false);
         }
     }
@@ -44,6 +63,25 @@ export default function Login() {
         <div className="auth-layout">
             {/* Left Panel - Wallpaper */}
             <div className="left-panel">
+                <div className="left-panel-antigravity" aria-hidden="true">
+                    <Antigravity
+                        count={220}
+                        magnetRadius={6}
+                        ringRadius={7}
+                        waveSpeed={0.4}
+                        waveAmplitude={1}
+                        particleSize={1.4}
+                        lerpSpeed={0.05}
+                        color="#3b5bdb"
+                        autoAnimate
+                        particleVariance={1}
+                        rotationSpeed={0}
+                        depthFactor={1}
+                        pulseSpeed={3}
+                        particleShape="capsule"
+                        fieldStrength={10}
+                    />
+                </div>
                 <div className="grid-texture" aria-hidden="true"></div>
                 <div className="glow g1" aria-hidden="true"></div>
                 <div className="glow g2" aria-hidden="true"></div>
@@ -58,11 +96,11 @@ export default function Login() {
                 <div className="lp-center">
                     <div className="lp-tagline-label" aria-hidden="true">
                         <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1l1.8 5.5L15 8l-5.2 1.5L8 15l-1.8-5.5L1 8l5.2-1.5z" fill="#4c6ef5"/>
+                            <path d="M8 1l1.8 5.5L15 8l-5.2 1.5L8 15l-1.8-5.5L1 8l5.2-1.5z" fill="#4c6ef5" />
                         </svg>
                         Official SLTDA Analytics Partner
                     </div>
-                    <h1 className="lp-headline">Data-driven decisions<br/>for <span className="ac">Sri Lanka's</span><br/>tourism future</h1>
+                    <h1 className="lp-headline">Data-driven decisions<br />for <span className="ac">Sri Lanka's</span><br />tourism future</h1>
                     <p className="lp-sub">AI-powered forecasting, real-time visitor load intelligence, and strategic insights — all in one portal.</p>
                 </div>
 
@@ -106,23 +144,23 @@ export default function Login() {
                             <div className="form-sub">Sign in to your analytics portal</div>
                         </div>
 
-                        <form onSubmit={handleSubmit} novalidate>
+                        <form onSubmit={handleSubmit} noValidate>
                             {/* Email Field */}
                             <div className="field">
                                 <label htmlFor="login-email">Email Address</label>
                                 <div className="input-wrap">
                                     <span className="input-icon">
                                         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                            <rect x="1.5" y="3" width="13" height="10" rx="2"/>
-                                            <path d="M1.5 5.5l6.5 4 6.5-4"/>
+                                            <rect x="1.5" y="3" width="13" height="10" rx="2" />
+                                            <path d="M1.5 5.5l6.5 4 6.5-4" />
                                         </svg>
                                     </span>
-                                    <input 
-                                        type="email" 
-                                        id="login-email" 
+                                    <input
+                                        type="email"
+                                        id="login-email"
                                         ref={emailRef}
-                                        placeholder="you@organisation.lk" 
-                                        autoComplete="email" 
+                                        placeholder="you@organisation.lk"
+                                        autoComplete="email"
                                         required
                                     />
                                 </div>
@@ -134,16 +172,16 @@ export default function Login() {
                                 <div className="input-wrap">
                                     <span className="input-icon">
                                         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                            <rect x="3" y="7" width="10" height="8" rx="2"/>
-                                            <path d="M5 7V5a3 3 0 0 1 6 0v2"/>
+                                            <rect x="3" y="7" width="10" height="8" rx="2" />
+                                            <path d="M5 7V5a3 3 0 0 1 6 0v2" />
                                         </svg>
                                     </span>
-                                    <input 
-                                        type="password" 
-                                        id="login-password" 
+                                    <input
+                                        type="password"
+                                        id="login-password"
                                         ref={passwordRef}
-                                        placeholder="Enter your password" 
-                                        autoComplete="current-password" 
+                                        placeholder="Enter your password"
+                                        autoComplete="current-password"
                                         required
                                     />
                                 </div>
@@ -151,7 +189,7 @@ export default function Login() {
 
                             {/* Remember Checkbox */}
                             <div className="check-field">
-                                <input type="checkbox" id="remember" name="remember"/>
+                                <input type="checkbox" id="remember" name="remember" />
                                 <label htmlFor="remember">Keep me signed in for 30 days</label>
                             </div>
 
@@ -173,10 +211,10 @@ export default function Login() {
                         {/* Google SSO */}
                         <button className="sso-btn" onClick={handleGoogleSignIn} disabled={loading}>
                             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                             </svg>
                             Continue with Google
                         </button>

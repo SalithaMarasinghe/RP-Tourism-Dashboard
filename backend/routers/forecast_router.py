@@ -9,7 +9,11 @@ import logging
 
 from fastapi import APIRouter, HTTPException
 
-from services.forecast_service import get_daily_forecasts, get_scenarios
+from services.forecast_service import (
+    get_daily_forecasts,
+    get_scenarios,
+    get_arrivals_timeline,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,3 +49,16 @@ async def forecast_daily():
     except Exception as exc:
         logger.error("Failed to load daily forecasts: %s", exc)
         raise HTTPException(status_code=500, detail="Failed to load daily forecasts")
+
+
+@router.get("/arrivals-timeline")
+async def forecast_arrivals_timeline():
+    """
+    Return one monthly timeline containing both historical actual arrivals and
+    future predicted arrivals.
+    """
+    try:
+        return get_arrivals_timeline()
+    except Exception as exc:
+        logger.error("Failed to load arrivals timeline: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to load arrivals timeline")

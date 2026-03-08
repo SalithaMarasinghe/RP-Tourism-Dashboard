@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from './ui/button';
+import StarBorder from './ui/StarBorder';
+import SubscriptionModal from './ui/SubscriptionModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import OverviewTab from './OverviewTab';
@@ -8,6 +9,8 @@ import DailyPredictionsComponent from './DailyPredictionsComponent';
 import TDMSComponent from './TDMSComponent';
 import SourceMarketIntelligence from './SourceMarketIntelligence';
 import ChatbotTab from '../ChatbotTab';
+import RevenueDashboard from '../pages/RevenueDashboard';
+import DemographicCohortTracker from '../pages/DemographicCohortTracker';
 import {
   BarChart3,
   Calendar,
@@ -21,6 +24,8 @@ import {
   LogOut,
   Settings,
   TrendingUp,
+  Users,
+  Wallet,
 } from 'lucide-react';
 
 function PowerBIDashboard() {
@@ -32,6 +37,7 @@ function PowerBIDashboard() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
 
@@ -140,18 +146,18 @@ function PowerBIDashboard() {
 
       {/* Floating Sidebar Navigation */}
       <div
-        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transform transition-transform duration-250 ease-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-gray-950 border border-gray-800 rounded-lg shadow-2xl shadow-black/40 z-50 transform transition-transform duration-250 ease-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-800">Navigation</h2>
+            <h2 className="text-lg font-semibold text-gray-100">Navigation</h2>
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-1 rounded-md hover:bg-gray-800 transition-colors"
               title="Close sidebar"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5 text-gray-400" />
             </button>
           </div>
           <nav className="space-y-1">
@@ -159,16 +165,18 @@ function PowerBIDashboard() {
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'predictions', label: 'Monthly Predictions', icon: Calendar },
               { id: 'daily-predictions', label: 'Daily Predictions', icon: CalendarDays },
-              { id: 'tdms', label: 'Distribution Management', icon: MapPin },
-              { id: 'source-markets', label: 'Source Markets', icon: TrendingUp },
+              { id: 'tdms', label: 'Tourist Flow Distribution', icon: MapPin },
+              { id: 'revenue', label: 'Revenue Intelligence', icon: Wallet },
+              { id: 'demographic', label: 'Demographic Cohorts', icon: Users },
+              { id: 'source-markets', label: 'Market Source Intelligence', icon: TrendingUp },
               { id: 'chatbot', label: 'AI Assistant', icon: MessageCircle }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
                 className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${activeTab === tab.id
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
               >
                 <tab.icon className="h-5 w-5 mr-3" />
@@ -184,52 +192,66 @@ function PowerBIDashboard() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden w-full">
           {/* Integrated Navigation Bar */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-black px-6 py-4">
+            <div className="relative flex items-center justify-between">
               {/* Left side - Menu button and title */}
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                  className="p-2 hover:bg-gray-800 rounded-md transition-colors"
                   aria-label="Toggle sidebar"
                   title="Toggle sidebar"
                 >
-                  <Menu className="h-5 w-5 text-gray-600" />
+                  <Menu className="h-5 w-5 text-gray-300" />
                 </button>
-                <h1 className="text-xl font-bold text-gray-800">Sri Lanka Tourism Analytics</h1>
+                <h1 className="text-xl font-bold text-gray-100">Sri Lanka Tourism Analytics</h1>
+              </div>
+
+              {/* Center - Subscribe button */}
+              <div className="absolute left-1/2 -translate-x-1/2">
+                <StarBorder
+                  as="button"
+                  type="button"
+                  onClick={() => setIsSubscriptionModalOpen(true)}
+                  className="transition-transform hover:scale-[1.02]"
+                  color="#3b82f6"
+                  speed="5s"
+                >
+                  Subscribe to PRO
+                </StarBorder>
               </div>
 
               {/* Right side - Profile */}
               <div className="flex items-center space-x-4 relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="flex items-center space-x-2 text-sm hover:bg-gray-100 rounded-md px-3 py-2 transition-colors"
+                  className="flex items-center space-x-2 text-sm hover:bg-gray-800 rounded-md px-3 py-2 transition-colors"
                 >
-                  <span className="text-gray-600">Logged in as:</span>
-                  <span className="ml-2 font-semibold text-gray-800">{displayName}</span>
-                  <User className="h-4 w-4 text-gray-600" />
-                  <ChevronDown className={`h-4 w-4 text-gray-600 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="text-gray-400">Logged in as:</span>
+                  <span className="ml-2 font-semibold text-gray-100">{displayName}</span>
+                  <User className="h-4 w-4 text-gray-300" />
+                  <ChevronDown className={`h-4 w-4 text-gray-300 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 overflow-hidden">
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-black rounded-lg shadow-xl border border-gray-800 py-2 z-50 overflow-hidden">
                     {/* User Summary */}
-                    <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="px-4 py-3 border-b border-gray-800">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
                           {getUserInitials()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-gray-900 truncate">
+                          <div className="font-semibold text-gray-100 truncate">
                             {userData?.firstName || ""} {userData?.lastName || ""}
                           </div>
-                          <div className="text-sm text-gray-500 truncate">
+                          <div className="text-sm text-gray-400 truncate">
                             {currentUser?.email}
                           </div>
                           {userData?.role && (
                             <div className="mt-1">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900 text-blue-200">
                                 {userData.role.toUpperCase()}
                               </span>
                             </div>
@@ -243,7 +265,7 @@ function PowerBIDashboard() {
                       <Link
                         to="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 transition-colors"
                       >
                         <Settings className="h-4 w-4 mr-3 text-gray-400 flex-shrink-0" />
                         Account settings
@@ -251,10 +273,10 @@ function PowerBIDashboard() {
                     </div>
 
                     {/* Logout Action */}
-                    <div className="border-t border-gray-100 pt-1">
+                    <div className="border-t border-gray-800 pt-1">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-red-950/40 transition-colors"
                       >
                         <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
                         Log out
@@ -267,16 +289,31 @@ function PowerBIDashboard() {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-auto p-6">
+          <div
+            className={`flex-1 overflow-auto ${activeTab === 'chatbot' ? 'p-0 bg-black' : 'p-6'} ${(activeTab === 'overview' || activeTab === 'predictions' || activeTab === 'daily-predictions' || activeTab === 'tdms' || activeTab === 'revenue' || activeTab === 'demographic' || activeTab === 'source-markets') ? 'bg-black' : ''}`}
+          >
             {activeTab === 'overview' && <OverviewTab />}
+            {activeTab === 'revenue' && <RevenueDashboard />}
+            {activeTab === 'demographic' && <DemographicCohortTracker />}
             {activeTab === 'predictions' && <MonthlyPredictionsComponent />}
             {activeTab === 'daily-predictions' && <DailyPredictionsComponent />}
             {activeTab === 'tdms' && <TDMSComponent />}
             {activeTab === 'source-markets' && <SourceMarketIntelligence />}
-            {activeTab === 'chatbot' && <div className="h-full p-0"><ChatbotTab /></div>}
+            {activeTab === 'chatbot' && <div className="h-full"><ChatbotTab /></div>}
           </div>
         </div>
       </div>
+
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+        onUpgrade={() => {
+          setIsSubscriptionModalOpen(false);
+        }}
+        onContinueFree={() => {
+          setIsSubscriptionModalOpen(false);
+        }}
+      />
     </div>
   );
 

@@ -1,0 +1,17 @@
+report_year,gender_male,gender_female,age_below_10,age_10_19,age_20_29,age_30_39,age_40_49,age_50_59,age_60_plus,purpose_leisure,purpose_business,purpose_vfr,purpose_transit,purpose_other,top_source_markets,note
+2010,54.1%,45.9%,,10.3%,15.0%,28.1%,28.9%,12.9%,4.8%,78.9%,12.7%,5.4%,,3.0%,"India, UK, Germany, Maldives, Australia","Age band ""3-19"" mapped to age_10_19"
+2011,59.2%,40.8%,,11.6%,16.9%,22.6%,26.6%,11.7%,10.6%,80.4%,8.0%,8.2%,,3.4%,"India, UK, Germany, France, Maldives","Age band ""3-19"" mapped to age_10_19"
+2012,55.4%,44.6%,,10.6%,19.2%,25.9%,25.1%,10.2%,9.0%,74.4%,9.0%,11.7%,,4.9%,"India, UK, Germany, France, Australia","Age band ""3-19"" mapped to age_10_19"
+2013,62.1%,37.9%,,2.4%,20.6%,30.3%,21.7%,13.9%,11.1%,72.7%,5.2%,12.4%,,9.7%,"India, UK, Germany, Maldives, France","Age band ""3-19"" mapped to age_10_19"
+2014,55.3%,44.7%,,9.5%,17.6%,23.7%,20.6%,16.2%,12.4%,67.95%,1.33%,27.45%,,3.27%,"India, UK, China, Germany, Maldives","Age band ""3-19"" mapped to age_10_19"
+2015,53.6%,46.4%,,9.9%,17.8%,22.6%,18.9%,17.0%,13.9%,66.6%,1.3%,25.5%,,6.6%,"India, China, UK, Germany, Maldives","Age band ""3-19"" mapped to age_10_19"
+2016,45.3%,54.7%,,7.9%,14.8%,22.5%,21.1%,16.6%,17.1%,83.4%,1.8%,11.5%,,3.3%,"India, China, UK, Germany, France","Age band ""3-19"" mapped to age_10_19"
+2017,54.9%,45.1%,,11.2%,17.9%,24.6%,17.5%,15.3%,13.5%,82.4%,3.3%,11.3%,,3.0%,"India, China, UK, Germany, France","Age band ""3-19"" mapped to age_10_19"
+2018,51.9%,48.1%,,11.4%,18.2%,22.4%,17.4%,15.6%,15.0%,81.72%,3.95%,10.84%,,3.49%,"India, China, UK, Germany, Australia","Age band ""3-19"" mapped to age_10_19"
+2019,52.3%,47.7%,,10.2%,17.0%,22.6%,16.8%,15.8%,17.6%,83.20%,3.65%,10.48%,,2.67%,"India, UK, China, Germany, France","Age band ""3-19"" mapped to age_10_19"
+2020,51.9%,48.1%,,8.1%,16.8%,24.5%,15.9%,15.5%,19.2%,87.52%,2.75%,7.61%,,2.12%,"India, UK, Russia, Germany, China","Age band ""3-19"" mapped to age_10_19"
+2021,,,,,,,,,,,,,,,"India, Russia, UK, Germany, Ukraine",Demographic data omitted from report
+2022,,,,,,,,,,,,,,,"India, Russia, UK, Germany, France",Demographic data omitted from report
+2023,14.48%,57.28%,0.005%,0.17%,0.1%,0.33%,0.65%,4.52%,5.48%,57.3%,4.5%,14.5%,,23.7%,"India, Russia, UK, Germany, China",Data anomalies in source report (see notes)
+2024,51.0%,49.0%,11.1%,,16.4%,22.5%,17.7%,15.2%,17.2%,,,,,,"India, Russia, UK, Germany, China","Age ""below 10"" mapped to age_below_10"
+2025,51.0%,49.0%,,10.11%,17.24%,21.82%,17.04%,15.34%,18.45%,,,,,,"India, Russia, UK, Germany, China","Age ""below 20"" mapped to age_10_19"

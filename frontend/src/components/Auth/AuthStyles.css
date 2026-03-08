@@ -35,11 +35,47 @@
   overflow: hidden;
 }
 
+/* Signup-only scrollbar override */
+.signup-page {
+  scrollbar-width: thin;
+  scrollbar-color: #d8dbe0 #ffffff;
+}
+
+.signup-page .right-panel,
+.signup-page .form-body {
+  scrollbar-width: thin;
+  scrollbar-color: #d8dbe0 #ffffff;
+}
+
+.signup-page .right-panel::-webkit-scrollbar,
+.signup-page .form-body::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.signup-page .right-panel::-webkit-scrollbar-track,
+.signup-page .form-body::-webkit-scrollbar-track {
+  background: #ffffff !important;
+  border-radius: 999px;
+}
+
+.signup-page .right-panel::-webkit-scrollbar-thumb,
+.signup-page .form-body::-webkit-scrollbar-thumb {
+  background: #d8dbe0 !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 999px;
+}
+
+.signup-page .right-panel::-webkit-scrollbar-thumb:hover,
+.signup-page .form-body::-webkit-scrollbar-thumb:hover {
+  background: #c2c7d0 !important;
+}
+
 /* Left Panel (Wallpaper) */
 .left-panel {
   flex: 0 0 55%;
   width: 55%;
-  background: var(--navy);
+  background: #000;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -47,6 +83,18 @@
   justify-content: space-between;
   padding: 36px 44px;
   min-height: 100vh;
+}
+
+.left-panel-antigravity {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.left-panel-antigravity canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Grid texture */
@@ -309,16 +357,23 @@
 }
 
 .form-body::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  background: #f5f5f5;
+}
+
+.form-body::-webkit-scrollbar-track {
+  background: #fafafa;
+  border-radius: 4px;
 }
 
 .form-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+  background: #a0a0a0;
+  border-radius: 4px;
+  border: 2px solid #fafafa;
 }
 
 .form-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: #808080;
 }
 
 .form-header {
@@ -384,7 +439,7 @@ select {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-dark);
-  background: var(--body-bg);
+  background: var(--white);
   border: 1.5px solid var(--border);
   border-radius: 8px;
   outline: none;
@@ -562,10 +617,40 @@ input::placeholder {
 .check-field input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: var(--blue);
+  accent-color: #707070;
   flex-shrink: 0;
   cursor: pointer;
   margin-top: 0;
+  caret-color: #707070;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  padding: 0;
+  display: inline-block;
+}
+
+.check-field input[type="checkbox"]:checked {
+  background-color: #f5f5f5;
+  border-color: #707070;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23707070' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M2 8l4 4 8-8'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+/* Webkit browsers - remove default styling */
+.check-field input[type="checkbox"]::-webkit-outer-spin-button,
+.check-field input[type="checkbox"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.check-field input[type="checkbox"] {
+  color-scheme: light;
 }
 
 .check-field label {
