@@ -68,6 +68,7 @@ const LandingPage = () => {
 
           <nav className="tb-nav" aria-label="Main navigation">
             <a href="#features">Features</a>
+            <a href="#analytics">Analytics</a>
             <a href="#audience">Who It's For</a>
             <a href="#ai-assistant">AI Assistant</a>
             <a href="#how-it-works">How It Works</a>
@@ -121,12 +122,20 @@ const LandingPage = () => {
                   <div className="hs-label">Baseline 2030 Forecast</div>
                 </div>
                 <div role="listitem">
-                  <div className="hs-val">50<span className="u">+</span></div>
+                  <div className="hs-val">15<span className="u"></span></div>
                   <div className="hs-label">Sites Monitored</div>
                 </div>
                 <div role="listitem">
                   <div className="hs-val">94<span className="u">%</span></div>
                   <div className="hs-label">Model Confidence</div>
+                </div>
+                <div role="listitem">
+                  <div className="hs-val">9<span className="u"></span></div>
+                  <div className="hs-label">Core Analytics Modules</div>
+                </div>
+                <div role="listitem">
+                  <div className="hs-val">$3.17<span className="u">B</span></div>
+                  <div className="hs-label">2024 Revenue</div>
                 </div>
               </div>
             </div>
@@ -402,7 +411,7 @@ const LandingPage = () => {
               <h2 className="sec-h2" id="feat-h2">Every dimension of<br/>tourism intelligence</h2>
             </div>
             <p className="sec-lead" style={{maxWidth: '380px', margin: '0'}}>
-              Four core modules built on machine learning, real-time data feeds, and Sri Lanka's official arrivals dataset.
+              Nine core modules built on machine learning, real-time data feeds, and Sri Lanka's official arrivals dataset.
             </p>
           </div>
           <MagicBento
@@ -448,8 +457,8 @@ const LandingPage = () => {
                         <path d="M3 12a9 9 0 1 0 18 0"/>
                       </svg>
                       <h3 className="magic-bento-card__title">Visitor Load Index</h3>
-                      <p className="magic-bento-card__description">Real-time VLI for 50+ sites. Alerts when load exceeds 120% capacity.</p>
-                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(245, 159, 0, 0.2)', color: '#f59f00', padding: '0.3em 0.6em', borderRadius: '4px'}}>50+ Sites</span>
+                      <p className="magic-bento-card__description">Real-time VLI for 15 sites. Alerts when load exceeds 120% capacity.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(245, 159, 0, 0.2)', color: '#f59f00', padding: '0.3em 0.6em', borderRadius: '4px'}}>15 Sites</span>
                     </div>
                   </>
                 )
@@ -500,6 +509,58 @@ const LandingPage = () => {
                       <h3 className="magic-bento-card__title">Top Source Markets</h3>
                       <p className="magic-bento-card__description">Market share by origin with trend tracking and alerts.</p>
                       <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(59, 91, 219, 0.2)', color: '#3b5bdb', padding: '0.3em 0.6em', borderRadius: '4px'}}>Market Intel</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(220, 38, 38, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Revenue Analytics</h3>
+                      <p className="magic-bento-card__description">Comprehensive revenue tracking with geopolitical adjustments and anomaly detection.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(220, 38, 38, 0.2)', color: '#dc2626', padding: '0.3em 0.6em', borderRadius: '4px'}}>Financial Insights</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Demographic Tracking</h3>
+                      <p className="magic-bento-card__description">Age cohort analysis, population pyramids, and rising segment alerts.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', padding: '0.3em 0.6em', borderRadius: '4px'}}>Visitor Profiles</span>
+                    </div>
+                  </>
+                )
+              },
+              {
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                render: () => (
+                  <>
+                    <div className="magic-bento-card__content">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" style={{marginBottom: '0.75em'}}>
+                        <polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/>
+                        <line x1="8" y1="2" x2="8" y2="18"/>
+                        <line x1="16" y1="6" x2="16" y2="22"/>
+                      </svg>
+                      <h3 className="magic-bento-card__title">Geopolitical Intelligence</h3>
+                      <p className="magic-bento-card__description">Geographic tourism patterns with regional impact analysis.</p>
+                      <span style={{fontSize: '11px', marginTop: 'auto', paddingTop: '0.5em', display: 'inline-block', background: 'rgba(99, 102, 241, 0.2)', color: '#6366f1', padding: '0.3em 0.6em', borderRadius: '4px'}}>Regional Analysis</span>
                     </div>
                   </>
                 )
@@ -643,6 +704,98 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ADVANCED ANALYTICS */}
+      <section className="sec" id="analytics" style={{background: 'var(--white)'}} aria-labelledby="analytics-h2">
+        <div className="section-antigravity" aria-hidden="true">
+          <Antigravity
+            count={160}
+            magnetRadius={8}
+            ringRadius={9}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.6}
+            lerpSpeed={0.05}
+            color="#ffffff"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
+        <div className="pw">
+          <div data-reveal style={{textAlign: 'center'}}>
+            <span className="eyebrow">Data Science Engine</span>
+            <h2 className="sec-h2" id="analytics-h2">Advanced analytics<br/>powering every insight</h2>
+            <p className="sec-lead" style={{maxWidth: '600px', margin: '0 auto', textAlign: 'center'}}>
+              State-of-the-art machine learning models processing millions of data points to deliver actionable tourism intelligence.
+            </p>
+          </div>
+          <div className="analytics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '48px'}}>
+            <div className="analytics-card" data-reveal style={{background: 'rgba(59, 91, 219, 0.03)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(59, 91, 219, 0.1)'}}>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '16px'}}>
+                <div style={{width: '40px', height: '40px', background: 'rgba(59, 91, 219, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px'}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                  </svg>
+                </div>
+                <h3 style={{margin: 0, fontSize: '18px', fontWeight: '600'}}>SVR & Ensemble Models</h3>
+              </div>
+              <p style={{margin: 0, color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5'}}>
+                Support Vector Regression combined with ensemble methods for 94% accuracy in 5-year tourism forecasting.
+              </p>
+            </div>
+
+            <div className="analytics-card" data-reveal style={{background: 'rgba(18, 184, 134, 0.03)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(18, 184, 134, 0.1)'}}>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '16px'}}>
+                <div style={{width: '40px', height: '40px', background: 'rgba(18, 184, 134, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px'}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#12b886" strokeWidth="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                  </svg>
+                </div>
+                <h3 style={{margin: 0, fontSize: '18px', fontWeight: '600'}}>Real-Time Processing</h3>
+              </div>
+              <p style={{margin: 0, color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5'}}>
+                Live data ingestion from 15 sites with sub-second VLI calculations and automated alert systems.
+              </p>
+            </div>
+
+            <div className="analytics-card" data-reveal style={{background: 'rgba(245, 159, 0, 0.03)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(245, 159, 0, 0.1)'}}>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '16px'}}>
+                <div style={{width: '40px', height: '40px', background: 'rgba(245, 159, 0, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px'}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59f00" strokeWidth="2">
+                    <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+                  </svg>
+                </div>
+                <h3 style={{margin: 0, fontSize: '18px', fontWeight: '600'}}>Anomaly Detection</h3>
+              </div>
+              <p style={{margin: 0, color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5'}}>
+                Statistical outlier detection identifying unusual patterns in arrivals, revenue, and site capacity utilization.
+              </p>
+            </div>
+
+            <div className="analytics-card" data-reveal style={{background: 'rgba(121, 80, 242, 0.03)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(121, 80, 242, 0.1)'}}>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '16px'}}>
+                <div style={{width: '40px', height: '40px', background: 'rgba(121, 80, 242, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px'}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7950f2" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </div>
+                <h3 style={{margin: 0, fontSize: '18px', fontWeight: '600'}}>Predictive Analytics</h3>
+              </div>
+              <p style={{margin: 0, color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5'}}>
+                Advanced time-series forecasting with scenario modeling for strategic tourism planning and resource allocation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="sec proc-sec" id="how-it-works" aria-labelledby="proc-h2">
         <div className="section-antigravity" aria-hidden="true">
@@ -757,20 +910,30 @@ const LandingPage = () => {
           <div className="foot-grid">
             <div>
               <span className="brand-pill" style={{fontSize: '12px'}}>Sri Lanka Tourism Analytics</span>
-              <p className="foot-brand-sub">Empowering Sri Lanka's tourism ecosystem with authoritative, AI-powered analytics.</p>
+              <p className="foot-brand-sub">Empowering Sri Lanka's tourism ecosystem with authoritative, AI-powered analytics and real-time insights.</p>
             </div>
             <div className="foot-col">
               <h4>Platform</h4>
               <a href="#features">Monthly Forecasting</a>
               <a href="#features">Daily Predictions</a>
               <a href="#features">Visitor Load Index</a>
+              <a href="#analytics">Advanced Analytics</a>
               <a href="#ai-assistant">AI Assistant</a>
+            </div>
+            <div className="foot-col">
+              <h4>Analytics</h4>
+              <a href="#features">Revenue Analytics</a>
+              <a href="#features">Demographic Tracking</a>
+              <a href="#features">Geopolitical Intelligence</a>
+              <a href="#features">Source Markets</a>
+              <a href="#features">Redistribution Tools</a>
             </div>
             <div className="foot-col">
               <h4>Organisation</h4>
               <a href="#">About SLTAP</a>
               <a href="#">SLTDA Partnership</a>
               <a href="#">Data Sources</a>
+              <a href="#">API Documentation</a>
               <a href="#">Contact</a>
             </div>
             <div className="foot-col">
