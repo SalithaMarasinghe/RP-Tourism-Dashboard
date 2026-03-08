@@ -56,7 +56,7 @@ export default function Signup() {
     }
 
     return (
-        <div className="auth-layout">
+        <div className="auth-layout signup-page">
             {/* Left Panel - Wallpaper */}
             <div className="left-panel">
                 <div className="left-panel-antigravity" aria-hidden="true">

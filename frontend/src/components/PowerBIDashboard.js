@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from './ui/button';
+import StarBorder from './ui/StarBorder';
+import SubscriptionModal from './ui/SubscriptionModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import OverviewTab from './OverviewTab';
@@ -36,6 +37,7 @@ function PowerBIDashboard() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
 
@@ -191,7 +193,7 @@ function PowerBIDashboard() {
         <div className="flex-1 flex flex-col overflow-hidden w-full">
           {/* Integrated Navigation Bar */}
           <div className="bg-black px-6 py-4">
-            <div className="flex items-center justify-between">
+            <div className="relative flex items-center justify-between">
               {/* Left side - Menu button and title */}
               <div className="flex items-center space-x-4">
                 <button
@@ -203,6 +205,20 @@ function PowerBIDashboard() {
                   <Menu className="h-5 w-5 text-gray-300" />
                 </button>
                 <h1 className="text-xl font-bold text-gray-100">Sri Lanka Tourism Analytics</h1>
+              </div>
+
+              {/* Center - Subscribe button */}
+              <div className="absolute left-1/2 -translate-x-1/2">
+                <StarBorder
+                  as="button"
+                  type="button"
+                  onClick={() => setIsSubscriptionModalOpen(true)}
+                  className="transition-transform hover:scale-[1.02]"
+                  color="#3b82f6"
+                  speed="5s"
+                >
+                  Subscribe to PRO
+                </StarBorder>
               </div>
 
               {/* Right side - Profile */}
@@ -287,6 +303,17 @@ function PowerBIDashboard() {
           </div>
         </div>
       </div>
+
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+        onUpgrade={() => {
+          setIsSubscriptionModalOpen(false);
+        }}
+        onContinueFree={() => {
+          setIsSubscriptionModalOpen(false);
+        }}
+      />
     </div>
   );
 
