@@ -86,11 +86,33 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Tourism Dashboard API", lifespan=lifespan)
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+# For development: allow localhost
+# For production: restrict to specific domains via environment variables
+if os.getenv("ENV") == "production":
+    # Production: use explicit domains
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "https://sri-lanka-tourism-intelligence.web.app")
+    additional_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+    additional_origins = [origin.strip() for origin in additional_origins if origin.strip()]
+    
+    allowed_origins_list = [
+        FRONTEND_URL,
+        "https://sri-lanka-tourism-intelligence.web.app",
+        "https://sri-lanka-tourism-intelligence.firebaseapp.com",
+    ] + additional_origins
+else:
+    # Development: allow localhost
+    allowed_origins_list = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://sri-lanka-tourism-intelligence.web.app",
+        "https://sri-lanka-tourism-intelligence.firebaseapp.com",
+    ]
+
+logger.info("CORS allowed origins: %s", allowed_origins_list)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "http://localhost:3000", "https://sri-lanka-tourism-intelligence.web.app"],
+    allow_origins=allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
