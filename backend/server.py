@@ -86,29 +86,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Tourism Dashboard API", lifespan=lifespan)
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-# For development: allow localhost
-# For production: restrict to specific domains via environment variables
-if os.getenv("ENV") == "production":
-    # Production: use explicit domains
-    FRONTEND_URL = os.getenv("FRONTEND_URL", "https://sri-lanka-tourism-intelligence.web.app")
-    additional_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
-    additional_origins = [origin.strip() for origin in additional_origins if origin.strip()]
-    
-    allowed_origins_list = [
-        FRONTEND_URL,
-        "https://sri-lanka-tourism-intelligence.web.app",
-        "https://sri-lanka-tourism-intelligence.firebaseapp.com",
-    ] + additional_origins
-else:
-    # Development: allow localhost
-    allowed_origins_list = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://sri-lanka-tourism-intelligence.web.app",
-        "https://sri-lanka-tourism-intelligence.firebaseapp.com",
-    ]
+# Simple, static CORS configuration that works for all environments
+# All necessary origins are explicitly listed
+allowed_origins_list = [
+    # Local development
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8000",
+    # Production - Firebase hosting
+    "https://sri-lanka-tourism-intelligence.web.app",
+    "https://sri-lanka-tourism-intelligence.firebaseapp.com",
+]
 
-logger.info("CORS allowed origins: %s", allowed_origins_list)
+logger.info("CORS configured. Allowed origins: %s", allowed_origins_list)
 
 app.add_middleware(
     CORSMiddleware,
