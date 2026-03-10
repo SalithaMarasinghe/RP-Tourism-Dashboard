@@ -18,6 +18,14 @@ const api = axios.create({
     },
 });
 
+// Create a dedicated axios instance for forecast services
+const forecastApi = axios.create({
+    baseURL: `${API_BASE_URL}/api/forecasts`,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
 /**
  * Internal helper to normalize scenario names for the backend.
  * Maps scenario names to lowercase backend expectations.
@@ -106,9 +114,27 @@ export const fetchRevenueDrivers = async (params = {}) => {
     }
 };
 
+/**
+ * fetchArrivalsTimeline
+ * Retrieves monthly tourist arrivals timeline (2010-2030) with actual/predicted labels.
+ * This includes both historical actual arrivals and forecast predictions for 2026-2030.
+ * 
+ * @returns {Promise<Array>} - Array of { date, arrivals, type } objects where type is 'actual' or 'predicted'
+ */
+export const fetchArrivalsTimeline = async () => {
+    try {
+        const response = await forecastApi.get('/arrivals-timeline');
+        return response.data;
+    } catch (error) {
+        console.error('API Error: fetchArrivalsTimeline', error);
+        throw error;
+    }
+};
+
 export default {
     fetchRevenueKpis,
     fetchRevenueSummary,
     fetchRevenueAnomalies,
     fetchRevenueDrivers,
+    fetchArrivalsTimeline,
 };

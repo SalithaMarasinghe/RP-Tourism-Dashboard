@@ -135,6 +135,7 @@ const RevenueDashboard = () => {
                     monthlyData={data.kpis?.monthly}
                     anomalies={data.anomalies?.anomalies}
                     events={data.anomalies?.events}
+                    arrivalsTimeline={data.arrivalsTimeline}
                     loading={loading}
                 />
             </section>
