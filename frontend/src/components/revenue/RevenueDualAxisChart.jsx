@@ -45,6 +45,16 @@ const CustomTooltip = ({ active, payload, label }) => {
                         <span className="font-semibold text-white">{new Intl.NumberFormat().format(data.arrivals)}</span>
                     </div>
 
+                    {data.arr_f_api && (
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <div className="w-2 h-2 rounded-full bg-[#06b6d4] mr-2" />
+                                <span className="text-gray-300">Arrivals (Forecast API):</span>
+                            </div>
+                            <span className="font-semibold text-white">{new Intl.NumberFormat().format(data.arr_f_api)}</span>
+                        </div>
+                    )}
+
                     <div className="flex justify-between items-center text-blue-600 font-medium">
                         <div className="flex items-center">
                             <div className="w-2 h-2 rounded-full bg-[#2563eb] mr-2" />
@@ -94,8 +104,12 @@ const CustomTooltip = ({ active, payload, label }) => {
  * - Left Axis: Revenue (USD Mn) & Avg Spend per Tourist (USD)
  * - Right Axis: Arrivals & Avg Length of Stay (Days)
  * - Styling: Solid (Historical) vs Dashed (Forecast)
+ * 
+ * Now includes:
+ * - Forecast arrivals sourced from dedicated forecast API (2026-2030)
+ * - Comparison view of forecast arrivals vs. revenue forecasts
  */
-const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
+const RevenueDualAxisChart = ({ monthlyData, anomalies, events, arrivalsTimeline, loading }) => {
 
     const processedData = useMemo(() => {
         if (!monthlyData) return [];
@@ -104,10 +118,25 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
         anomalies?.forEach(a => anomaliesMap.set(a.ds, a));
         events?.forEach(e => anomaliesMap.set(e.ds, e));
 
+        // Build a map of forecast arrivals from the dedicated API
+        // Format: "YYYY-MM" -> arrivals count
+        const forecastArrivalsMap = new Map();
+        if (arrivalsTimeline && Array.isArray(arrivalsTimeline)) {
+            arrivalsTimeline.forEach(row => {
+                if (row.type === 'predicted' && row.date && row.arrivals) {
+                    forecastArrivalsMap.set(row.date, row.arrivals);
+                }
+            });
+        }
+
         return monthlyData.map((row, idx) => {
             const isFC = row.is_forecast;
             const nextIsFC = monthlyData[idx + 1]?.is_forecast;
             const isPivot = !isFC && nextIsFC;
+
+            // Extract the forecast arrivals from the dedicated API if available
+            const dateKey = row.ds ? row.ds.substring(0, 7) : null; // YYYY-MM format
+            const forecastArrivalsFromApi = dateKey ? forecastArrivalsMap.get(dateKey) : null;
 
             return {
                 ...row,
@@ -123,12 +152,15 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
                 rpt_f: isFC || isPivot ? row.avg_rpt_usd : null,
                 los_f: isFC || isPivot ? row.avg_los : null,
 
+                // Forecast Arrivals from dedicated API (distinct series for 2026-2030)
+                arr_f_api: isFC ? forecastArrivalsFromApi : null,
+
                 hasAnomaly: anomaliesMap.has(row.ds),
                 anomalyInfo: anomaliesMap.get(row.ds),
                 anomalyPoint: (anomaliesMap.has(row.ds) && anomaliesMap.get(row.ds).type !== 'event') ? row.revenue_usd_mn : null
             };
         });
-    }, [monthlyData, anomalies, events]);
+    }, [monthlyData, anomalies, events, arrivalsTimeline]);
 
     // Consolidate noisy event-series into discrete markers so the chart remains readable.
     const eventMarkers = useMemo(() => {
@@ -273,6 +305,9 @@ const RevenueDualAxisChart = ({ monthlyData, anomalies, events, loading }) => {
                             {/* Primary: Arrivals (Emerald, Right) */}
                             <Line yAxisId="right" type="monotone" dataKey="arr_h" name="Arrivals" stroke="#10b981" strokeWidth={3} dot={false} connectNulls={false} strokeOpacity={0.8} />
                             <Line yAxisId="right" type="monotone" dataKey="arr_f" name="Arrivals (F)" stroke="#10b981" strokeWidth={3} strokeDasharray="5 5" dot={false} connectNulls={false} strokeOpacity={0.8} legendType="none" />
+                            
+                            {/* Forecast Arrivals from Dedicated API (2026-2030) - Cyan, Right Axis */}
+                            <Line yAxisId="right" type="monotone" dataKey="arr_f_api" name="Arrivals Forecast (API)" stroke="#06b6d4" strokeWidth={2.5} strokeDasharray="3 3" dot={false} connectNulls={false} strokeOpacity={0.9} />
 
                             {/* Secondary: Per-Tourist Spend (Amber, Left) */}
                             <Line yAxisId="left" type="monotone" dataKey="rpt_h" name="Avg Spend" stroke="#f59e0b" strokeWidth={1.5} dot={false} strokeOpacity={0.4} />
