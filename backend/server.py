@@ -31,6 +31,7 @@ from routers import (
     revenue_geo,
     demo,
 )
+from routers.review_intelligence import router as review_intelligence_router, init_review_service
 from routers.geopolitical_tile import validate_env_vars, ConfigurationError
 from services.geopolitical_tile_scheduler import run_scheduled_pipeline
 from services import tourism_rag
@@ -78,6 +79,15 @@ async def lifespan(app: FastAPI):
         logger.info("RAG system initialized successfully")
     else:
         logging.error("Failed to initialize RAG system")
+
+    # 4. Initialize Review Intelligence Service
+    logger.info("Initializing Review Intelligence system...")
+    csv_path = ROOT_DIR / "forecasts" / "location_aspect_scores.csv"
+    try:
+        init_review_service(str(csv_path))
+        logger.info("Review Intelligence system initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize Review Intelligence system: {e}")
     yield
     # ── Shutdown ────────────────────────────────────────────────────────────
     _scheduler.shutdown(wait=False)
@@ -140,3 +150,4 @@ app.include_router(source_market_geo_router.router)
 app.include_router(rev.router)
 app.include_router(revenue_geo.router)
 app.include_router(demo.router)
+app.include_router(review_intelligence_router)
