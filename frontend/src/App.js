@@ -13,6 +13,7 @@ import PowerBIDashboard from './components/PowerBIDashboard';
 import OverviewTab from './components/OverviewTab';
 import RevenueDashboard from './pages/RevenueDashboard';
 import LandingPage from './components/Landing/LandingPage';
+import ReviewIntelligence from './pages/ReviewIntelligence';
 
 const App = () => {
 
@@ -65,19 +66,21 @@ const App = () => {
           />
 
           <Route
-
             path="/revenue"
-
             element={
-
               <ProtectedRoute>
-
                 <RevenueDashboard />
-
               </ProtectedRoute>
-
             }
+          />
 
+          <Route
+            path="/review-intelligence"
+            element={
+              <ProtectedRoute>
+                <PowerBIDashboard />
+              </ProtectedRoute>
+            }
           />
 
         </Routes>

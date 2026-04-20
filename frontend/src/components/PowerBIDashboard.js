@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import StarBorder from './ui/StarBorder';
 import SubscriptionModal from './ui/SubscriptionModal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import OverviewTab from './OverviewTab';
 import MonthlyPredictionsComponent from './MonthlyPredictionsComponent';
@@ -11,6 +11,7 @@ import SourceMarketIntelligence from './SourceMarketIntelligence';
 import ChatbotTab from '../ChatbotTab';
 import RevenueDashboard from '../pages/RevenueDashboard';
 import DemographicCohortTracker from '../pages/DemographicCohortTracker';
+import ReviewIntelligence from '../pages/ReviewIntelligence';
 import {
   BarChart3,
   Calendar,
@@ -26,14 +27,23 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Star,
 } from 'lucide-react';
 
 function PowerBIDashboard() {
 
   const { userData, currentUser, logout } = React.useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('overview');
+  // Determine initial tab based on URL or default to overview
+  const getInitialTab = () => {
+    if (location.pathname.startsWith('/review-intelligence')) return 'review-intelligence';
+    if (location.pathname === '/revenue') return 'revenue';
+    return 'overview';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab());
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -117,11 +127,20 @@ function PowerBIDashboard() {
   // Handle tab click - close sidebar automatically
 
   const handleTabClick = (tabId) => {
-
     setActiveTab(tabId);
-
     setIsSidebarOpen(false);
-
+    
+    // If it's a standalone route, navigate there
+    if (tabId === 'review-intelligence') {
+      navigate('/review-intelligence');
+    } else if (tabId === 'revenue') {
+      navigate('/revenue');
+    } else {
+      // Otherwise stay on dashboard and switch internal tab
+      if (location.pathname !== '/dashboard') {
+        navigate('/dashboard');
+      }
+    }
   };
 
 
@@ -146,11 +165,11 @@ function PowerBIDashboard() {
 
       {/* Floating Sidebar Navigation */}
       <div
-        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-gray-950 border border-gray-800 rounded-lg shadow-2xl shadow-black/40 z-50 transform transition-transform duration-250 ease-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-4 left-4 h-[calc(100vh-2rem)] w-56 bg-gray-950 border border-gray-800 rounded-lg shadow-2xl shadow-black/40 z-50 transform transition-transform duration-250 ease-out flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-6">
+        <div className="p-4 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6 flex-shrink-0">
             <h2 className="text-lg font-semibold text-gray-100">Navigation</h2>
             <button
               onClick={() => setIsSidebarOpen(false)}
@@ -160,29 +179,36 @@ function PowerBIDashboard() {
               <X className="h-5 w-5 text-gray-400" />
             </button>
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-1 overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'predictions', label: 'Monthly Predictions', icon: Calendar },
               { id: 'daily-predictions', label: 'Daily Predictions', icon: CalendarDays },
               { id: 'tdms', label: 'Tourist Flow Distribution', icon: MapPin },
               { id: 'revenue', label: 'Revenue Intelligence', icon: Wallet },
+              { id: 'review-intelligence', label: 'Review Intelligence', icon: Star },
               { id: 'demographic', label: 'Demographic Cohorts', icon: Users },
               { id: 'source-markets', label: 'Market Source Intelligence', icon: TrendingUp },
               { id: 'chatbot', label: 'AI Assistant', icon: MessageCircle }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabClick(tab.id)}
-                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                  }`}
-              >
-                <tab.icon className="h-5 w-5 mr-3" />
-                {tab.label}
-              </button>
-            ))}
+            ].map((tab) => {
+              const isActive = activeTab === tab.id || 
+                               (tab.id === 'review-intelligence' && location.pathname.startsWith('/review-intelligence')) ||
+                               (tab.id === 'revenue' && location.pathname === '/revenue');
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabClick(tab.id)}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${isActive
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    }`}
+                >
+                  <tab.icon className="h-5 w-5 mr-3" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </nav>
         </div>
       </div>
@@ -290,10 +316,11 @@ function PowerBIDashboard() {
 
           {/* Tab Content */}
           <div
-            className={`flex-1 overflow-auto ${activeTab === 'chatbot' ? 'p-0 bg-black' : 'p-6'} ${(activeTab === 'overview' || activeTab === 'predictions' || activeTab === 'daily-predictions' || activeTab === 'tdms' || activeTab === 'revenue' || activeTab === 'demographic' || activeTab === 'source-markets') ? 'bg-black' : ''}`}
+            className={`flex-1 overflow-auto ${activeTab === 'chatbot' ? 'p-0 bg-black' : 'p-6'} ${(activeTab === 'overview' || activeTab === 'predictions' || activeTab === 'daily-predictions' || activeTab === 'tdms' || activeTab === 'revenue' || activeTab === 'demographic' || activeTab === 'source-markets' || activeTab === 'review-intelligence') ? 'bg-black' : ''}`}
           >
             {activeTab === 'overview' && <OverviewTab />}
             {activeTab === 'revenue' && <RevenueDashboard />}
+            {activeTab === 'review-intelligence' && <ReviewIntelligence />}
             {activeTab === 'demographic' && <DemographicCohortTracker />}
             {activeTab === 'predictions' && <MonthlyPredictionsComponent />}
             {activeTab === 'daily-predictions' && <DailyPredictionsComponent />}
