@@ -111,6 +111,15 @@ class RisingSegmentAlert(DemographicModel):
     message: str = Field(..., description="Human-readable alert text.")
 
 
+class SourceMarketTrend(DemographicModel):
+    """Trend payload for one source market."""
+
+    source_market: str = Field(..., description="Source market name.")
+    points: list[DemographicTrendPoint] = Field(default_factory=list)
+    latest_value: float | None = Field(default=None, ge=0)
+    yoy_growth_pct: float | None = Field(default=None)
+
+
 class AnnualDemographicRecordsResponse(DemographicModel):
     """Wrapper for annual demographic records endpoint."""
 
@@ -147,6 +156,12 @@ class RisingSegmentAlertsResponse(DemographicModel):
     alerts: list[RisingSegmentAlert] = Field(default_factory=list)
 
 
+class SourceMarketTrendsResponse(DemographicModel):
+    """Wrapper for source market trends endpoint."""
+
+    trends: list[SourceMarketTrend] = Field(default_factory=list)
+
+
 __all__ = [
     "AnnualDemographicRecord",
     "DemographicKPIResponse",
@@ -154,10 +169,12 @@ __all__ = [
     "PopulationPyramidResponse",
     "HeatmapCell",
     "RisingSegmentAlert",
+    "SourceMarketTrend",
     "AnnualDemographicRecordsResponse",
     "DemographicKPIsResponse",
     "DemographicTrendResponse",
     "PopulationPyramidListResponse",
     "HeatmapResponse",
     "RisingSegmentAlertsResponse",
+    "SourceMarketTrendsResponse",
 ]
