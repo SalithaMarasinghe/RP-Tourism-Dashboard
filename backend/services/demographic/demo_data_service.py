@@ -1,7 +1,7 @@
 """Central demographic data service for Feature Card 3.
 
 This service orchestrates demographic data loading, transformation, trend
-enrichment, and alerts behind a single dependency-
+enrichment, alerts, and source-market analytics behind a single dependency-
 injection-friendly class for FastAPI routers.
 """
 
@@ -49,6 +49,7 @@ class DemographicDataService:
         self._canonical_df: DataFrame | None = None
         self._trend_df: DataFrame | None = None
         self._alerts_df: DataFrame | None = None
+        self._source_market_analytics: dict[str, DataFrame] | None = None
 
     # -------------------------------------------------------------------------
     # Internal orchestration
@@ -60,13 +61,14 @@ class DemographicDataService:
             from services.demographic.demo_transform_service import transform_demographic_annual
             from services.demographic.demo_metrics_service import build_demographic_trend_metrics
             from services.demographic.demo_alert_service import build_rising_segment_alerts
+            from services.demographic.demo_source_market_service import build_source_market_analytics
             from services.demographic.demo_pyramid_service import (
                 prepare_population_pyramid_payload,
             )
         except ModuleNotFoundError as exc:
             raise RuntimeError(
                 "Required demographic service module is missing. "
-                "Ensure loader/transform/metrics/alert/pyramid services exist."
+                "Ensure loader/transform/metrics/alert/source-market/pyramid services exist."
             ) from exc
 
         return {
@@ -74,6 +76,7 @@ class DemographicDataService:
             "transform_demographic_annual": transform_demographic_annual,
             "build_demographic_trend_metrics": build_demographic_trend_metrics,
             "build_rising_segment_alerts": build_rising_segment_alerts,
+            "build_source_market_analytics": build_source_market_analytics,
             "prepare_population_pyramid_payload": prepare_population_pyramid_payload,
         }
 
@@ -89,16 +92,19 @@ class DemographicDataService:
             transformer = deps["transform_demographic_annual"]
             trend_builder = deps["build_demographic_trend_metrics"]
             alert_builder = deps["build_rising_segment_alerts"]
+            source_builder = deps["build_source_market_analytics"]
 
             raw_df = loader(self._csv_path) if self._csv_path is not None else loader()
             canonical_df = transformer(raw_df)
             trend_df = trend_builder(canonical_df)
             alerts_df = alert_builder(trend_df)
+            source_analytics = source_builder(canonical_df)
 
             self._raw_df = raw_df
             self._canonical_df = canonical_df
             self._trend_df = trend_df
             self._alerts_df = alerts_df
+            self._source_market_analytics = source_analytics
             self._is_loaded = True
 
     def _ensure_loaded(self) -> None:
@@ -116,6 +122,7 @@ class DemographicDataService:
             self._canonical_df = None
             self._trend_df = None
             self._alerts_df = None
+            self._source_market_analytics = None
             self._is_loaded = False
 
     # -------------------------------------------------------------------------
@@ -154,28 +161,6 @@ class DemographicDataService:
             raise ValueError(f"Year {year} not found in demographic dataset. Available: {sorted(set(years))}")
         return year
 
-    def _build_group_trends(self, columns: tuple[str, ...], group_name: str) -> list[dict[str, Any]]:
-        """Build long-form trend payload for a metric group."""
-        self._ensure_loaded()
-        assert self._trend_df is not None
-        out: list[dict[str, Any]] = []
-
-        for _, row in self._trend_df.sort_values("report_year", ascending=True).iterrows():
-            report_year = int(row["report_year"])
-            for metric in columns:
-                out.append(
-                    {
-                        "group": group_name,
-                        "metric": metric,
-                        "report_year": report_year,
-                        "value": row.get(metric),
-                        "share_pct": row.get(f"{metric}_share_pct"),
-                        "yoy_pct": row.get(f"{metric}_yoy_pct"),
-                        "rolling_3y_avg": row.get(f"{metric}_rolling_3y_avg"),
-                    }
-                )
-        return out
-
     def _resolve_latest_non_empty_label(self, column: str, upto_year: int) -> str | None:
         """Return latest non-empty label at or before the given year."""
         self._ensure_loaded()
@@ -198,6 +183,28 @@ class DemographicDataService:
                 return text
 
         return None
+
+    def _build_group_trends(self, columns: tuple[str, ...], group_name: str) -> list[dict[str, Any]]:
+        """Build long-form trend payload for a metric group."""
+        self._ensure_loaded()
+        assert self._trend_df is not None
+        out: list[dict[str, Any]] = []
+
+        for _, row in self._trend_df.sort_values("report_year", ascending=True).iterrows():
+            report_year = int(row["report_year"])
+            for metric in columns:
+                out.append(
+                    {
+                        "group": group_name,
+                        "metric": metric,
+                        "report_year": report_year,
+                        "value": row.get(metric),
+                        "share_pct": row.get(f"{metric}_share_pct"),
+                        "yoy_pct": row.get(f"{metric}_yoy_pct"),
+                        "rolling_3y_avg": row.get(f"{metric}_rolling_3y_avg"),
+                    }
+                )
+        return out
 
     # -------------------------------------------------------------------------
     # Public API methods
@@ -269,9 +276,30 @@ class DemographicDataService:
         return pyramid_builder(self._canonical_df, target_year)
 
     def get_heatmap_data(self, metric_group: str) -> list[dict[str, Any]]:
-        """Return heatmap cells for age/gender/purpose groups."""
+        """Return heatmap cells for age/gender/purpose/source_market groups."""
         self._ensure_loaded()
         group = metric_group.strip().lower()
+
+        if group == "source_market":
+            assert self._source_market_analytics is not None
+            heatmap_df = self._source_market_analytics.get("source_market_heatmap", pd.DataFrame())
+            if heatmap_df.empty:
+                return []
+            cells: list[dict[str, Any]] = []
+            for market_name, row in heatmap_df.iterrows():
+                for year, value in row.items():
+                    if pd.isna(value):
+                        continue
+                    year_int = int(year)
+                    cells.append(
+                        {
+                            "report_year": year_int,
+                            "row_key": str(market_name),
+                            "column_key": str(year_int),
+                            "value": float(value),
+                        }
+                    )
+            return cells
 
         mapping: dict[str, tuple[str, ...]] = {
             "age": AGE_COLUMNS,
@@ -279,11 +307,11 @@ class DemographicDataService:
             "purpose": PURPOSE_COLUMNS,
         }
         if group not in mapping:
-            raise ValueError("metric_group must be one of: age, gender, purpose")
+            raise ValueError("metric_group must be one of: age, gender, purpose, source_market")
 
         assert self._trend_df is not None
         columns = mapping[group]
-        cells: list[dict[str, Any]] = []
+        cells = []
 
         for _, row in self._trend_df.sort_values("report_year", ascending=True).iterrows():
             year = int(row["report_year"])
@@ -310,6 +338,48 @@ class DemographicDataService:
         if year is not None and "report_year" in alerts_df.columns:
             alerts_df = alerts_df[alerts_df["report_year"] == year]
         return self._serialize_records(alerts_df)
+
+    def get_source_market_trends(self) -> dict[str, Any]:
+        """Return source-market rank analytics payload."""
+        self._ensure_loaded()
+        assert self._source_market_analytics is not None
+
+        yearly_table = self._source_market_analytics.get(
+            "yearly_top_market_table", pd.DataFrame()
+        )
+        frequency = self._source_market_analytics.get(
+            "market_presence_frequency", pd.DataFrame()
+        )
+        heatmap = self._source_market_analytics.get(
+            "source_market_heatmap", pd.DataFrame()
+        )
+        alerts = self._source_market_analytics.get(
+            "rising_source_market_alerts", pd.DataFrame()
+        )
+
+        heatmap_cells: list[dict[str, Any]] = []
+        if isinstance(heatmap, pd.DataFrame) and not heatmap.empty:
+            for market_name, row in heatmap.iterrows():
+                for year, value in row.items():
+                    if pd.isna(value):
+                        continue
+                    year_int = int(year)
+                    heatmap_cells.append(
+                        {
+                            "report_year": year_int,
+                            "row_key": str(market_name),
+                            "column_key": str(year_int),
+                            "value": float(value),
+                        }
+                    )
+
+        return {
+            "yearly_top_market_table": self._serialize_records(yearly_table),
+            "market_presence_frequency": self._serialize_records(frequency),
+            "source_market_heatmap_cells": heatmap_cells,
+            "rising_source_market_alerts": self._serialize_records(alerts),
+        }
+
 
 _demographic_data_service_singleton: DemographicDataService | None = None
 
