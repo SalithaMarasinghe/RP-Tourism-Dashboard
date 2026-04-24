@@ -40,6 +40,7 @@ async function apiFetch(path, options = {}) {
     const token = await getIdToken();
     const res = await fetch(`${API_BASE}${path}`, {
         ...options,
+        credentials: 'include', // Enable credentials for cross-origin requests
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -66,6 +67,7 @@ export function AuthProvider({ children }) {
         // 1. Backend creates the user + Firestore profile, returns custom token
         const res = await fetch(`${API_BASE}/api/auth/signup`, {
             method: "POST",
+            credentials: 'include',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 email: normalizedEmail,
@@ -128,6 +130,7 @@ export function AuthProvider({ children }) {
             console.log("[Auth] Syncing user profile with backend...");
             const response = await fetch(`${API_BASE}/api/auth/google`, {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ idToken })
             });
@@ -220,6 +223,7 @@ export function AuthProvider({ children }) {
                     try {
                         const token = await user.getIdToken();
                         const res = await fetch(`${API_BASE}/api/auth/me`, {
+                            credentials: 'include',
                             headers: { Authorization: `Bearer ${token}` }
                         });
                         if (res.ok) {

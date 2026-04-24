@@ -8,10 +8,11 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -114,10 +115,27 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,
 )
+
+# ── Additional Security Headers Middleware ─────────────────────────────────
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        
+        # Allow cross-origin to access the window object and opener for OAuth
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+        response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        
+        # Allow credentials in cross-origin requests
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # ── Static Files (for production) ───────────────────────────────────────────
 if os.path.exists(ROOT_DIR / "../frontend/build"):
