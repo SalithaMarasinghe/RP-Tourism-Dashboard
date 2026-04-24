@@ -30,14 +30,15 @@ import {
   Star,
 } from 'lucide-react';
 
-function PowerBIDashboard() {
+function PowerBIDashboard({ initialTab = null }) {
 
   const { userData, currentUser, logout } = React.useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine initial tab based on URL or default to overview
+  // Determine initial tab based on initialTab prop, URL, or default to overview
   const getInitialTab = () => {
+    if (initialTab) return initialTab;
     if (location.pathname.startsWith('/review-intelligence')) return 'review-intelligence';
     if (location.pathname === '/revenue') return 'revenue';
     return 'overview';

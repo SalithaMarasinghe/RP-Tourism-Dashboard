@@ -73,10 +73,10 @@ const RevenueDashboard = () => {
     }
 
     return (
-        <div className="space-y-6 pb-12">
+        <div className="min-h-screen bg-[#0f0f0f] space-y-6 pb-12">
 
             {/* 1. Header & Global Controls */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2 bg-[#151515] p-4 rounded-xl border border-[#2a2a2a]">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-extrabold text-white tracking-tight">
                         Revenue <span className="text-blue-600">Intelligence</span>

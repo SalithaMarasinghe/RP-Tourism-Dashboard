@@ -50,26 +50,19 @@ const App = () => {
           />
 
           <Route
-
             path="/dashboard"
-
             element={
-
               <ProtectedRoute>
-
                 <PowerBIDashboard />
-
               </ProtectedRoute>
-
             }
-
           />
 
           <Route
             path="/revenue"
             element={
               <ProtectedRoute>
-                <RevenueDashboard />
+                <PowerBIDashboard initialTab="revenue" />
               </ProtectedRoute>
             }
           />
@@ -78,7 +71,7 @@ const App = () => {
             path="/review-intelligence"
             element={
               <ProtectedRoute>
-                <PowerBIDashboard />
+                <PowerBIDashboard initialTab="review-intelligence" />
               </ProtectedRoute>
             }
           />

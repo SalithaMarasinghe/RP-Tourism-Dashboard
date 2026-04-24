@@ -16,6 +16,7 @@ async function authFetch(path, options = {}) {
   const token = await user.getIdToken();
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
+    credentials: 'include', // Enable credentials for cross-origin requests
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
