@@ -107,7 +107,8 @@ Tourism authorities face fragmented data, reactive decision-making, and lack of 
 ### Data Flow
 
 ```
-Raw CSV Dataset (1971–2023)
+Raw CSV Dataset (2010-2025)                                                           
+  
         │
         ▼
 ┌──────────────────────┐
@@ -140,13 +141,13 @@ Raw CSV Dataset (1971–2023)
 
 | Module | Description | Technology |
 |--------|-------------|------------|
-| 🔮 **Arrival Forecasting** | Predicts tourist arrivals using Time-Series, ML, and Deep Learning models trained on 50+ years of data | Prophet, LSTM, XGBoost |
+| 🔮 **Arrival Forecasting** | Predicts tourist arrivals using Time-Series, ML, and Deep Learning models trained on 15 years of data  | Tsformer, SVR |
 | 💰 **Revenue Analytics** | Tracks geographic revenue distribution, identifies anomalies, and forecasts income streams | Pandas, NumPy, Recharts |
 | 🗺️ **Geopolitical Intelligence** | Monitors global events, automatically refreshes risk tiles weekly via APScheduler | Groq LLM, APScheduler |
 | 🎯 **Source Market Profiling** | Segments tourists by origin, demographics, and travel behavior for targeted marketing | Recharts, GeoJSON |
 | ⭐ **Review Intelligence** | Sentiment & aspect-based analysis of visitor reviews across locations and landmarks | ChromaDB, Gemini AI |
-| 💬 **AI Strategic Assistant** | Conversational interface with RAG-augmented context and live web search | Gemini, LangChain, Tavily |
-| 🔍 **Knowledge Retrieval (RAG)** | Retrieval-Augmented Generation over tourism datasets for grounded, factual AI responses | ChromaDB, BM25, LangChain |
+| 💬 **AI Strategic Assistant** | Conversational interface with RAG-augmented context and live web search | Gemini, Tavily |
+| 🔍 **Knowledge Retrieval (RAG)** | Retrieval-Augmented Generation over tourism datasets for grounded, factual AI responses | ChromaDB, BM25 |
 | 📊 **Interactive Dashboards** | React-based KPI dashboards with real-time charts, 3D globe, and exportable reports | Recharts, Three.js, jsPDF |
 | 🔐 **Auth & TDMS** | Firebase Auth with Google OAuth 2.0 and per-user chat persistence | Firebase, Firestore |
 
