@@ -544,7 +544,7 @@ curl https://your-backend.railway.app/api/rev/summary
 | Attribute | Detail |
 |-----------|--------|
 | Source | Sri Lanka Tourism Development Authority (SLTDA) |
-| Coverage | 1971 – 2023 (52 years) |
+| Coverage | 2010-2025 (15 Years) |                    
 | Granularity | Annual arrivals → disaggregated to monthly |
 | Features | Total arrivals, source country, revenue, purpose of visit |
 | Format | CSV (raw), processed CSV (preprocessed) |
