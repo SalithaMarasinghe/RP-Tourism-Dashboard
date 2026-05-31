@@ -16,9 +16,10 @@
 [![Database](https://img.shields.io/badge/Database-Firebase%20Firestore-orange?style=flat-square)]()
 [![Deployment](https://img.shields.io/badge/Deployment-Docker%20%7C%20Railway%20%7C%20Firebase-blue?style=flat-square)]()
 
-> **Research Paper:** *Hybrid Ensemble Forecasting and Visitor Flow Management for Tourism Intelligence in Sri Lanka* — presents the modelling methodology and empirical results underpinning this system.
+>
 
-</div>
+</div>                    
+  
 
 ---
 
