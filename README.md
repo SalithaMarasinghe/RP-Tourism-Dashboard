@@ -4,17 +4,17 @@
 
 **An end-to-end AI-powered analytics and decision-support system for national tourism planning — combining hybrid ensemble arrival forecasting with attraction-level visitor flow management.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase%20Hosting-orange?style=for-the-badge&logo=firebase)](https://sri-lanka-tourism-intelligence.web.app)
-[![Backend](https://img.shields.io/badge/Backend-FastAPI%20on%20Railway-brightgreen?style=for-the-badge&logo=railway)](https://railway.app)
-[![Python](https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python)](https://python.org)
-[![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[](https://sri-lanka-tourism-intelligence.web.app)
+[](https://railway.app)
+[](https://python.org)
+[](https://react.dev)
+[](LICENSE)
 
-[![ML](https://img.shields.io/badge/ML-Time%20Series%20%7C%20Ensemble%20%7C%20Deep%20Learning-purple?style=flat-square)]()
-[![NLP](https://img.shields.io/badge/NLP-RAG%20%7C%20Gemini%20AI-red?style=flat-square)]()
-[![VectorDB](https://img.shields.io/badge/Vector%20DB-ChromaDB-blueviolet?style=flat-square)]()
-[![Database](https://img.shields.io/badge/Database-Firebase%20Firestore-orange?style=flat-square)]()
-[![Deployment](https://img.shields.io/badge/Deployment-Docker%20%7C%20Railway%20%7C%20Firebase-blue?style=flat-square)]()
+[]()
+[]()
+[]()
+[]()
+[]()
 
 > **Research Paper:** *Hybrid Ensemble Forecasting and Visitor Flow Management for Tourism Intelligence in Sri Lanka* — presents the modelling methodology and empirical results underpinning this system.
 
@@ -73,28 +73,31 @@ This platform directly responds to these needs by providing a unified, evidence-
 
 ## 🔬 Research Contribution
 
-The study makes the following methodological contributions:     
+The study makes the following methodological contributions:
 
 Integrated two-module framework — Links national-level arrival forecasting with attraction-level visitor flow modelling into a single decision-support system, replacing the dominant practice of treating these as isolated problems.
 
 ### Arrival Forecasting
 
 1. **Multi-source data integration** — Demand-side and behavioral covariates (Google Trends search indices, exchange rates) are combined with environmental variables (Open-Meteo weather) and macroeconomic indicators (World Bank GDP series) into a unified input space, providing richer context than single-source approaches.
-
+  
 2. **Consensus-based feature selection** — Rather than relying on any single criterion, seven independent selection methods (Pearson, Spearman, Mutual Information, Lasso, Random Forest importance, permutation importance, SHAP values, and Granger causality) are aggregated into a consensus-weighted score. Only features that rank highly across multiple criteria are retained, improving both reliability and interpretability.
-
+  
 3. **Bayesian Optimization and Genetic Algorithm integration** — Each base learner (SVR and TsFormer) is independently fine-tuned using Bayesian Optimization with time-series-aware cross-validation. Ensemble weights are then searched via a Genetic Algorithm under a normalization constraint, minimizing validation-set RMSE. This end-to-end automated optimization is theoretically grounded in the bias-variance-diversity decomposition:
-   ```
-   ℒ_ensemble = noise + bias + variance − diversity
-   ```
-
+  
+  ```
+  ℒ_ensemble = noise + bias + variance − diversity
+  ```
+  
 4. **Explainable AI (XAI)** — SHAP-based feature attribution is applied to the final ensemble to make model behavior transparent. Prediction-level SHAP explanations are surfaced in the Tourism Intelligence Dashboard, enabling non-technical decision-makers to inspect and trust the drivers behind individual forecast outputs.
+  
 
 ### Visitor Flow Distribution
 
 5. **Panel Ridge Regression for flow distribution** — Leverages multi-site cross-sectional pooling to overcome the endemic data scarcity problem at individual attraction levels in developing tourism economies.
-
+  
 6. **Dynamic Visitor Load Index (VLI)** — Replaces static carrying-capacity thresholds with a continuous, predicted-demand-based load index that enables proactive congestion diagnosis and redistribution planning.
+  
 
 ---
 
@@ -179,7 +182,7 @@ The ML pipelines are built on 15 years of historical data (2010–2025), combini
 ### Primary Tourism Data
 
 | Attribute | Detail |
-|-----------|--------|
+| --- | --- |
 | **Source** | Sri Lanka Tourism Development Authority (SLTDA) |
 | **Coverage** | 2010–2025 (15 years) |
 | **Granularity** | Monthly national arrivals → disaggregated to **daily** via PyMC Bayesian model |
@@ -191,7 +194,7 @@ The ML pipelines are built on 15 years of historical data (2010–2025), combini
 ### External Demand Drivers
 
 | Source | Variables | Role |
-|--------|-----------|------|
+| --- | --- | --- |
 | World Bank / Macroeconomic APIs | GDP, economic health indicators | Structural demand drivers |
 | Exchange Rate Series | Daily FX rates (forward-filled for weekends/gaps) | Price competitiveness |
 | Google Trends | Country-level search interest indices | Behavioral / intent signals |
@@ -202,7 +205,7 @@ The ML pipelines are built on 15 years of historical data (2010–2025), combini
 ### Chronological Train / Validation / Test Split
 
 | Split | Period | Purpose |
-|-------|--------|---------|
+| --- | --- | --- |
 | Training | 2010–2021 | Model fitting |
 | Validation | 2022–2023 | Hyperparameter tuning, early stopping |
 | Test | 2024–2025 | Held-out evaluation |
@@ -229,7 +232,7 @@ Raw preprocessing steps applied before model training:
 Rather than relying on any single selection criterion, a consensus-weighted approach aggregates seven independent methods. Only features that score highly across multiple criteria are retained:
 
 | Method | Type |
-|--------|------|
+| --- | --- |
 | Pearson Correlation | Linear association |
 | Spearman Correlation | Monotonic association |
 | Mutual Information | Non-linear dependence |
@@ -250,7 +253,7 @@ A comprehensive model search was conducted across three families, with consisten
 **Models Explored:**
 
 | Family | Models |
-|--------|--------|
+| --- | --- |
 | Time Series | ARIMAX, SARIMAX, Holt–Winters, Prophet |
 | Machine Learning | Random Forest, XGBoost, CatBoost, SVR |
 | Deep Learning | LSTM, BiLSTM, GRU, TsFormer |
@@ -258,17 +261,17 @@ A comprehensive model search was conducted across three families, with consisten
 **Full Comparison Results:**
 
 | Model | Family | Test RMSE | Test R² | Test MAPE |
-|-------|--------|-----------|---------|-----------|
-| ARIMAX | Time Series | 5,474.53 | −5.13 | — |
-| SARIMAX | Time Series | 4,044.02 | −2.34 | — |
-| Holt–Winters | Time Series | 2,293.05 | −0.08 | — |
-| Random Forest | ML | 2,018.18 | 0.167 | — |
-| XGBoost | ML | 1,992.78 | 0.188 | — |
-| CatBoost | ML | 2,052.43 | 0.138 | — |
+| --- | --- | --- | --- | --- |
+| ARIMAX | Time Series | 5,474.53 | −5.13 | —   |
+| SARIMAX | Time Series | 4,044.02 | −2.34 | —   |
+| Holt–Winters | Time Series | 2,293.05 | −0.08 | —   |
+| Random Forest | ML  | 2,018.18 | 0.167 | —   |
+| XGBoost | ML  | 1,992.78 | 0.188 | —   |
+| CatBoost | ML  | 2,052.43 | 0.138 | —   |
 | **SVR** | **ML** | **862.03** | **0.848** | **10.51%** |
-| LSTM | Deep Learning | 2,222.26 | −0.126 | — |
-| BiLSTM | Deep Learning | 2,339.67 | −0.248 | — |
-| GRU | Deep Learning | 1,223.26 | 0.659 | — |
+| LSTM | Deep Learning | 2,222.26 | −0.126 | —   |
+| BiLSTM | Deep Learning | 2,339.67 | −0.248 | —   |
+| GRU | Deep Learning | 1,223.26 | 0.659 | —   |
 | **TsFormer** | **Deep Learning** | **816.57** | **0.848** | **11.14%** |
 
 Traditional time-series models produced negative R² scores on the test set — a consequence of Sri Lanka's shock-driven, structurally unstable demand patterns (Easter attacks 2019, COVID-19, 2022 economic crisis) that violate the linearity assumption. SVR and TsFormer were the clear top performers and were selected as base learners for ensemble construction.
@@ -282,7 +285,7 @@ Traditional time-series models produced negative R² scores on the test set — 
 Each base learner was independently fine-tuned using BO with time-series-aware cross-validation:
 
 | Model | Validation RMSE (Before BO) | Validation RMSE (After BO) | Test R² (After BO) | Test MAPE |
-|-------|-----------------------------|----------------------------|--------------------|-----------|
+| --- | --- | --- | --- | --- |
 | SVR | 618.42 | 351.36 | 0.8612 | 10.30% |
 | TsFormer | 609.82 | 249.29 | 0.8934 | 10.32% |
 
@@ -291,19 +294,20 @@ Each base learner was independently fine-tuned using BO with time-series-aware c
 GA-based weight search under a normalization constraint minimized validation-set RMSE. The optimal weights assigned TsFormer a higher weight, reflecting its stronger generalization after fine-tuning:
 
 | Base Learner | Optimal Weight |
-|--------------|---------------|
+| --- | --- |
 | TsFormer | 66.83% |
 | SVR | 33.17% |
 
 **Ensemble Performance vs. Individual Learners:**
 
-| Model | Dataset | RMSE | R² | MAPE |
-|-------|---------|------|----|------|
+| Model | Dataset | RMSE | R²  | MAPE |
+| --- | --- | --- | --- | --- |
 | TsFormer | Test | 683.70 | 0.8934 | 10.32% |
 | SVR | Test | 796.39 | 0.8515 | 10.30% |
 | **Hybrid Ensemble** | **Test** | **581.24** | **0.9230** | **9.36%** |
 
 The hybrid ensemble outperforms both base learners on all three metrics. Statistical significance is confirmed by the **Diebold–Mariano test**:
+
 - vs. SVR baseline: DM = 4.8524, p < 0.0001
 - vs. TsFormer baseline: DM = 5.7509, p < 0.0001
 
@@ -311,8 +315,8 @@ The hybrid ensemble outperforms both base learners on all three metrics. Statist
 
 To isolate GA's contribution, five weighting schemes were compared. All ensembles outperformed individual models, confirming that the performance gain is primarily driven by the complementary inductive biases of SVR and TsFormer rather than the exact weighting strategy. GA remains the preferred method as it is fully automated and scales to larger ensembles.
 
-| Strategy | SVR Weight | TsFormer Weight | RMSE | R² | MAPE |
-|----------|-----------|----------------|------|----|------|
+| Strategy | SVR Weight | TsFormer Weight | RMSE | R²  | MAPE |
+| --- | --- | --- | --- | --- | --- |
 | Equal Weights | 0.50 | 0.50 | 586.85 | 0.9215 | 9.23% |
 | Val-Error Weights | 0.41 | 0.59 | 578.70 | 0.9236 | 9.25% |
 | **GA-Optimized** | **0.33** | **0.67** | **581.23** | **0.9230** | **9.36%** |
@@ -328,10 +332,10 @@ SHAP-based feature attribution was applied to the ensemble for interpretability.
 The ensemble was evaluated at forecast horizons from 1 month to 24 months to confirm its suitability for medium- and long-term planning (beyond short-term interpolation).
 
 | Horizon | N (days) | SVR MAPE | TsFormer MAPE | **Ensemble MAPE** | Ensemble R² |
-|---------|---------|----------|--------------|-------------------|------------|
-| 1 month | 21 | 5.7% | 4.2% | **2.9%** | 0.910 |
-| 3 months | 62 | 8.6% | 9.2% | **7.9%** | 0.746 |
-| 6 months | 91 | 7.4% | 8.5% | **7.2%** | 0.862 |
+| --- | --- | --- | --- | --- | --- |
+| 1 month | 21  | 5.7% | 4.2% | **2.9%** | 0.910 |
+| 3 months | 62  | 8.6% | 9.2% | **7.9%** | 0.746 |
+| 6 months | 91  | 7.4% | 8.5% | **7.2%** | 0.862 |
 | 12 months | 183 | 9.8% | 12.5% | **10.6%** | 0.878 |
 | 18 months | 183 | 12.6% | 9.8% | **9.6%** | 0.914 |
 | 24 months | 274 | 11.4% | 10.6% | **9.9%** | 0.918 |
@@ -341,7 +345,7 @@ The ensemble maintains MAPE at or below 10% through 24 months, outperforming bot
 **Independent Validation Against SLTDA Official Statistics (no retraining):**
 
 | Period | Ensemble Forecast | SLTDA Official | Annual Error |
-|--------|-------------------|----------------|-------------|
+| --- | --- | --- | --- |
 | Full Year 2024 | 2.238 million | 2.050 million | **9.2%** |
 | Jan–Sep 2025 | 1.817 million | 1.770 million | **2.7%** |
 
@@ -356,6 +360,7 @@ The visitor flow distribution pipeline (Notebook 7) operates at the attraction l
 Individual tourist sites in Sri Lanka face severe **data scarcity** — historical visitor count records are limited, irregular, or entirely absent for many attractions. To overcome this, a **panel data** structure is adopted, pooling observations across all sites into a shared matrix indexed by `(site, date)`.
 
 This approach:
+
 - Enables the model to learn cross-sectional temporal patterns common across sites
 - Transfers statistical signal from data-rich sites to data-scarce ones
 - Eliminates the need for separate per-site models that would each individually overfit
@@ -379,7 +384,7 @@ The flow pipeline applies the following transformations to the site-date panel m
 A full model comparison was conducted across linear, tree-based, deep learning, and hybrid families:
 
 | Model | MAPE | Accuracy | MASE |
-|-------|------|----------|------|
+| --- | --- | --- | --- |
 | **Panel Ridge Regression** | **10.74%** | **89.26%** | **0.246** |
 | Panel CatBoost | 11.84% | 88.16% | 0.273 |
 | Hybrid (Ridge + XGBoost) | 12.43% | 87.57% | 0.278 |
@@ -391,7 +396,7 @@ Panel Ridge Regression was selected as the production flow model. Notably, deep 
 **Feature Importance (Panel Ridge Regression):**
 
 | Feature | Importance Score |
-|---------|-----------------|
+| --- | --- |
 | 7-day lag of site visitors | 0.35 |
 | Month | 0.22 |
 | 1-day lag of site visitors | 0.18 |
@@ -400,7 +405,7 @@ Panel Ridge Regression was selected as the production flow model. Notably, deep 
 **Ablation: Panel vs. Isolated Site Modelling**
 
 | Modelling Strategy | Overall MAPE | MASE | Accuracy |
-|--------------------|-------------|------|----------|
+| --- | --- | --- | --- |
 | **Panel Approach (multi-site)** | **10.74%** | **0.246** | **89.26%** |
 | Isolated Approach (single-site) | 16.32% | 0.381 | 82.91% |
 
@@ -419,7 +424,7 @@ VLI = (Predicted Visitors / Site Capacity Threshold) × 100
 Capacity thresholds are derived from SLTDA visitor management documents and are site-specific.
 
 | VLI Range | Status | Operational Meaning |
-|-----------|--------|---------------------|
+| --- | --- | --- |
 | < 60% | 🟢 Under-load | Potential for increased marketing / visitor attraction |
 | 60–100% | 🟡 Acceptable load | Normal operations |
 | > 100% | 🔴 Congestion | Intervention required |
@@ -435,13 +440,13 @@ The platform includes a redistribution scenario tool. Transferring 10–15% of p
 To validate robustness against a real-world, high-stakes scenario, the flow model was tested against the **April 2026 Sinhala and Tamil New Year holiday week** at five major tourist attractions — a period characterized by extreme localized demand surges.
 
 | Attraction | Pre-Holiday Daily Avg | Predicted Peak | Actual (SLTDA Gate Count) | Predicted VLI | APE |
-|-----------|----------------------|---------------|--------------------------|--------------|-----|
+| --- | --- | --- | --- | --- | --- |
 | Temple of the Tooth (Kandy) | 3,500 | 9,800 (+180%) | 10,290 | 135% | 4.76% |
 | Sigiriya Rock Fortress | 3,000 | 6,900 (+130%) | 7,245 | 140% | 4.76% |
 | Galle Fort | 2,200 | 5,390 (+145%) | 5,145 | 115% | 4.76% |
 | Yala National Park | 1,500 | 3,000 (+100%) | 3,150 | 125% | 4.76% |
 | Horton Plains | 1,000 | 2,100 (+110%) | 2,210 | 110% | 4.98% |
-| **Average** | — | — | — | — | **4.8%** |
+| **Average** | —   | —   | —   | —   | **4.8%** |
 
 Without any post-training adjustment, the model predicted surges of up to 180% and flagged Sigiriya and Yala as congestion hotspots **three weeks in advance** — demonstrating that the holiday encoding approach translates anticipated national demand into accurate, site-level operational intelligence.
 
@@ -454,13 +459,14 @@ The trained models and intelligence outputs are delivered through a production-g
 ### Platform Features
 
 | Module | Description | Key Metrics / Technology |
-|--------|-------------|--------------------------|
-| 🔮 **Arrival Forecasting** | Hybrid SVR–TsFormer ensemble forecasts national tourist arrivals up to 24 months ahead with interactive multi-horizon views and SHAP explanations per forecast | Test R² 0.9230, MAPE 9.36%; SVR + TsFormer, BO + GA |
+| --- | --- | --- |
+| 🔮 **Arrival Forecasting** | Hybrid SVR–TsFormer ensemble forecasts daily and monthly national tourist arrivals  (2026-2030)  with interactive multi-horizon views and SHAP explanations per forecast | Test R² 0.9230, MAPE 9.36%; SVR + TsFormer, BO + GA, XAI |
 | 🗺️ **Visitor Flow & VLI** | Attraction-level daily demand forecasts with a Dynamic Visitor Load Index, congestion hotspot detection, and 10–15% visitor redistribution simulation | Accuracy 89.26%, MASE 0.246; Panel Ridge Regression |
-| 💰 **Revenue Analytics** | Geographic revenue distribution tracking, revenue anomaly detection, and income stream forecasting by source market | Pandas, NumPy, Recharts |
-| 🌍 **Geopolitical Intelligence** | Monitors global events and generates weekly risk tiles with automated refresh | Groq LLM, APScheduler (7-day refresh) |
+| 💰 **Revenue Analytics | Hybrid machine learning Model that forecasts monthly revenue (2026-2030) | Pandas, NumPy, Recharts |
+|     |     |     |
 | 🎯 **Source Market Profiling** | Segments tourist arrivals by country of origin, demographics, and travel behavior for targeted marketing insights | Recharts, GeoJSON |
-| ⭐ **Review Intelligence** | Sentiment analysis and aspect-based opinion mining over visitor reviews by landmark and region | ChromaDB, Gemini AI |
+| 🌍 **Geopolitical Intelligence** | Monitors global events and generates weekly risk tiles with automated refresh for Revenue and Source Market Analytics | Groq LLM, APScheduler (7-day refresh) |
+| ⭐ **Review Intelligence** | Sentiment analysis and aspect-based opinion mining over visitor reviews by landmark and region | ABSA (Aspect Based Sentiment Analysis), with Sarcasm Detection |
 | 💬 **AI Strategic Assistant** | Conversational interface grounded in tourism datasets via RAG, augmented with live web search for current events | Gemini API, Tavily, ChromaDB |
 | 📖 **Knowledge Retrieval (RAG)** | Hybrid BM25 + vector retrieval over tourism documents and historical data for factual, grounded AI responses | ChromaDB, rank-bm25, LangChain |
 | 📊 **Interactive Dashboard** | KPI overview, real-time charts, 3D globe visualization, and PDF export of reports | Recharts, Three.js, jsPDF |
@@ -473,7 +479,7 @@ The trained models and intelligence outputs are delivered through a production-g
 #### Backend
 
 | Layer | Technology | Version |
-|-------|-----------|---------|
+| --- | --- | --- |
 | API Framework | FastAPI | ≥ 0.115.0 |
 | Server | Uvicorn (ASGI) | ≥ 0.30.0 |
 | Data Processing | Pandas, NumPy | 3.0.1, 2.4.x |
@@ -491,7 +497,7 @@ The trained models and intelligence outputs are delivered through a production-g
 #### Frontend
 
 | Layer | Technology | Version |
-|-------|-----------|---------|
+| --- | --- | --- |
 | Framework | React | 19.0.0 |
 | Routing | React Router DOM | 7.x |
 | UI Components | Radix UI + shadcn/ui | Latest |
@@ -508,7 +514,7 @@ The trained models and intelligence outputs are delivered through a production-g
 #### Infrastructure
 
 | Component | Platform |
-|-----------|---------|
+| --- | --- |
 | Backend Hosting | Railway (Docker container) |
 | Frontend Hosting | Firebase Hosting |
 | Database | Google Cloud Firestore |
@@ -607,10 +613,10 @@ RP-Tourism-Dashboard/
 ### Prerequisites
 
 | Tool | Minimum Version | Install |
-|------|----------------|---------|
+| --- | --- | --- |
 | Python | 3.10 | [python.org](https://www.python.org/) |
 | Node.js | 18.x LTS | [nodejs.org](https://nodejs.org/) |
-| npm | 9+ | Bundled with Node.js |
+| npm | 9+  | Bundled with Node.js |
 | Git | 2.x | [git-scm.com](https://git-scm.com/) |
 | Docker *(optional)* | 24.x | [docker.com](https://www.docker.com/) |
 
@@ -655,6 +661,7 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 ```
 
 > **Where to get your keys:**
+> 
 > - **Gemini API Key** → [Google AI Studio](https://ai.google.dev) → Get API Key
 > - **Groq API Key** → [console.groq.com](https://console.groq.com)
 > - **Tavily API Key** → [app.tavily.com](https://app.tavily.com)
@@ -689,7 +696,7 @@ uvicorn server:app --reload --host 0.0.0.0 --port 8000
 ```
 
 | Endpoint | URL |
-|----------|-----|
+| --- | --- |
 | API base | `http://localhost:8000` |
 | Swagger UI | `http://localhost:8000/docs` |
 | ReDoc | `http://localhost:8000/redoc` |
@@ -772,7 +779,7 @@ Production URL: **`https://sri-lanka-tourism-intelligence.web.app`**
 Full interactive documentation is available at `/docs` (Swagger UI) once the backend is running. All endpoints require a valid **Firebase ID Token** as a Bearer token in the `Authorization` header, except the health check.
 
 | Router | Base Path | Description |
-|--------|-----------|-------------|
+| --- | --- | --- |
 | Core | `/api/` | Health check, base data endpoints |
 | Auth | `/api/auth/` | Firebase token validation, user management |
 | Forecast | `/api/forecast/` | National arrival predictions (hybrid ensemble) |
@@ -842,7 +849,7 @@ match /{document=**} {
 ### Secrets Management
 
 | Secret | Storage |
-|--------|---------|
+| --- | --- |
 | API Keys (Gemini, Groq, Tavily) | Environment variables (`.env`, Railway Variables) |
 | Firebase Service Account | `serviceAccountKey.json` (gitignored) |
 | Firebase Client Config | Environment variables (prefixed `REACT_APP_`) |
@@ -888,21 +895,27 @@ npm test
 ## 🔧 Troubleshooting
 
 #### `"Web search endpoint failed with status: 404"`
+
 Confirm the backend is running on `http://localhost:8000` and that `REACT_APP_API_BASE_URL` in `.env.local` points to the correct URL.
 
 #### `"API key was reported as leaked"` (Gemini)
+
 Your key was automatically revoked by Google. Generate a new one at [Google AI Studio](https://ai.google.dev) and update both `frontend/.env.local` and `backend/.env`.
 
 #### `Chatbot not responding`
+
 Verify `GEMINI_API_KEY` is valid and has sufficient quota. Check the browser console for errors and confirm the backend is running (the chat uses server-side RAG).
 
 #### `CORS errors in browser`
+
 Ensure your frontend URL is in the `allowed_origins_list` in `backend/server.py`. In production, use the exact Firebase Hosting URL with no trailing slash. See `CORS_FIX_DEPLOYMENT_GUIDE.md` for a detailed resolution guide.
 
 #### `ChromaDB / RAG initialization fails`
+
 Ensure the `backend/vector database/` directory exists and has write permissions. On first run, the RAG system builds the index — this may take a few minutes. Look for `"RAG system initialized successfully"` in the startup logs.
 
 #### `Docker container fails to start`
+
 Verify all required environment variables are set in Railway's dashboard and check the Railway deployment logs for startup errors. For `serviceAccountKey.json` in containerized deployments, encode the JSON as a base64 string and pass as an environment variable.
 
 ---
