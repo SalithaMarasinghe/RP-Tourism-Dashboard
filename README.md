@@ -73,20 +73,28 @@ This platform directly responds to these needs by providing a unified, evidence-
 
 ## 🔬 Research Contribution
 
-This project is the implementation artifact for a peer-reviewed applied research paper. The study makes the following methodological contributions:
+The study makes the following methodological contributions:     
 
-1. **Integrated two-module framework** — Links national-level arrival forecasting with attraction-level visitor flow modelling into a single decision-support system, replacing the dominant practice of treating these as isolated problems.
+Integrated two-module framework — Links national-level arrival forecasting with attraction-level visitor flow modelling into a single decision-support system, replacing the dominant practice of treating these as isolated problems.
 
-2. **Hybrid SVR–TsFormer ensemble** — Combines Support Vector Regression (SVR) and a Transformer-based time-series model (TsFormer), optimized using Bayesian Optimization (BO) per learner and Genetic Algorithm (GA) ensemble weight search. This is theoretically justified by the bias-variance-diversity decomposition, which proves that ensemble loss reduces as:
+### Arrival Forecasting
+
+1. **Multi-source data integration** — Demand-side and behavioral covariates (Google Trends search indices, exchange rates) are combined with environmental variables (Open-Meteo weather) and macroeconomic indicators (World Bank GDP series) into a unified input space, providing richer context than single-source approaches.
+
+2. **Consensus-based feature selection** — Rather than relying on any single criterion, seven independent selection methods (Pearson, Spearman, Mutual Information, Lasso, Random Forest importance, permutation importance, SHAP values, and Granger causality) are aggregated into a consensus-weighted score. Only features that rank highly across multiple criteria are retained, improving both reliability and interpretability.
+
+3. **Bayesian Optimization and Genetic Algorithm integration** — Each base learner (SVR and TsFormer) is independently fine-tuned using Bayesian Optimization with time-series-aware cross-validation. Ensemble weights are then searched via a Genetic Algorithm under a normalization constraint, minimizing validation-set RMSE. This end-to-end automated optimization is theoretically grounded in the bias-variance-diversity decomposition:
    ```
    ℒ_ensemble = noise + bias + variance − diversity
    ```
 
-3. **Consensus-based feature selection** — Aggregates seven selection criteria (Pearson, Spearman, Mutual Information, Lasso, Random Forest importance, permutation importance, SHAP values, and Granger causality) to identify the most reliable and informative predictors.
+4. **Explainable AI (XAI)** — SHAP-based feature attribution is applied to the final ensemble to make model behavior transparent. Prediction-level SHAP explanations are surfaced in the Tourism Intelligence Dashboard, enabling non-technical decision-makers to inspect and trust the drivers behind individual forecast outputs.
 
-4. **Panel Ridge Regression for flow distribution** — Leverages multi-site cross-sectional pooling to overcome the endemic data scarcity problem at individual attraction levels in developing tourism economies.
+### Visitor Flow Distribution
 
-5. **Dynamic Visitor Load Index (VLI)** — Replaces static carrying-capacity thresholds with a continuous, predicted-demand-based load index that enables proactive congestion diagnosis and redistribution planning.
+5. **Panel Ridge Regression for flow distribution** — Leverages multi-site cross-sectional pooling to overcome the endemic data scarcity problem at individual attraction levels in developing tourism economies.
+
+6. **Dynamic Visitor Load Index (VLI)** — Replaces static carrying-capacity thresholds with a continuous, predicted-demand-based load index that enables proactive congestion diagnosis and redistribution planning.
 
 ---
 
